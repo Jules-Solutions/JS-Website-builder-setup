@@ -11,8 +11,9 @@ detection_signals:
   has_figma_file: false
   has_html_artifact: true           # exactly one .html file at root
   html_artifact_count: 1
-  ai_output_signature: true         # Tailwind-class density + inline styles + React-flavored markup
+  ai_output_signature: true         # filename hint + Tailwind class density + inline styles
   detected_signals:
+    - filename_hint                 # filename "claude-landing.html" matches AI-output hint list
     - tailwind_utility_classes      # ≥10 distinct utility classes
     - jsx_classname_attribute       # className= (not class=) → React-source provenance
     - inline_style_with_css_vars    # <style> with custom properties

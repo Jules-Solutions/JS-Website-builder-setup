@@ -42,7 +42,10 @@ HUGO_CONFIG_NAMES = {"hugo.toml", "config.toml"}  # config.toml is ambiguous; ch
 WORDPRESS_MARKERS = {"wp-config.php", "wp-config-sample.php"}
 
 # Files that exist in pre-bootstrap meta-shape and DON'T disqualify "empty".
-META_FILES = {".gitkeep", "README.md", "readme.md", "LICENSE", "LICENSE.md", ".gitignore"}
+# This set MUST match Captain C's `trivial` set in
+# `hooks-handlers/session_start.py::is_effectively_empty` so the reference
+# detector and the production hook agree on which files mean "greenfield."
+META_FILES = {"README.md", "LICENSE", ".gitignore", ".gitattributes"}
 
 
 def _list_root_files(project_dir: Path) -> list[Path]:
@@ -164,14 +167,43 @@ TAILWIND_UTILITY_RE = re.compile(
 JSX_CLASSNAME_RE = re.compile(r'\bclassName\s*=\s*["\']', re.IGNORECASE)
 INLINE_STYLE_VARS_RE = re.compile(r'<style[^>]*>[\s\S]*?--[a-z-]+\s*:[\s\S]*?</style>', re.IGNORECASE)
 
+# Filename-hint heuristic — matches Captain C's `AI_OUTPUT_FILENAME_HINTS` in
+# hooks-handlers/session_start.py. A single .html file at root with one of these
+# substrings in its filename is treated as AI-output. This is the strongest
+# user-driven signal (the user has likely named their export after the source
+# tool — `claude-export.html`, `gpt-landing.html`, `v0-attempt.html`, etc.).
+AI_OUTPUT_FILENAME_HINTS: tuple[str, ...] = (
+    "claude",
+    "chatgpt",
+    "gpt",
+    "v0",
+    "lovable",
+    "bolt",
+    "cursor",
+    "ai-output",
+    "generated",
+)
 
-def _detect_ai_output_signature(html_text: str) -> dict[str, bool]:
-    """Return signal flags for AI-output classification."""
-    # Count distinct utility-class hits
+
+def _filename_hint_matches(filename: str) -> bool:
+    """True if any AI-output filename hint substring appears in `filename`."""
+    name = filename.lower()
+    return any(hint in name for hint in AI_OUTPUT_FILENAME_HINTS)
+
+
+def _detect_ai_output_signature(html_path: Path, html_text: str) -> dict[str, bool]:
+    """Return signal flags for AI-output classification.
+
+    Uses both filename-hint detection (strong signal — matches Captain C) and
+    content-pattern detection (Tailwind class density + JSX className + inline
+    style with CSS vars) so either path can classify a fixture.
+    """
     utility_hits = TAILWIND_UTILITY_RE.findall(html_text)
     jsx_classname = bool(JSX_CLASSNAME_RE.search(html_text))
     inline_style_vars = bool(INLINE_STYLE_VARS_RE.search(html_text))
+    filename_hint = _filename_hint_matches(html_path.name)
     return {
+        "filename_hint": filename_hint,
         "tailwind_utility_classes": len(utility_hits) >= 10,
         "jsx_classname_attribute": jsx_classname,
         "inline_style_with_css_vars": inline_style_vars,
@@ -312,10 +344,13 @@ def detect(project_dir: Path) -> DetectionResult:
         # Only check AI-output signature if there's exactly one HTML and no other dirs
         # (multi-file static site = has-existing-site fallthrough; not yet a fixture in v0.1)
         html_text = root_html[0].read_text(encoding="utf-8", errors="replace")
-        ai_signals = _detect_ai_output_signature(html_text)
-        # AI-output signature: at least 2 of 3 sub-signals must hit
-        ai_match_count = sum(1 for v in ai_signals.values() if v)
-        if ai_match_count >= 2:
+        ai_signals = _detect_ai_output_signature(root_html[0], html_text)
+        # AI-output signature: filename hint alone is sufficient (matches Captain C's
+        # production hook), OR at least 2 of the 3 content sub-signals must hit
+        # (catches fixtures with generic filenames but recognizable AI-output patterns).
+        content_signals = {k: v for k, v in ai_signals.items() if k != "filename_hint"}
+        content_match_count = sum(1 for v in content_signals.values() if v)
+        if ai_signals["filename_hint"] or content_match_count >= 2:
             signals = dict(base_signals)
             signals["html_artifact_count"] = 1
             signals["ai_output_signature"] = True

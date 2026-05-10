@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -192,42 +193,70 @@ def _find_session_start_hook() -> Path | None:
     return None
 
 
-def _hook_invocation_command(hook_path: Path, project_dir: Path) -> list[str]:
-    """Build the command to invoke the hook against a project dir."""
+def _hook_invocation_command(hook_path: Path) -> list[str]:
+    """
+    Build the command to invoke the hook. The caller passes `cwd=str(project_dir)`
+    to subprocess.run; the hook reads `Path.cwd()` (matching CC's SessionStart
+    semantics — CC sets cwd to the user's project at session start, the hook
+    inspects that cwd). We do NOT pass project_dir as argv[1] because Captain C's
+    session_start.py reads Path.cwd() directly and ignores argv per the CC spec.
+    """
     if hook_path.suffix == ".py":
-        return [sys.executable, str(hook_path), str(project_dir)]
+        return [sys.executable, str(hook_path)]
     # bash script
-    return ["bash", str(hook_path), str(project_dir)]
+    return ["bash", str(hook_path)]
+
+
+_JSON_FENCE_RE = re.compile(r"```(?:json)?\s*\n(\{[\s\S]*?\})\s*\n```", re.MULTILINE)
 
 
 def _parse_hook_output(stdout: str) -> dict[str, Any] | None:
     """
-    Try to parse the hook's stdout as either JSON or YAML.
+    Extract the structured hook output dict from stdout.
 
-    Captain C's hook may emit:
-      - JSON object on stdout (preferred for machine-parseability)
-      - YAML object on stdout
-      - A line starting with `entry_mode:` followed by structured data
+    Captain C's SessionStart hook emits prose markdown intended for CC to inject
+    into the agent's session context (matches CC SessionStart hook semantics:
+    stdout becomes agent-readable context, not machine output). Inside that
+    prose, the hook embeds a `## Machine-readable summary` section with a
+    fenced JSON block carrying the structured fields (`entry_mode`,
+    `entry_signals`, `project_root`, etc.).
 
-    Returns parsed dict or None if unparseable.
+    Parser strategy, in order:
+      1. Whole stdout parses as JSON object → use it (covers a future hook that
+         outputs pure JSON, or a custom test runner).
+      2. Whole stdout parses as YAML object → use it.
+      3. First fenced ```json ... ``` block parses as JSON object → use it
+         (Captain C's actual production format; the prose around the fence is
+         agent-context, the fence is the machine surface).
+
+    Returns parsed dict or None if all three strategies fail.
     """
     stdout = stdout.strip()
     if not stdout:
         return None
-    # Try JSON first
+    # Strategy 1 — whole stdout as JSON
     try:
         parsed_json = json.loads(stdout)
         if isinstance(parsed_json, dict):
             return parsed_json
     except json.JSONDecodeError:
         pass
-    # Try YAML
+    # Strategy 2 — whole stdout as YAML
     try:
         parsed_yaml = yaml.safe_load(stdout)
         if isinstance(parsed_yaml, dict):
             return parsed_yaml
     except yaml.YAMLError:
         pass
+    # Strategy 3 — extract first ```json ... ``` fenced block from markdown prose
+    for match in _JSON_FENCE_RE.finditer(stdout):
+        candidate = match.group(1)
+        try:
+            parsed_fence = json.loads(candidate)
+            if isinstance(parsed_fence, dict):
+                return parsed_fence
+        except json.JSONDecodeError:
+            continue
     return None
 
 
@@ -258,12 +287,13 @@ class TestHookIntegration:
         expected = _load_expected(entry_mode)
         tempdir = _make_tempdir_with_fixture(entry_mode)
         try:
-            cmd = _hook_invocation_command(self.hook, tempdir)
+            cmd = _hook_invocation_command(self.hook)
             proc = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 env={**os.environ, "CLAUDE_PLUGIN_ROOT": str(PLUGIN_ROOT)},
+                cwd=str(tempdir),  # hook reads Path.cwd() per CC SessionStart spec
                 timeout=30,
             )
             assert proc.returncode == 0, (
@@ -370,16 +400,20 @@ class TestBootstrapSkill:
         expected = _load_expected(entry_mode)
         tempdir = _make_tempdir_with_fixture(entry_mode)
         try:
+            # Same cwd-not-argv pattern as TestHookIntegration: bootstrap runner
+            # operates on Path.cwd() (matching the SessionStart hook's convention,
+            # since the wb-bootstrap skill runs in the same CC-set cwd context).
             cmd = (
-                [sys.executable, str(self.runner), str(tempdir)]
+                [sys.executable, str(self.runner)]
                 if self.runner.suffix == ".py"
-                else ["bash", str(self.runner), str(tempdir)]
+                else ["bash", str(self.runner)]
             )
             proc = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 env={**os.environ, "CLAUDE_PLUGIN_ROOT": str(PLUGIN_ROOT)},
+                cwd=str(tempdir),  # runner reads Path.cwd() per CC SessionStart spec
                 timeout=60,
             )
             assert proc.returncode == 0, (
