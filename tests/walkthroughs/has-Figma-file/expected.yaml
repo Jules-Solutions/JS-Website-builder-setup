@@ -1,0 +1,51 @@
+# Expected detection + bootstrap output for the `has-Figma-file` fixture.
+
+# --- Hook output (Captain C) ---
+entry_mode: has-Figma-file
+detection_confidence: high
+detection_signals:
+  empty_or_near_empty: false
+  has_stack_config: false
+  has_framework_in_package_json: false
+  has_framer_dir: false
+  has_figma_file: true             # primary detection signal
+  figma_file_count: 1
+  figma_file_at_root: true
+  has_html_artifact: false
+
+# --- Downstream routing ---
+next_phase: 6.5                    # ingest the Figma file
+runs_phase_6_5_at_start: true
+phase_6_5_extractors:
+  - figma-design-to-json           # user-in-the-loop: user runs Figma plugin,
+                                   # pastes JSON; agent ingests
+                                   # per extraction/figma-design-to-json.md
+ingestion_targets:
+  - brand.yaml.tokens              # design tokens from Figma
+  - components.yaml                # frame structures → component specs
+  - content/pages/*.md             # frame text content → page prose
+                                   # (sitemap.yaml may or may not be derivable
+                                   #  depending on Figma file structure)
+
+# --- Bootstrap output (Captain D) — .website-builder/ initialization ---
+website_builder_dir_created: true
+project_yaml_assertions:
+  entry_mode: has-Figma-file
+  current_phase: 0                 # bootstrap pre-phase
+  stack: null                      # NOT pre-detected — Figma is stack-agnostic;
+                                   # user picks at phase 11
+  stack_pre_detected: false
+  cms: null
+  languages: null
+
+# --- Files / dirs that MUST exist after bootstrap ---
+required_paths:
+  - .website-builder/
+  - .website-builder/project.yaml
+  - .website-builder/README.md
+  - .gitignore
+
+# --- Files / dirs that MUST NOT exist after bootstrap ---
+forbidden_paths:
+  - .website-builder/brand.yaml             # populated by phase 6.5 ingest
+  - .website-builder/components.yaml        # same

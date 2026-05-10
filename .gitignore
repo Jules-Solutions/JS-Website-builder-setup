@@ -38,6 +38,8 @@ htmlcov/
 build/
 dist/
 *.egg
+.venv/
+venv/
 
 # Node / JS / TS
 node_modules/

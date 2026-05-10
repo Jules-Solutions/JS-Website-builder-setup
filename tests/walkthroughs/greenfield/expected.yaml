@@ -1,0 +1,47 @@
+# Expected detection + bootstrap output for the `greenfield` fixture.
+#
+# Tested by tests/smoke_test.py against:
+#   1. SessionStart hook output (entry-mode detection) — Captain C's surface
+#   2. wb-bootstrap skill output (.website-builder/ initialization) — Captain D's surface
+#
+# v0.1 scope: detection + initialization shape. End-to-end agent invocation
+# deferred to Phase 7-8 cosplay/Ralph tests.
+
+# --- Hook output (Captain C) ---
+entry_mode: greenfield
+detection_confidence: high
+detection_signals:
+  empty_or_near_empty: true        # only .gitkeep / README.md / similar meta-files
+  has_stack_config: false          # no next.config.js / astro.config.js / etc.
+  has_framer_dir: false            # no .framer/
+  has_figma_file: false            # no *.fig
+  has_html_artifact: false         # no AI-output .html
+
+# --- Downstream routing ---
+next_phase: 1                      # phase 1 = idea
+runs_phase_6_5_at_start: false     # no artifact to ingest
+
+# --- Bootstrap output (Captain D) — .website-builder/ initialization ---
+website_builder_dir_created: true
+project_yaml_assertions:
+  entry_mode: greenfield
+  current_phase: 0                 # bootstrap completes before phase 1 begins
+  stack: null                      # set later at phase 11
+  cms: null                        # set later at phase 12
+  transactional: null              # set later at phase 11
+  languages: null                  # set later at phase 14 / i18n decision
+  default_language: null
+  design_skill_flavor: null        # set during bootstrap interview if asked, else null
+  component_library: null
+
+# --- Files / dirs that MUST exist after bootstrap ---
+required_paths:
+  - .website-builder/
+  - .website-builder/project.yaml
+  - .website-builder/README.md     # auto-generated per DESIGN-project-scaffold.md
+  - .gitignore                     # bootstrap creates / extends .gitignore
+
+# --- Files / dirs that MUST NOT exist after greenfield bootstrap ---
+forbidden_paths:
+  - .website-builder/decisions/ingest-*.md   # no ingestion ran
+  - .website-builder/outputs/                # no external-tool outputs to ingest
