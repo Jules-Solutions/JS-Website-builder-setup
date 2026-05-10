@@ -1,0 +1,50 @@
+# Expected detection + bootstrap output for the `has-Framer-attempt` fixture.
+
+# --- Hook output (Captain C) ---
+entry_mode: has-Framer-attempt
+detection_confidence: high
+detection_signals:
+  empty_or_near_empty: false
+  has_stack_config: false           # no Next/Astro/etc. configs
+  has_framework_in_package_json: false
+  has_framer_dir: true              # primary detection signal
+  framer_dir_at_root: true
+  has_figma_file: false
+  has_html_artifact: false
+
+# --- Downstream routing ---
+next_phase: 6.5                    # ingest the Framer project
+runs_phase_6_5_at_start: true
+phase_6_5_extractors:
+  - framer-adapter                 # per stacks/DESIGN-stack-framer.md Phase 6.5 ingestion
+                                   # (Captain F authors in Phase 3)
+ingestion_targets:
+  - brand.yaml.tokens              # Framer style tokens → brand tokens
+  - sitemap.yaml                   # Framer pages → sitemap
+  - components.yaml                # Framer components → component specs
+  - content/pages/*.md             # Framer page prose
+
+# --- Bootstrap output (Captain D) — .website-builder/ initialization ---
+website_builder_dir_created: true
+project_yaml_assertions:
+  entry_mode: has-Framer-attempt
+  current_phase: 0                 # bootstrap pre-phase
+  stack: framer                    # pre-detected from .framer/ directory
+  stack_pre_detected: true
+  cms: framer-cms                  # Framer's built-in CMS (default if user has Framer Pro)
+  cms_pre_detected: true
+  languages: null
+  component_library: framer-custom
+
+# --- Files / dirs that MUST exist after bootstrap ---
+required_paths:
+  - .website-builder/
+  - .website-builder/project.yaml
+  - .website-builder/README.md
+  - .gitignore
+
+# --- Files / dirs that MUST NOT exist after bootstrap ---
+forbidden_paths:
+  - .website-builder/brand.yaml             # populated by phase 6.5 ingest
+  - .website-builder/sitemap.yaml           # same
+  - .website-builder/components.yaml        # same

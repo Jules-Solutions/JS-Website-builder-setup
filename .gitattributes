@@ -1,0 +1,34 @@
+# Default: text files use LF line endings consistently across platforms.
+* text=auto eol=lf
+
+# Shell scripts MUST use LF — CRLF breaks bash on Linux/macOS.
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Python — LF (PEP 8 + portable across platforms).
+*.py text eol=lf
+
+# YAML / JSON / TOML / MD — LF for portability.
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+
+# Windows-only files keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files — never modify.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.fig binary

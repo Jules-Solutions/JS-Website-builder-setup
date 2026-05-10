@@ -1,0 +1,56 @@
+# Expected detection + bootstrap output for the `has-existing-site` fixture.
+
+# --- Hook output (Captain C) ---
+entry_mode: has-existing-site
+detection_confidence: high
+detection_signals:
+  empty_or_near_empty: false
+  has_stack_config: true             # next.config.js present
+  detected_stack: nextjs             # determined by config + package.json
+  has_framework_in_package_json: true
+  framework: next
+  app_router_present: true           # app/ dir with page.tsx
+  pages_router_present: false
+  has_framer_dir: false
+  has_figma_file: false
+  has_html_artifact: false           # multi-file framework project, not one-shot AI
+
+# --- Downstream routing ---
+next_phase: 6.5                    # ingest existing site before continuing main pipeline
+runs_phase_6_5_at_start: true
+phase_6_5_extractors:
+  - playwright-walk                # walk live URL if user provides one
+  - stitch                         # extract DESIGN tokens from URL
+  - ai-output                      # parse local source files for tokens + content
+ingestion_targets:
+  - brand.yaml.tokens              # design tokens from existing site
+  - sitemap.yaml                   # page structure
+  - components.yaml                # component shapes
+  - content/pages/*.md             # extracted page prose
+  - content/strings/{lang}.json    # extracted microcopy
+
+# --- Bootstrap output (Captain D) — .website-builder/ initialization ---
+website_builder_dir_created: true
+project_yaml_assertions:
+  entry_mode: has-existing-site
+  current_phase: 0                 # bootstrap pre-phase
+  stack: nextjs                    # pre-detected from config (user can override)
+  stack_pre_detected: true         # signals to phase 11 that stack is already chosen
+  cms: null                        # not yet detected (phase 12 picks)
+  languages: null
+  component_library: null
+
+# --- Files / dirs that MUST exist after bootstrap ---
+required_paths:
+  - .website-builder/
+  - .website-builder/project.yaml
+  - .website-builder/README.md
+  - .gitignore
+
+# --- Files / dirs that MUST NOT exist after bootstrap (pre-phase-6.5) ---
+# Phase 6.5 ingestion runs separately after bootstrap, surfacing the agent's
+# AskUserQuestion to confirm. Bootstrap itself does NOT pre-populate these.
+forbidden_paths:
+  - .website-builder/brand.yaml             # populated by phase 6.5 ingest, not bootstrap
+  - .website-builder/sitemap.yaml           # same
+  - .website-builder/components.yaml        # same
