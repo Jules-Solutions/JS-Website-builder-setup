@@ -1,0 +1,23 @@
+{
+  "name": "website-builder",
+  "version": "0.1.0",
+  "description": "A Claude Code plugin that turns CC into a freelancer-shaped collaborator for users building websites — disciplined, refuses to skip steps, drags users through the right phases. A process and discipline framework, not a component library.",
+  "author": {
+    "name": "Jules.Solutions",
+    "email": "hello@jules.solutions",
+    "url": "https://jules.solutions"
+  },
+  "homepage": "https://github.com/Jules-Solutions/JS-Website-builder-setup",
+  "repository": "https://github.com/Jules-Solutions/JS-Website-builder-setup",
+  "license": "UNLICENSED",
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "website-builder",
+    "freelancer",
+    "design-discipline",
+    "stack-agnostic",
+    "no-code",
+    "low-code"
+  ]
+}

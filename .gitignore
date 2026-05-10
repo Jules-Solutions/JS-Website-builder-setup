@@ -1,0 +1,73 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.swn
+*~
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+build/
+dist/
+*.egg
+
+# Node / JS / TS
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+.next/
+.nuxt/
+.turbo/
+.cache/
+*.tsbuildinfo
+yarn-error.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Claude Code temp
+.claude/temp/
+
+# Test fixtures local state (re-generated)
+tests/.fixtures-state/
+tests/coverage/
+
+# Plugin runtime state (user-side artifacts that shouldn't ship in plugin repo)
+.website-builder/
+
+# Logs
+*.log
+logs/
+
+# Local-only override files (per-developer)
+*.local.json
+*.local.yaml
+*.local.toml

@@ -1,0 +1,4 @@
+{
+  "description": "website-builder plugin hooks — populated by Captain C with SessionStart (entry-mode detection) and PreToolUse (anti-skip gating) handlers per foundation/DESIGN-architecture.md.",
+  "hooks": {}
+}
