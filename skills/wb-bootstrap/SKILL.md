@@ -14,7 +14,7 @@ version: 0.1.0
 
 Runs the website-builder plugin's first-run setup in the user's project directory. Five concerns:
 
-1. **Entry-mode detection + confirmation** — five canonical entry modes per locked decision 15 (greenfield / has-existing-site / has-AI-output / has-Framer-attempt / has-Figma-file). The plugin's SessionStart hook (per `hooks-handlers/session-start.sh`) scans for signals; this skill confirms with the user via `AskUserQuestion`.
+1. **Entry-mode detection + confirmation** — five canonical entry modes per locked decision 15 (greenfield / has-existing-site / has-AI-output / has-Framer-attempt / has-Figma-file). The plugin's SessionStart hook (per `hooks-handlers/session_start.py`) scans for signals and emits a context block to STDOUT, which CC injects into the agent's session context. This skill consumes that injected context and confirms with the user via `AskUserQuestion`.
 2. **Secrets-backend choice** — `.env` (muggle default, single-machine simple) vs 1Password CLI (opt-in for multi-machine / power-user setups). Per locked decision 29.
 3. **Upstream skill install** — runs `scripts/install-skills.sh` to fetch the user-picked design-skill flavor (v0.1 ships UI/UX Pro Max only per decision 55; full 6-flavor surface in expansion phase 10) into the user's `~/.claude/skills/` directory. Per locked decision 32.
 4. **`.website-builder/` state-dir initialization** — creates the canonical layout per `foundation/DESIGN-project-scaffold.md` with sensible `project.yaml` defaults seeded from the entry mode + secrets-backend choices.
@@ -33,26 +33,46 @@ The skill is **re-runnable**. If invoked when partial state exists (e.g., a prev
 
 ## Step-by-step instructions for the agent
 
-### Step 1 — Read the SessionStart hook's detection signal
+### Step 1 — Read the SessionStart hook's detection signal from the agent's session context
 
-The SessionStart hook (Captain C's territory; lives at `hooks-handlers/session-start.sh`) scans the user's project directory and writes a detected entry-mode signal to `.website-builder/.bootstrap-signal.json` (or surfaces it via injected context). Read it. The signal looks like:
+The SessionStart hook (Captain C's territory; `hooks-handlers/session_start.py`) emits a context block to STDOUT at CC startup. Per the canonical CC SessionStart hook spec, CC injects that STDOUT directly into the agent's session context — there is **no signal file on disk**. By the time this skill is invoked, that context is already in the agent's session and the agent reads it directly.
+
+Look for the context block in the existing session context. It begins with the literal heading `# website-builder — session context` and contains either:
+
+- A `## Fresh project (no `.website-builder/` state yet)` section (when the user is starting fresh) with bulleted lines:
+  - `- Detected entry mode: **<mode>**` — one of `greenfield`, `has-existing-site`, `has-Framer-attempt`, `has-AI-output`, `has-Figma-file`
+  - `- Signal: <signal description>` — short prose describing what the hook saw
+  - `- Markers found:` — list of marker files / dirs that drove the detection (e.g., `framer.json`, `*.fig`, `package.json`)
+  - Optional fields: `- Figma files:`, `- AI-output file:`, `- Top-level entries:`
+
+- A `## Mid-project (`.website-builder/` exists)` section (when re-entering an existing project) with bulleted lines:
+  - `- Current phase: **<n>**`
+  - `- Entry mode: <mode>` — the mode from `project.yaml`
+  - `- Stack`, `- CMS`, `- Languages`, `- Transactional` — the locked-in choices
+
+Both sections are followed by a `## Machine-readable summary` section containing a fenced ` ```json ` block. The JSON shape:
 
 ```json
 {
-  "detected_entry_mode": "has-framer-attempt",
-  "confidence": "high",
-  "signals": {
-    "framer_files": ["framer.json", "site/"],
-    "ai_output_html": [],
-    "figma_files": [],
-    "existing_deployment": null,
-    "build_artifacts": ["framer.json"]
+  "plugin": "website-builder",
+  "project_root": "/path/to/user/project",
+  "state_present": false,
+  "entry_mode": "has-Framer-attempt",
+  "entry_signals": {
+    "signal": "Framer project detected",
+    "markers": [{"marker": "framer.json", "label": "Framer project file"}]
   },
-  "scanned_at": "2026-05-10T14:32:00Z"
+  "project_state": null
 }
 ```
 
-If the signal file doesn't exist (the hook didn't run, or you're invoked in a context where the hook didn't fire), fall through to greenfield-default. Mention this to the user as a small caveat: *"I didn't get a signal from the entry-mode detector — defaulting to greenfield. If that's wrong, pick the right mode below."*
+When `state_present` is `true`, `entry_mode` and `entry_signals` are `null` and `project_state` is the parsed `project.yaml` from disk. When `state_present` is `false`, `project_state` is `null` and the entry-mode fields are populated.
+
+**How to consume**: prefer the JSON record (it's machine-readable and unambiguous). Fall back to the markdown bullets if the JSON block is malformed or missing — the markdown is the same data in human-readable form.
+
+**Special case — developer in plugin dir**: if the cwd is the plugin install directory itself (the hook detects this via `CLAUDE_PLUGIN_ROOT`), the context block is a brief diagnostic only ("cwd is the plugin install dir; skipping entry-mode detection") with no entry-mode fields. Surface this to the user verbatim and stand down — they need to open a real user-project directory before bootstrap is meaningful.
+
+**If the SessionStart context is absent** (the hook didn't fire, the skill is invoked outside a CC session, or the context block was elided), fall through to greenfield-default. Mention this to the user as a small caveat: *"I didn't get a signal from the entry-mode detector — defaulting to greenfield. If that's wrong, pick the right mode below."*
 
 ### Step 2 — Confirm entry mode with the user
 
