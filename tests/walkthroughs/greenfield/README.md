@@ -10,10 +10,12 @@ This is the canonical "happy path" entry mode (per locked decision 15) — the u
 
 ```
 fixture/
-└── .gitkeep   (empty — the project directory is bare)
+└── .gitignore   (empty — the project directory is bare)
 ```
 
-A truly empty project directory cannot be checked into git (git doesn't track empty dirs); `.gitkeep` is a zero-byte placeholder so the fixture is preservable. The detection logic should treat the presence of `.gitkeep` (and nothing else) as equivalent to "empty" — the file is a fixture-preservation artifact, not a real project file.
+A truly empty project directory cannot be checked into git (git doesn't track empty dirs); a zero-byte `.gitignore` is the placeholder that preserves the fixture in source control. The detection logic must treat `.gitignore` as a "trivial" file that does not disqualify the dir from `greenfield` classification — it's universally part of any new project.
+
+The plugin's production hook (`hooks-handlers/session_start.py::is_effectively_empty`) treats `{README.md, LICENSE, .gitignore, .gitattributes}` as the trivial-file set; the reference detector in `tests/detector.py::META_FILES` matches that exact set so detection agrees across hook and reference implementations. (`.gitkeep` is NOT in either trivial set — using it as a fixture placeholder would cause a false `ambiguous` classification, which is why this fixture uses `.gitignore` instead.)
 
 ## Expected behavior
 

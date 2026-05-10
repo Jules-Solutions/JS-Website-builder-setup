@@ -11,7 +11,7 @@
 entry_mode: greenfield
 detection_confidence: high
 detection_signals:
-  empty_or_near_empty: true        # only .gitkeep / README.md / similar meta-files
+  empty_or_near_empty: true        # only .gitignore / README.md / LICENSE / .gitattributes (Captain C's trivial set)
   has_stack_config: false          # no next.config.js / astro.config.js / etc.
   has_framer_dir: false            # no .framer/
   has_figma_file: false            # no *.fig

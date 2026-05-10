@@ -12,10 +12,11 @@ Per locked decision 15 + `DESIGN-architecture.md` line 248:
 
 ```
 fixture/
-└── landing.html       # single self-contained AI-output file with React-flavored / Tailwind-laden markup
+└── claude-landing.html       # single self-contained AI-output file with React-flavored / Tailwind-laden markup
 ```
 
 The fixture is a single HTML file with hallmarks of an AI-generated landing page:
+- **Filename hint** — `claude-landing.html` matches Captain C's production hook's filename-hint list (`claude`, `chatgpt`, `gpt`, `v0`, `lovable`, `bolt`, `cursor`, `ai-output`, `generated`). This is the strongest user-driven signal: users typically name their AI export after the source tool.
 - Tailwind utility classes (recognized by the AI-output extractor per `extraction/ai-output.md`)
 - Inline `<style>` block with custom CSS variables
 - Inline `<script>` for interactive bits
@@ -34,16 +35,16 @@ The fixture is a single HTML file with hallmarks of an AI-generated landing page
 
 Per `DESIGN-ingestion-and-extraction.md` §"AI-output parser":
 
-**AI-output detection (must match enough of these):**
-- Exactly one `.html` / `.htm` file at project root (or in a top-level subdir)
-- File contains Tailwind utility-class patterns (`class="flex items-center gap-4 ..."` densely; ≥10 distinct utility classes)
-- OR file contains React/JSX-like structures saved as HTML (`<div className="...` — note `className` not `class`)
-- OR file contains inline `<style>` with CSS custom properties + a single page section structure
+**AI-output detection (any one of these is sufficient):**
+- **Filename hint** (Captain C's production hook signal): a single `.html` file at project root whose name contains `claude`, `chatgpt`, `gpt`, `v0`, `lovable`, `bolt`, `cursor`, `ai-output`, or `generated`. Strongest signal — users typically name their export after the source tool.
+- **Content patterns** (reference detector signal): file contains Tailwind utility-class patterns (`class="flex items-center gap-4 ..."` densely; ≥10 distinct utility classes), OR React/JSX-like structures saved as HTML (`<div className="...` — note `className` not `class`), OR inline `<style>` with CSS custom properties. The reference detector requires ≥2 of these 3 content sub-signals to fire.
+
+Required negative signals (eliminate other entry modes):
 - No `package.json` referencing a framework (eliminates `has-existing-site`)
 - No `.framer/` directory (eliminates `has-Framer-attempt`)
 - No `.fig` files (eliminates `has-Figma-file`)
 
-This fixture's `landing.html` is intentionally Tailwind-heavy to trigger the strongest signal.
+This fixture's `claude-landing.html` triggers BOTH the filename-hint signal AND all three content sub-signals — maximum confidence.
 
 ## Distinguishing edge cases
 
