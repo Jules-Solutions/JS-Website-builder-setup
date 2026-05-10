@@ -28,6 +28,7 @@ import json
 import re
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
+from typing import Any
 
 
 # --- Detection signal helpers ----------------------------------------------
@@ -183,7 +184,11 @@ def _detect_ai_output_signature(html_text: str) -> dict[str, bool]:
 class DetectionResult:
     entry_mode: str  # one of: greenfield | has-existing-site | has-AI-output | has-Framer-attempt | has-Figma-file | ambiguous
     detection_confidence: str  # high | medium | low | none
-    detection_signals: dict = field(default_factory=dict)
+    # Signals dict holds heterogeneous values: bool flags, int counts (e.g. figma_file_count),
+    # str labels (e.g. detected_stack), and list[str] (e.g. detected_signals). Typed as Any to
+    # accept all of them; Pyright's strict mode would otherwise narrow to dict[str, bool] from
+    # the first initializer call site and fire reportArgumentType on every other write.
+    detection_signals: dict[str, Any] = field(default_factory=dict)
     next_phase: float = 1.0  # 1.0 = phase 1 (idea); 6.5 = phase 6.5 (artifact ingestion)
     runs_phase_6_5_at_start: bool = False
     phase_6_5_extractors: list[str] = field(default_factory=list)
@@ -193,7 +198,7 @@ class DetectionResult:
     detected_cms: str | None = None
     detected_component_library: str | None = None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
@@ -232,7 +237,7 @@ def detect(project_dir: Path) -> DetectionResult:
     pages_router = _has_pages_router(project_dir)
     root_html = [p for p in _list_root_files(project_dir) if p.suffix.lower() in {".html", ".htm"}]
 
-    base_signals = {
+    base_signals: dict[str, Any] = {
         "empty_or_near_empty": is_empty,
         "has_stack_config": stack_from_config is not None,
         "has_framework_in_package_json": framework_from_pkg is not None,

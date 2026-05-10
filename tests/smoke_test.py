@@ -38,6 +38,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import Any
 
 import pytest
 import yaml
@@ -199,7 +200,7 @@ def _hook_invocation_command(hook_path: Path, project_dir: Path) -> list[str]:
     return ["bash", str(hook_path), str(project_dir)]
 
 
-def _parse_hook_output(stdout: str) -> dict | None:
+def _parse_hook_output(stdout: str) -> dict[str, Any] | None:
     """
     Try to parse the hook's stdout as either JSON or YAML.
 
@@ -215,14 +216,16 @@ def _parse_hook_output(stdout: str) -> dict | None:
         return None
     # Try JSON first
     try:
-        return json.loads(stdout)
+        parsed_json = json.loads(stdout)
+        if isinstance(parsed_json, dict):
+            return parsed_json
     except json.JSONDecodeError:
         pass
     # Try YAML
     try:
-        parsed = yaml.safe_load(stdout)
-        if isinstance(parsed, dict):
-            return parsed
+        parsed_yaml = yaml.safe_load(stdout)
+        if isinstance(parsed_yaml, dict):
+            return parsed_yaml
     except yaml.YAMLError:
         pass
     return None
@@ -234,6 +237,11 @@ class TestHookIntegration:
     branch. When it exists, invokes the hook and compares its output to
     expected.yaml.
     """
+
+    # Class-level annotation: tests run only after _skip_if_missing has set this,
+    # so within test methods the attribute is guaranteed Path (not None). The
+    # annotation tells Pyright the same.
+    hook: Path
 
     @pytest.fixture(autouse=True)
     def _skip_if_missing(self):
@@ -333,6 +341,10 @@ class TestBootstrapSkill:
       b. SKILL.md present but no runnable invocation script → skipped
          (skill must be exercised via real CC session — Phase 7-8 scope)
     """
+
+    # Class-level annotation: tests run only after _skip_if_missing has set this,
+    # so within test methods the attribute is guaranteed Path (not None).
+    runner: Path
 
     @pytest.fixture(autouse=True)
     def _skip_if_missing(self):
