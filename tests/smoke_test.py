@@ -335,11 +335,22 @@ def _find_bootstrap_runner() -> Path | None:
     runner exists, this test invokes it; otherwise, this Tier 2 test is skipped
     (the SKILL.md exists, but the test harness can't invoke a skill in
     isolation — that requires a live CC session, which is Phase 7-8 scope).
+
+    Discovery preference order: Python runner first, shell runner second. When
+    both ship (the Phase 2 CL-1 reality — `.sh` is a thin cross-OS launcher
+    that delegates to the `.py` runner where the actual bootstrap logic lives),
+    invoking the `.py` runner directly is portable across all subprocess /
+    bash combinations (including Windows-Python invoking WSL-bash, where
+    `["bash", "C:\\path\\with\\backslashes\\file.sh"]` fails because WSL bash
+    mangles backslash escapes and cannot resolve `C:\\` drive paths). The
+    `.py` runner runs identically under any Python interpreter the test was
+    launched with. Preserving `.sh` as a fallback keeps POSIX-only `.sh`
+    deliveries supported.
     """
     candidates = [
-        PLUGIN_ROOT / "scripts" / "wb-bootstrap.sh",
         PLUGIN_ROOT / "scripts" / "wb-bootstrap.py",
         PLUGIN_ROOT / "scripts" / "wb_bootstrap.py",
+        PLUGIN_ROOT / "scripts" / "wb-bootstrap.sh",
     ]
     for c in candidates:
         if c.is_file():
