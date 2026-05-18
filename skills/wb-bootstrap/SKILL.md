@@ -173,7 +173,7 @@ Create the canonical layout per `foundation/DESIGN-project-scaffold.md`. Minimum
 
 ```
 .website-builder/
-├── project.yaml              # seeded with entry-mode, secrets-backend, plugin version, current_phase: 1
+├── project.yaml              # seeded with entry-mode, secrets-backend, plugin version, current_phase: 0 (bootstrap pre-phase; phase 1 = idea questionnaire is the next step the agent enters AFTER bootstrap)
 ├── content/                  # empty subdirs ready to be filled by downstream phases
 │   ├── pages/
 │   └── strings/
@@ -285,7 +285,7 @@ slug: ""
 
 # Pipeline state
 entry_mode: "greenfield"        # set by Step 2
-current_phase: 1                # phase 1 = idea questionnaire (next up)
+current_phase: 0                # 0 = bootstrap pre-phase complete, agent has NOT yet entered phase 1; phase 1 (idea questionnaire) is the next step the agent enters after bootstrap. Matches the 5 entry-mode fixtures + scripts/wb-bootstrap runner.
 phase_locked: false             # true once a phase is locked, prevents accidental rollback
 
 # Secrets backend (set by Step 3)
