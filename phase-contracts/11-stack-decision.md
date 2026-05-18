@@ -3,6 +3,7 @@ phase: 11
 name: Stack decision (plus sibling, transactional decision)
 group: architecture
 pipeline_section: architecture
+skill: wb-architecture
 prev_phase: 10
 next_phase: 12
 re_runnable: false

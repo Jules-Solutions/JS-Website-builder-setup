@@ -3,6 +3,7 @@ phase: 9
 name: Sitemap
 group: content-foundation
 pipeline_section: content-foundation
+skill: wb-content-foundation
 prev_phase: 8
 next_phase: 10
 re_runnable: false

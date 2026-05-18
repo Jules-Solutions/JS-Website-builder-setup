@@ -3,6 +3,7 @@ phase: 13
 name: Content per page
 group: content-wireframes
 pipeline_section: content-wireframes
+skill: wb-content
 prev_phase: 12
 next_phase: 14
 re_runnable: false

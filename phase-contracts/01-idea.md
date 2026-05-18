@@ -3,6 +3,7 @@ phase: 1
 name: Idea
 group: discovery-strategy
 pipeline_section: discovery-strategy
+skill: wb-discovery
 prev_phase: ~
 next_phase: 2
 re_runnable: false

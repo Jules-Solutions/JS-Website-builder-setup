@@ -3,6 +3,7 @@ phase: 8
 name: Image strategy + generation plan
 group: content-foundation
 pipeline_section: content-foundation
+skill: wb-content-foundation
 prev_phase: 7
 next_phase: 9
 re_runnable: false

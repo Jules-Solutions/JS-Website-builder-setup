@@ -3,6 +3,7 @@ phase: 10
 name: Information architecture / nav strategy
 group: architecture
 pipeline_section: architecture
+skill: wb-architecture
 prev_phase: 9
 next_phase: 11
 re_runnable: false

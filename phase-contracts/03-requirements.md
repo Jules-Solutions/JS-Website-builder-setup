@@ -3,6 +3,7 @@ phase: 3
 name: Requirements
 group: discovery-strategy
 pipeline_section: discovery-strategy
+skill: wb-discovery
 prev_phase: 2
 next_phase: 4
 re_runnable: false

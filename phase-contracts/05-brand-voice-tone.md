@@ -3,6 +3,7 @@ phase: 5
 name: Brand voice & tone
 group: discovery-strategy
 pipeline_section: discovery-strategy
+skill: wb-discovery
 prev_phase: 4
 next_phase: 6
 re_runnable: false

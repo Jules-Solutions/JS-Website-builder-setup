@@ -3,6 +3,7 @@ phase: 4
 name: Project / company info
 group: discovery-strategy
 pipeline_section: discovery-strategy
+skill: wb-discovery
 prev_phase: 3
 next_phase: 5
 re_runnable: false

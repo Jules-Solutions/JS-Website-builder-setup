@@ -3,6 +3,7 @@ phase: 12
 name: CMS decision
 group: architecture
 pipeline_section: architecture
+skill: wb-architecture
 prev_phase: 11
 next_phase: 13
 re_runnable: false

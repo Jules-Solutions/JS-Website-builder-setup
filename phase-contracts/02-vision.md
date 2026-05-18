@@ -3,6 +3,7 @@ phase: 2
 name: Vision
 group: discovery-strategy
 pipeline_section: discovery-strategy
+skill: wb-discovery
 prev_phase: 1
 next_phase: 3
 re_runnable: false

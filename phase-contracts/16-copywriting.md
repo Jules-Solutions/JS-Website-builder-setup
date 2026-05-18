@@ -3,6 +3,7 @@ phase: 16
 name: Copywriting
 group: content-wireframes
 pipeline_section: content-wireframes
+skill: wb-content
 prev_phase: 15
 next_phase: 17
 re_runnable: false

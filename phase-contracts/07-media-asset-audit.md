@@ -3,6 +3,7 @@ phase: 7
 name: Media refinement / asset audit
 group: content-foundation
 pipeline_section: content-foundation
+skill: wb-content-foundation
 prev_phase: 6
 next_phase: 8
 re_runnable: false

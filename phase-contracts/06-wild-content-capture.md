@@ -3,6 +3,7 @@ phase: 6
 name: Wild unstructured content capture
 group: content-foundation
 pipeline_section: content-foundation
+skill: wb-content-foundation
 prev_phase: 5
 next_phase: 7
 re_runnable: false
