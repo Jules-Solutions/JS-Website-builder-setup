@@ -39,6 +39,7 @@ Refuse to start if any is unmet (the contract enumerates these — surface the s
 
 - Phase 17 complete — `brand.yaml.tokens` + `brand.yaml.tokens.css` exist (OKLCH colors, type scale, spacing, motion, dark-mode). A component that does not reference these is a gating failure.
 - Phase 11 complete — `project.yaml.stack` + `project.yaml.transactional` set. The stack determines the component-library candidate set.
+- Phase 9 complete — `sitemap.yaml` exists and is locked. Phases 13–15 derive the component inventory from it; this is the transitive prerequisite for a complete inventory.
 - Phases 13–15 complete — `content/pages/*.md` + `content/sections.yaml` name every component the site needs. This inventory is the contract phase 18 must fully satisfy.
 - Phase 16 complete — components are built against real content, not lorem ipsum.
 

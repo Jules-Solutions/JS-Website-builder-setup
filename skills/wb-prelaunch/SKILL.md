@@ -96,7 +96,3 @@ Treat a 404 on a canonical legal source as a Tier-2 fall-back: WebSearch reputab
 - **`references/jurisdiction-legal.md`** — phases 24c + 25 legal regimes: EU Consumer Rights Directive (14-day withdrawal + digital-supply-consent waiver + the 2023/2673 withdrawal-button), Swiss VAT (8.1%, CHF 100k threshold, fiscal representative) + Swiss imprint (UWG Art. 3(1)(s)) + revFADP, US sales-tax nexus, UK consumer law, the EU cookie-consent valid-consent requirements + 2026 enforcement, the not-a-lawyer discipline.
 - **`references/seo-structured-data.md`** — phase 26: the schema.org type-per-page catalog with core properties, the per-page metadata checklist, the JSON-LD validation workflow, the LLM-discoverability check, the sitemap/robots build-wiring.
 - **`references/cross-browser-qa.md`** — phase 27: the full Safari-specific bug checklist with fixes, the browser × device matrix grid schema, the pre-launch-layer re-verification list, the known-bug gate procedure.
-
-## Provenance
-
-Authored 2026-05-18 by Captain `wb-prelaunch-captain-1` (Stage 2.B of the website-builder build) per `Workstreams/website-builder/scratch/PHASE-2B-CAPTAIN-PROMPT-TEMPLATE.md` (the `wb-prelaunch` matrix row). Drives phases 24-27 incl. the conditional commerce branch 24a/b/c. Design-doc primacy: substantive contracts are the phase-contract MDs + the `commerce/`, `cross-cutting/`, and `foundation/` design docs cited inline. MVP commerce per locked decisions 54 (Stripe Checkout + Cal.com) + 26 (TWINT-via-Stripe for Switzerland).

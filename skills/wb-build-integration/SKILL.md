@@ -6,7 +6,7 @@ version: 0.1.0
 
 # wb-build-integration — Composition → Responsive → A11y → Perf → Forms
 
-> The single skill for the build-integration phase group (phases 19-23, per locked Decision 64). It turns the parts built in phases 14-18 into a real site that is assembled, intentionally responsive, accessible, fast, and functionally working — verified, not asserted, at every step.
+> The single skill for the build-integration phase group (phases 19-23, per locked Decision 64). It assembles the components and content produced by earlier phases into a real site that is intentionally responsive, accessible, fast, and functionally working — verified, not asserted, at every step.
 >
 > Source of truth: the five phase contracts at `phase-contracts/19-composition.md`, `phase-contracts/20-responsive-mobile.md`, `phase-contracts/21-accessibility-audit.md`, `phase-contracts/22-performance-audit.md`, `phase-contracts/23-forms-interactive.md`. This skill is the procedural overlay; the contracts are authoritative on mission, entry/exit, gating, and outputs. Read the relevant contract verbatim at each phase entry.
 

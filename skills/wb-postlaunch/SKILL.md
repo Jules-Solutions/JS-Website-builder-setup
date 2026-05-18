@@ -109,8 +109,8 @@ At **phase 32**, when the user wants the v1.1 roadmap kept as a living changelog
 
 - Design — post-launch maintainer template + the launch-once-vs-ongoing split (decisions 28/37/45/49): `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md`
 - Design — Skills anatomy + how phase-group skills layer on the agent profile: `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills (lines 193-201)
-- Design — pipeline source for phases 31-34: `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` §§ 31-34
-- Phase contracts (authoritative per-phase behavior): `phase-contracts/31-launch-announcement.md`, `32-iteration-roadmap.md`, `33-maintenance-cadence.md`, `34-monitoring-backup.md`
+- Design — pipeline *design ancestry* (seeded the contracts; NOT runtime authority): `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` §§ 31-34
+- Phase contracts (**authoritative** per-phase runtime behavior — read these, not the design ancestry above): `phase-contracts/31-launch-announcement.md`, `32-iteration-roadmap.md`, `33-maintenance-cadence.md`, `34-monitoring-backup.md`
 - Phase 29 (the deploy wizard that pre-decides cadence/monitoring/backup — read before phases 33/34): `phase-contracts/29-hosting-deployment.md`
 - Secrets handling (monitor/error-tracking tokens — user-supplied, referenced not persisted): `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md`
 - Locked decisions 28 / 37 / 45 / 49 — STATE doc: `Workstreams/website-builder/website-builder.md`
