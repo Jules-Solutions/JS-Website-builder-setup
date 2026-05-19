@@ -122,17 +122,166 @@ Per-stack sections below carry the specific emission code + verification mechani
 
 ### WordPress
 
-<!-- TODO — authored by Phase 3 Captain H per INST-wb-phase3-captain-wordpress.md.
-     This section MUST cover:
-     - Polylang: hreflang auto-emitted; verify via Polylang Settings → URL Modifications → enabled
-     - WPML: hreflang auto-emitted via WPML SEO module
-     - When the plugin's hreflang is wrong/missing: manual emission via theme `header.php` reading from `pll_languages_list()` (Polylang) or `apply_filters('wpml_active_languages', ...)` (WPML)
-     - x-default handling: Polylang adds it by default; WPML configurable in WPML → Languages
-     - Region codes: configure per plugin (Polylang Settings → Languages → Locale; WPML → Languages → Edit)
-     - Verification: WP admin → Polylang/WPML report; production curl `<head>`; Google Search Console
-     - Known WP gotchas: caching plugins (WP Rocket, W3 Total Cache) can serve stale hreflang to the wrong locale — clear cache after locale changes
-     - Cross-reference: `adapters/stack-wordpress.md#i18n-recipe`, `i18n/language-switcher.md#wordpress`
--->
+WordPress's i18n plugins auto-emit hreflang on every public page when properly configured. The agent's job is verification + manual fallback when plugin output is wrong (broken caching, custom routes the plugin doesn't see, plugin disabled mid-project).
+
+**Polylang — hreflang auto-emit.** Enabled by default when "URL Modifications" is on (`wp-admin/admin.php?page=mlang_settings` → "URL modifications" tab → verify "Hide URL language information for default language" + "Modifications" settings match the `project.yaml.language_routing` choice). Polylang emits one `<link rel="alternate" hreflang="...">` per language per public page including the current page's own hreflang + an `x-default` pointing at the `default_language` version.
+
+Verification:
+
+```bash
+# Production verification
+curl -s https://example.com/about | grep -i 'hreflang'
+
+# Expected (for site supporting en + de + fr, default en, prefix routing):
+# <link rel="alternate" hreflang="en" href="https://example.com/about" />
+# <link rel="alternate" hreflang="de" href="https://example.com/de/about" />
+# <link rel="alternate" hreflang="fr" href="https://example.com/fr/about" />
+# <link rel="alternate" hreflang="x-default" href="https://example.com/about" />
+```
+
+**WPML — hreflang auto-emit.** Enabled via WPML's SEO module (`wp-admin/admin.php?page=sitepress-multilingual-cms/menu/languages.php` → "SEO" tab → "Add hreflang tag" → On). x-default behavior is configurable here (default = `default_language`; can be set to a specific language or omitted). Region codes (Swiss `de-CH` / `fr-CH` / `it-CH` etc.) configured at the per-language level via "Edit Languages" → "Default Locale".
+
+**Region codes — both plugins.** When `project.yaml.language_regions` is set (e.g. Swiss multilingual: `de: de-CH`, `fr: fr-CH`, `it: it-CH`), the agent configures each plugin's per-language locale field to emit the region-tagged code:
+
+- **Polylang:** Settings → Languages → Edit → "Locale" field → set to `de_CH` (underscore in WP convention; converted to `de-CH` in hreflang output).
+- **WPML:** Languages → Edit Languages → "Default Locale" → set to `de-CH` directly.
+
+**Manual emission fallback (when plugin output is wrong or missing).** Emit hreflang directly from the theme's `wp_head` hook using the plugin's API. Use this when (a) Polylang/WPML disabled mid-project; (b) custom post types that the plugin doesn't include in its default scope; (c) caching plugin serving stale plugin output.
+
+Polylang variant:
+
+```php
+<?php
+/**
+ * functions.php — manual hreflang emission fallback for WordPress + Polylang.
+ * Use ONLY when Polylang's auto-emit is missing or wrong; otherwise rely on plugin.
+ */
+add_action( 'wp_head', function () {
+    if ( is_admin() || ! function_exists( 'pll_the_languages' ) ) {
+        return;
+    }
+
+    // Skip non-public pages
+    if ( is_404() || is_user_logged_in() ) {
+        // Drop the is_user_logged_in() check if you serve hreflang for logged-in too
+    }
+
+    $langs = pll_the_languages( array(
+        'raw'           => 1,
+        'hide_if_empty' => 0,
+    ) );
+
+    if ( empty( $langs ) ) {
+        return;
+    }
+
+    $default_lang = pll_default_language();
+
+    foreach ( $langs as $lang ) {
+        printf(
+            "<link rel=\"alternate\" hreflang=\"%s\" href=\"%s\" />\n",
+            esc_attr( $lang['locale'] ),                       // e.g. de-CH if configured
+            esc_url( $lang['url'] )
+        );
+    }
+
+    // x-default — points to default-language version
+    $default = isset( $langs[ $default_lang ] ) ? $langs[ $default_lang ] : null;
+    if ( $default ) {
+        printf(
+            "<link rel=\"alternate\" hreflang=\"x-default\" href=\"%s\" />\n",
+            esc_url( $default['url'] )
+        );
+    }
+}, 5 );
+?>
+```
+
+WPML variant:
+
+```php
+<?php
+add_action( 'wp_head', function () {
+    if ( is_admin() ) {
+        return;
+    }
+
+    $languages = apply_filters( 'wpml_active_languages', null, array(
+        'skip_missing' => 0,
+    ) );
+
+    if ( empty( $languages ) ) {
+        return;
+    }
+
+    $default_code = apply_filters( 'wpml_default_language', null );
+
+    foreach ( $languages as $lang ) {
+        printf(
+            "<link rel=\"alternate\" hreflang=\"%s\" href=\"%s\" />\n",
+            esc_attr( $lang['default_locale'] ),
+            esc_url( $lang['url'] )
+        );
+    }
+
+    if ( isset( $languages[ $default_code ]['url'] ) ) {
+        printf(
+            "<link rel=\"alternate\" hreflang=\"x-default\" href=\"%s\" />\n",
+            esc_url( $languages[ $default_code ]['url'] )
+        );
+    }
+}, 5 );
+?>
+```
+
+Both fallbacks check `is_admin()` to avoid emitting on `/wp-admin/*` pages.
+
+**x-default handling.** Polylang adds x-default automatically pointing at `default_language` when "URL Modifications" is on. WPML's behavior is configurable in `wp-admin/admin.php?page=sitepress-multilingual-cms/menu/languages.php` → "SEO" → "x-default". If neither plugin is emitting x-default OR pointing it at the wrong language, use the manual-emission fallback above (it includes x-default by default).
+
+**Caching plugin interaction (this is the failure mode users hit most often).** WP Rocket, W3 Total Cache, LiteSpeed Cache, and managed-host page caches (Kinsta, WP Engine, SiteGround) all cache the rendered `<head>` per URL. If the cache key doesn't include locale, the wrong-locale hreflang gets served:
+
+- **WP Rocket:** Settings → "Add-ons" → enable "WPML" or "Polylang" add-on; cache keys vary by locale automatically. Verify after every plugin update.
+- **W3 Total Cache:** Performance → "Page Cache" → "Cache by user agent group" + create a group per language (more brittle than the WP Rocket path; consider switching).
+- **LiteSpeed Cache:** Cache → "Cache" → "Vary by Language" → set per Polylang/WPML; works cleanly with LiteSpeed-hosted servers.
+- **Cloudflare:** Add a Cache Rule that varies by URL prefix (`/de/*`, `/fr/*`, etc.) OR by `Accept-Language` header. "Always Online" must be off OR explicitly per-language to avoid cross-locale serving.
+
+After ANY locale config change (Polylang/WPML settings, language added/removed, routing-strategy switch), purge ALL caches: plugin + Cloudflare + managed-host. Verify with the curl check above on three random pages, one per language.
+
+**Region targeting — Swiss + multi-region case study.** For Swiss multilingual sites (DE/FR/IT/EN), the canonical region map is `de-CH`, `fr-CH`, `it-CH`, `en`. Configure in `project.yaml`:
+
+```yaml
+languages: [en, de, fr, it]
+default_language: en
+language_routing: prefix
+language_regions:
+  en: en           # not Swiss-targeted; bare 'en' so Google serves to English-speakers globally
+  de: de-CH
+  fr: fr-CH
+  it: it-CH
+```
+
+Then in Polylang Settings → Languages → Edit for each → set "Locale" to `de_CH` / `fr_CH` / `it_CH` (note WP's underscore convention internally; plugin renders to dash-form in HTML).
+
+**Common WordPress hreflang failure modes (in addition to the general failure-modes table above):**
+
+| WP-specific failure | Cause | Fix |
+|---|---|---|
+| hreflang appears in `view-source` but not in browser inspector | A plugin (often a "minify HTML" plugin like Autoptimize) is stripping `<link>` tags | Configure the minify plugin to preserve `<link rel="alternate">` tags |
+| hreflang for one language only (current page) | i18n plugin not active OR "URL Modifications" off | Activate plugin + enable URL Modifications |
+| All pages emit `<example.com/wp-admin/...>` for hreflang | `home_url()` returns wrong base | Verify Settings → General → WordPress Address + Site Address are correct |
+| Custom post type pages have no hreflang | i18n plugin not configured for that CPT | Polylang: Settings → Languages → "Custom post types and Taxonomies" — enable the CPT. WPML: WPML → Settings → "Post Types Translation" — enable. |
+| Sitemap.xml lists translated URLs but hreflang missing | Yoast/RankMath sitemap separate from plugin's hreflang | Verify Yoast's "Languages" XML sitemap extension is active (if using Yoast WPML SEO) |
+| Page passes browser hreflang check but Google Search Console flags reciprocity error | One language's page links to translations; the translation's page doesn't link back | Audit each language's HTML head; ensure ALL pages emit the SAME set of hreflang tags (per the §29 spec line: hreflang must be reciprocal) |
+
+**Verification — post-deploy.** Phase 26 (SEO audit) + phase 29 (deploy verification):
+
+1. `curl -s https://example.com/about | grep hreflang` — expect every language + x-default.
+2. Same for `/de/about` and `/fr/about` — reciprocity check (must emit identical set).
+3. WP admin: Polylang Settings → URL Modifications → reads the live state; WPML → Languages → "SEO" tab shows hreflang status.
+4. Google Search Console (post first Google crawl, ~phase 30) → International Targeting report → flags reciprocity errors.
+5. https://hreflang.org online validator — paste production URL + alternates; reports broken chains.
+
+**Cross-reference:** `adapters/stack-wordpress.md` §"i18n integration" (this Captain's authored §5), `i18n/language-switcher.md#wordpress` (paired switcher implementation that ships matching `hreflang=` attributes on `<a>` links), `i18n/strings-schema.md` (CDJSON layer that doesn't touch hreflang directly — adjacent).
 
 ---
 
