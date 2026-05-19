@@ -64,6 +64,9 @@ tests/coverage/
 
 # Plugin runtime state (user-side artifacts that shouldn't ship in plugin repo)
 .website-builder/
+# Exception: test fixtures DO ship — they ARE the per-adapter test contract
+!tests/adapters/*/fixture/.website-builder/
+!tests/adapters/*/fixture/.website-builder/**
 
 # Logs
 *.log
