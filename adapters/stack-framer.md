@@ -60,11 +60,49 @@ Code Components are written locally in `code/` (Framer convention), pushed via `
 
 **Verify-at-entry:** the exact `framer-cli` package name + command surface has shifted across Framer releases. Re-fetch from context7 `/websites/framer_developers` or WebFetch `https://www.framer.com/developers` at the user's setup step.
 
-### MCP / tooling
+### MCP servers (recommended at setup)
 
-**No official Framer MCP server exists as of 2026-05-19.** The agent operates the Plugins / Managed Collection / Localization REST APIs via `Bash` + `curl` or via a small Python wrapper at `.website-builder/library/scripts/framer-api.py`. The agent re-invokes context7 + WebFetch at phase 18 + 24a + 28 to confirm current REST surface.
+The plugin does **not** bundle any MCP server — same discipline as the existing `mcp__playwright__*` integration: the user installs each MCP they want in their own Claude Code config (`.mcp.json` project-scoped OR `~/.claude.json` user-scoped per CC plugin spec); the agent uses each MCP when present and falls back to direct REST/CLI when not. The agent's session-start checks tool-surface availability and surfaces missing MCPs at phase 11 setup so the user can install the ones they want before the pipeline reaches the phase that consumes them.
 
-If/when a Framer MCP server lands, swap the curl path for MCP tool calls — same operations, cleaner surface.
+Verified-current ecosystem as of 2026-05-20. Per Lock-3 + `.claude/rules/tool-dependency-discipline.md` Tier-2 discipline: re-verify install snippets via context7 / WebFetch at the user's setup step — MCP install commands + auth surfaces drift.
+
+#### Framer-specific MCPs
+
+| MCP | Maintainer + canonical URL | Install path | Agent uses at | Fallback when not installed |
+|---|---|---|---|---|
+| **"MCP: AI Plugin" (Framer Marketplace, Tommy D. Rossi)** | Community / free. Marketplace: https://www.framer.com/marketplace/plugins/mcp/ — author profile https://www.framer.com/@unframer/ | (1) Install the Framer plugin from the Marketplace into the user's Framer project (one-click in Editor). (2) Open the plugin in the Editor — it generates a per-project WebSocket tunnel URL via a Cloudflare Worker, keyed by the user's Framer ID. (3) Add to user's CC config as a remote/HTTP MCP entry per the URL the plugin shows. Plugin must stay OPEN in the Framer Editor for the tunnel to be live. | **Phase 17** (push Color/Text Styles into the open project's canvas) · **Phase 18** (insert generated Code Components directly via the running plugin instead of `framer push`) · **Phase 22** (rewrite copy via canvas-driven CMS updates) · **Phase 6.5** (read canvas state for re-ingestion / drift detection) | All operations route through Plugins API + REST surface per `### CRUD vocabulary` — `framer push` for Code Components, `framer.plugins.createCollection` / `collection.addItems` for CMS, `/api/managed-collection/*` REST for headless seeding. Slower (user re-loads Editor to see API-pushed changes) but functionally equivalent. |
+| **"Design Bridge MCP" (Framer Marketplace, Jay Wilcox)** | Community / free. Marketplace: https://www.framer.com/marketplace/plugins/design-bridge-mcp/ — third-party catalog: https://www.framerjungle.com/plugins/design-bridge-mcp | Same as above (install Framer plugin → plugin emits a tunnel URL → add to CC MCP config). 70 automation tools per the marketplace description (frames / text / images / SVGs / layer management / CMS); narrower than Tommy D. Rossi's plugin in some areas, broader in others. | **Phase 18** (frame primitives + SVG insertion on canvas) · **Phase 14** (wireframe Frame seeding) — useful when Tommy D. Rossi's plugin isn't installed AND user wants any canvas-side automation | Same fallback as above (REST / CLI surface). |
+| **Sheshiyer/framer-plugin-mcp (GitHub)** | Community / GitHub: https://github.com/Sheshiyer/framer-plugin-mcp — Awesome MCP listing: https://mcpservers.org/servers/Sheshiyer/framer-plugin-mcp | **OUT OF SCOPE for this adapter.** Per the README intro: this MCP **scaffolds new Framer plugins** (with web3 capabilities); it does NOT operate existing Framer sites. Listed here so future Captains don't confuse it with the marketplace MCP plugins above. | n/a — not consumed by the website-builder pipeline | n/a |
+
+#### Framer-official MCP status (per Commander Round-3 verification)
+
+There is **no first-party Framer-built MCP server** as of 2026-05-20. The Framer community thread "Support for MCP Server Integration in Framer" (https://www.framer.community/c/support/support-for-mcp-server-integration-in-framer) is open; the agent re-checks at phase 11 setup via context7 + WebFetch. The two marketplace plugins above are **community-maintained**; they're the strongest available signal that Framer-side MCP integration is real, viable, and CC-compatible — but they are NOT Framer-maintained. Surface this to the user at phase 11 with the explicit "community-maintained, may break with Framer Editor updates" caveat.
+
+#### Cross-cutting MCPs that apply to Framer's pipeline
+
+| MCP | Maintainer + canonical URL | Install path | Agent uses at | Fallback when not installed |
+|---|---|---|---|---|
+| **Playwright MCP** (`@playwright/mcp`) | Microsoft, official: https://github.com/microsoft/playwright-mcp — v0.0.75 released 2026-05-07 | `.mcp.json`: `{"mcpServers": {"playwright": {"command": "npx", "args": ["@playwright/mcp@latest"]}}}` | **Phase 6.5** ingestion of existing Framer / non-Framer sites (paired with Stitch screenshot mode per `extraction/playwright-walk.md`) · **Phase 20** responsive walk · **Phase 22** a11y + perf walk · **Phase 29** deploy verification walk · **Phase 30** analytics + hreflang verification | Without Playwright MCP, the existing-site walks degrade — user must capture screenshots manually and feed to Stitch's screenshot mode; per-viewport / hover / scroll state coverage drops sharply. Tier-2 capability degradation surfaced at phase 11 if user wants `has-existing-site` entry mode. |
+| **Cloudflare MCP** (`mcp.cloudflare.com`) | Cloudflare, official: https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/ | `.mcp.json`: `{"mcpServers": {"cloudflare": {"url": "https://mcp.cloudflare.com/mcp"}}}` — OAuth on first invocation (no API token needed; user picks scopes in browser). Single "API" server exposes all 2,500+ endpoints via two tools (`search()` + `execute()`); product-specific servers also available (DNS Analytics, Workers, etc.). | **Phase 28** custom domain setup — DNS CNAME / A record creation against the user's Cloudflare zone; verifying SSL propagation. Replaces the existing § "Deploy" guidance "walks user through setting CNAME / A records on their registrar" with automated DNS record creation. | User manually creates DNS records in their Cloudflare dashboard (or whatever DNS provider they use — Cloudflare MCP doesn't help if they're on Namecheap/Route53/etc.). Agent provides explicit copy-paste-ready record values. Note: the older community DNS-only MCP at `IAMSamuelRodda/cloudflare-mcp` was **archived 2026-02-16** — point users at the official Cloudflare URL above. |
+| **Stripe MCP** (`@stripe/mcp`) | Stripe, official: https://docs.stripe.com/mcp | `.mcp.json` local: `{"mcpServers": {"stripe": {"command": "npx", "args": ["-y", "@stripe/mcp@latest"], "env": {"STRIPE_SECRET_KEY": "<your-test-key>"}}}}` — OR remote: `{"servers": {"stripe": {"type": "http", "url": "https://mcp.stripe.com"}}}`. Auth: STRIPE_SECRET_KEY env var OR OAuth via remote endpoint. | **Phase 24a** commerce platform setup — create products / prices / Payment Links / Checkout Sessions for the Framer site's Stripe-backed buy buttons · **Phase 24b** payment-provider wiring — confirm TWINT / iDEAL / SEPA / Klarna enabled on the user's Stripe account for the target market | Without Stripe MCP, agent emits configuration instructions for the user to apply manually in Stripe dashboard + generates the Stripe.js client-side embed code from the existing `### Commerce integration` recipes. Slower, fully functional. |
+| **Lemon Squeezy MCP** (community: `IntrepidServicesLLC/lemonsqueezy-mcp-server`) | Community / GitHub: https://github.com/IntrepidServicesLLC/lemonsqueezy-mcp-server — multiple alternates (`atharvagupta2003/mcp-lemonsqueezy`, `MichaelWeed/lemon-squeezy-mcp`); none Lemon Squeezy-official yet | Per chosen implementation's README (varies). Typically: clone repo → `npm install && npm run build` → add to `.mcp.json` with `LEMONSQUEEZY_API_KEY` env var. Re-verify maintenance status at session-setup — community implementations vary in update velocity. | **Phase 24a** (Lemon Squeezy is the recommended-default commerce platform for Framer per § "Commerce integration"). Create products / variants / discounts; pull order data for the site's success-page; manage subscriptions. | Lemon Squeezy's own dashboard + REST API directly via `curl` from the agent. Agent generates Buy Button HTML / Code Component wrapper from existing recipes; user wires the embed manually. |
+| **GitHub MCP** (official) | GitHub, official: https://github.com/github/github-mcp-server | `.mcp.json` remote: `{"servers": {"github": {"type": "http", "url": "https://api.githubcopilot.com/mcp/"}}}` (OAuth via VS Code 1.101+ / Claude Code). OR local Docker: `docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server`. 80+ tools across repos / issues / PRs / Actions / code security / discussions. | **Phase 18** when user wants `code/{Component}.tsx` Code Components tracked in their own GitHub repo (alternate to Framer-only source-of-truth) — agent commits + opens PRs directly · **Phase 28** when deploy involves a GitHub-triggered Cloudflare Worker or Vercel webhook · **Post-launch** repo maintenance loops | Without GitHub MCP, the agent uses `gh` CLI (foundation-pack-equivalent) for the same operations — functionally complete, slightly more friction per command. |
+| **Sentry MCP** (`@sentry/mcp-server`) | Sentry, official: https://github.com/getsentry/sentry-mcp — hosted at https://mcp.sentry.dev | Remote: OAuth via `https://mcp.sentry.dev`. Local: `.mcp.json`: `{"mcpServers": {"sentry": {"command": "npx", "args": ["@sentry/mcp-server"], "env": {"SENTRY_ACCESS_TOKEN": "<token>"}}}}`. Tools: `search_events`, `search_issues`, full event/trace pull. | **Phase 34** post-launch monitoring — if user wired Sentry into their Framer site (via Custom Code head injection of the Sentry browser SDK), agent investigates errors directly without leaving the session. Optional but recommended for production Framer sites. | User pastes Sentry dashboard errors into the chat; agent reasons from prose. Tier-2 friction; agent surfaces "wire Sentry MCP for tighter monitoring loops" as a follow-up. |
+| **Plausible MCP** (community: `alexanderop/plausible-mcp`) | Community / GitHub: https://github.com/alexanderop/plausible-mcp — v1.0.0 (initial release; few commits — verify maintenance at setup) | Build-from-source currently (no npx package yet): `git clone ... && npm install && npm run build`. `.mcp.json` with `PLAUSIBLE_API_KEY` env var; tools: `plausible_query`, `plausible_aggregate`, `plausible_breakdown`, `plausible_timeseries`. | **Phase 34** post-launch monitoring — if user picked Plausible at phase 28 analytics, agent pulls site stats directly into the session. | Plausible dashboard URL; user pastes screenshots / stats; agent reasons from those. |
+| **Google Analytics MCP / GA4** (third-party via Composio etc.) | Multiple third-party implementations (Composio: https://composio.dev/toolkits/google_analytics/framework/claude-code); no Google-official MCP as of 2026-05-20 | Per implementation. Composio's: managed OAuth + tool-router pattern (account-bound rather than self-hosted). | **Phase 34** post-launch monitoring (alternate to Plausible) | Same as Plausible fallback. |
+| **Image-generation MCPs** (multiple) | Several active implementations: `TamerinTECH/claude-code-generate-images-mcp` (Azure OpenAI + Flux + Gemini); `GongRzhe/Image-Generation-MCP-Server` (Replicate Flux); various others | Per implementation. TamerinTECH's: `git clone + ./install.sh`; env vars per provider (`GEMINI_API_KEY` or `AZURE_OPENAI_*`). | **Phase 8** image strategy + **Phase 17** brand visual generation + **Phase 18** Code Component asset generation — generate hero images, illustrations, OG images, favicons in-session and upload to Framer Assets | Per `consumers/image-gen.md` (the plugin's existing consumer-fallback path per locked decision 56 v1 strategy): user pastes images they generated externally; agent ingests via phase 6.5. Slower; pre-existing v1 path. |
+| **Vercel MCP** (official) | Vercel, official: https://vercel.com/docs/mcp/vercel-mcp — remote at https://mcp.vercel.com (Beta as of 2026-02-12) | `claude mcp add --transport http vercel https://mcp.vercel.com` (CC native command). OAuth on first invocation. Tools: project/deployment management, deployment log analysis, Vercel docs search. | **Out of scope for Framer stack** — Framer publishes to Framer's own edge, NOT Vercel. Listed here for cross-reference because the Next.js + shadcn stack (Captain G) will rely on this. Only relevant to Framer if user pivots to Next.js via the escape hatch at phase 11 transactional flag mid-project change. | n/a |
+| **Snipcart / Cal.com / Calendly MCP** | **None verified to exist** as of 2026-05-20 (web search returned no Snipcart MCP server; Cal.com's API is documented but no official MCP wrapper found). | n/a | n/a — agent uses each platform's direct REST API / embed snippet per existing § "Commerce integration" (Snipcart) + § "Booking flows" (Cal.com / Calendly) | The existing direct-API path is fully functional; no degradation. |
+
+#### Setup-flow summary
+
+At phase 11 setup the agent surfaces the relevant MCPs the user should consider installing for their flavor of site:
+
+- **Always recommend:** Playwright MCP (if `has-existing-site` entry mode) + one of the Framer Marketplace MCP plugins (Tommy D. Rossi's first by surface breadth; Design Bridge as alternate).
+- **Recommend if applicable:** Cloudflare MCP (if user's DNS is on Cloudflare), Stripe MCP (if `transactional=true` + Stripe), Lemon Squeezy MCP (if `transactional=true` + Lemon Squeezy), GitHub MCP (if user wants Code Components in their own repo), Sentry / Plausible MCP (post-launch monitoring).
+- **Surface but don't bundle install instructions:** image-generation MCPs (user picks per provider preference / cost).
+
+The agent re-checks tool-surface availability (the `mcp__*` tool list visible in its session) at the start of each phase that has an MCP option, and degrades silently to the documented REST/CLI fallback when an expected MCP isn't present. No silent skipping — the agent surfaces "Playwright MCP not detected; falling back to manual screenshot capture" per `.claude/rules/tool-dependency-discipline.md` Tier-2 protocol.
 
 ### Project bootstrap
 
@@ -263,6 +301,8 @@ Derives from `DESIGN-stack-framer.md` lines 99-127 ("i18n integration") + `DESIG
 
 Re-runnable artifact ingestion. Per the schema, this is its own H2 (not nested under Migration) because phase 6.5 fires at multiple lifecycle points + the 5 extraction tools each need per-stack normalization.
 
+> **MCP cross-reference:** existing-site walks at phase 6.5 prefer the Playwright MCP (`@playwright/mcp`) for hover/scroll/auth-walled state capture; the Framer-Marketplace MCP plugins (Tommy D. Rossi or Design Bridge) can read live canvas state when the user has them installed. See § "MCP servers (recommended at setup)" above for install paths + fallbacks.
+
 ### Extraction tool choices per entry mode
 
 | Entry mode | Primary tool | Pair-with | Why |
@@ -299,6 +339,8 @@ Derives from `DESIGN-ingestion-and-extraction.md` + `extraction/stitch.md` + `ex
 ## Commerce integration (if transactional=true)
 
 Framer is not a commerce platform. For transactional sites on Framer the agent wires an external commerce stack via phase 24a / 24b / 24c.
+
+> **MCP cross-reference:** Stripe ships an official MCP (`@stripe/mcp` or `https://mcp.stripe.com`); Lemon Squeezy has community MCP implementations; Snipcart / Cal.com / Calendly have no MCP servers verified as of 2026-05-20 (direct REST / embed-snippet only). See § "MCP servers (recommended at setup)" above for install paths + fallbacks.
 
 ### Phase 24a — Commerce platform setup
 
@@ -435,13 +477,15 @@ Derives from `DESIGN-stack-framer.md` lines 183-193 ("Component library pairing"
 
 ## Deploy
 
+> **MCP cross-reference:** Cloudflare ships an official MCP at `https://mcp.cloudflare.com/mcp` (OAuth, two-tool `search()` + `execute()` surface over all 2,500+ Cloudflare API endpoints incl. DNS / zone / SSL); GitHub MCP (`https://api.githubcopilot.com/mcp/` OAuth or local Docker) handles repo + Actions if user wants source-of-truth in their own repo. Phase 29 deploy verification consumes Playwright MCP per § "Phase 6.5 ingestion". See § "MCP servers (recommended at setup)" above for full install paths + fallbacks.
+
 ### Hosting
 
 **Framer Publish (built-in).** One-click publish from the Framer canvas; deploys to Framer's global edge. The agent verifies deploy via Playwright walkthrough at phase 29.
 
 ### Custom domain
 
-Configured in Framer project settings → Domain. Framer provides DNS instructions (CNAME / A records). The agent walks the user through setting records on their registrar (or via Cloudflare MCP if the user uses Cloudflare for DNS — re-fetch the Cloudflare MCP surface via context7 at phase 28).
+Configured in Framer project settings → Domain. Framer provides DNS instructions (CNAME / A records). The agent walks the user through setting records on their registrar (or via the official Cloudflare MCP at `https://mcp.cloudflare.com/mcp` if the user's DNS is on Cloudflare — see § "MCP servers (recommended at setup)" for OAuth-based install).
 
 ### SSL
 
@@ -560,6 +604,7 @@ Per the Lock-3 freshness pattern.
 | 22 (i18n + a11y + perf) | `/websites/framer_developers` | "current `useLocaleInfo` hook + Localization REST API + hreflang emission + RTL handling" | `https://www.framer.com/developers/components-reference` |
 | 24a (commerce) | `/websites/framer_developers` | "current Framer + {Lemon Squeezy | Stripe | Snipcart} integration patterns + Buy Button SDKs" | platform's own docs (`https://docs.stripe.com`, `https://docs.lemonsqueezy.com`, etc.) |
 | 28-30 (deploy) | `/websites/framer_developers` | "current Framer Publish + custom domain + DNS + analytics injection patterns" | `https://www.framer.com/help` |
+| 11 setup — MCP ecosystem | (no canonical context7 ID — MCP install surfaces change frequently) | n/a | Framer Marketplace `https://www.framer.com/marketplace/plugins/mcp/` + `https://www.framer.com/marketplace/plugins/design-bridge-mcp/` ; Framer community thread `https://www.framer.community/c/support/support-for-mcp-server-integration-in-framer` ; cross-cutting MCP canonical URLs in § "MCP servers (recommended at setup)" above |
 
 ### Cache discipline
 
