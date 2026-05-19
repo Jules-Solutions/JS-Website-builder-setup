@@ -1,0 +1,42 @@
+{
+  "$language": "en",
+  "$schema": "spec/strings-v1.json",
+
+  "cta": {
+    "contact": "Get in touch",
+    "learn_more": "Learn more",
+    "submit": "Send",
+    "submit_loading": "Sending…",
+    "submit_success": "Thanks. We'll get back to you within 24 hours.",
+    "submit_error": "Something didn't work. Please try again."
+  },
+
+  "errors": {
+    "network": "Connection failed. Check your internet and try again.",
+    "validation_email": "That doesn't look like a valid email.",
+    "validation_required": "This field is required."
+  },
+
+  "nav": {
+    "primary": {
+      "home": "Home",
+      "services": "Services",
+      "about": "About",
+      "blog": "Blog",
+      "contact": "Contact"
+    },
+    "skip_to_content": "Skip to content",
+    "language_switcher_label": "Language",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu"
+  },
+
+  "dates": {
+    "format_short": "MMM d, yyyy",
+    "format_long": "MMMM d, yyyy"
+  },
+
+  "footer": {
+    "copyright": "© {year} Fixture Consultancy"
+  }
+}
