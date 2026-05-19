@@ -410,19 +410,138 @@ This is the canonical next-intl App Router navigation surface — wraps Next.js 
 
 ### WordPress
 
-<!-- TODO — authored by Phase 3 Captain H per INST-wb-phase3-captain-wordpress.md.
-     This section MUST cover:
-     - Polylang vs WPML widget choice + rationale
-     - Native widget vs custom theme template part
-     - Where in the theme to render (`header.php` / template part)
-     - hreflang emission via plugin (Polylang/WPML auto-emit) — verify per plugin
-     - Pattern auto-pick (Polylang/WPML widget vs custom template)
-     - localStorage persistence via inline JS (WP doesn't ship with state management — inline script in `wp_footer`)
-     - Accessibility: verify the plugin's widget meets WCAG; custom-fallback when it doesn't
-     - i18n string source — strings.json shipped as theme `lang/*.po` files vs inline (Polylang strings translation panel)
-     - Known WP gotchas: caching plugins must vary by locale; CDN configuration; URL rewriting
-     - Cross-reference: `adapters/stack-wordpress.md#i18n-recipe`, `i18n/hreflang.md#wordpress`
--->
+The WordPress language switcher lives in `parts/header.html` (or the alternative footer location per phase-10 / phase-17 decision) inside the block theme. Two implementation paths — pick at phase 12 based on the i18n plugin choice:
+
+**Plugin choice + widget vs custom-template trade-off.** Polylang is the default per the §5 framing in `adapters/stack-wordpress.md` (free, ~80% of WPML's features). WPML is the upgrade path for commercial sites. Both ship a native language-switcher widget (or shortcode); both can be overridden with a custom theme template part. Pick the native widget for minimum agent code; pick the custom template part for full brand control over markup + accessibility.
+
+**Pattern auto-pick (inline vs dropdown):** the agent counts `project.yaml.languages` at phase 18. 2-3 languages → inline (small chips: `EN | DE | FR`). 4+ → dropdown. Plugin widgets honor this when configured; custom template parts implement the pattern directly. Override in `project.yaml.language_switcher.pattern` if user prefers otherwise.
+
+**Path A — Polylang widget (default for muggle sites):**
+
+The Polylang widget is registered via the standard WP widget API. Drop into the header via the block editor's Widget Block (FSE-compatible) OR call the function directly from a custom template part:
+
+```php
+<?php
+/**
+ * parts/language-switcher.html — Polylang custom block wrapper
+ * Renders the inline pattern; brand-styled via theme.json color/typography presets.
+ */
+if ( function_exists( 'pll_the_languages' ) ) {
+    $languages = pll_the_languages( array(
+        'show_flags'     => 0,                  // brand-controlled — no plugin flags
+        'show_names'     => 1,
+        'display_names_as' => 'name',           // 'Deutsch' not 'de'
+        'force_home'     => 0,                  // deep-link to same page in target language
+        'hide_current'   => 0,                  // show active language highlighted
+        'hide_if_empty'  => 0,
+        'echo'           => 0,
+        'raw'            => 1,                  // returns array — we control markup
+    ) );
+
+    if ( $languages ) {
+        $current_lang = pll_current_language();
+        ?>
+        <nav class="wb-lang-switcher" aria-label="<?php esc_attr_e( 'Language', 'still-humans' ); ?>">
+          <ul role="list">
+            <?php foreach ( $languages as $lang ) : ?>
+              <li>
+                <a
+                  href="<?php echo esc_url( $lang['url'] ); ?>"
+                  hreflang="<?php echo esc_attr( $lang['locale'] ); ?>"
+                  lang="<?php echo esc_attr( $lang['slug'] ); ?>"
+                  aria-current="<?php echo $lang['slug'] === $current_lang ? 'true' : 'false'; ?>"
+                  class="<?php echo $lang['slug'] === $current_lang ? 'is-active' : ''; ?>"
+                >
+                  <?php echo esc_html( $lang['name'] ); ?>
+                </a>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </nav>
+        <?php
+    }
+}
+?>
+```
+
+The `pll_the_languages()` call returns the list of available locales with deep-linked URLs (Polylang resolves the target-language path automatically per `project.yaml.language_routing`).
+
+**Path B — WPML widget:**
+
+Same shape; different API. Replace with the `wpml_active_languages` filter:
+
+```php
+<?php
+$languages = apply_filters( 'wpml_active_languages', null, array(
+    'skip_missing' => 0,                       // include languages even if no translation
+    'orderby'      => 'custom',
+    'order'        => 'asc',
+) );
+// Same `<nav><ul>...` shape as Path A.
+```
+
+**Path C — Custom block (alternative for full design control):**
+
+When the agent's `sections.yaml` calls for a LanguageSwitcher as its own component, register a custom Gutenberg block (`wp-content/plugins/{slug}-blocks/blocks/language-switcher/`). The block's `render.php` reads the plugin's language list (Polylang OR WPML — detect at runtime) and emits the same brand-styled `<nav>` markup. Allows the user to drop the switcher into any page via the block editor.
+
+**hreflang emission via plugin.** Polylang auto-emits hreflang on every public page when "URL Modifications" is enabled (verify at `wp-admin/admin.php?page=mlang_settings`). WPML auto-emits via its SEO module. Per `i18n/hreflang.md#wordpress` for the detail + manual fallback when plugin output is wrong.
+
+**localStorage persistence pattern.** WordPress doesn't ship with client-side state; the persistence layer is implemented as an inline script enqueued in the theme's `wp_footer` action:
+
+```php
+<?php
+add_action( 'wp_footer', function () {
+    $current_lang = function_exists( 'pll_current_language' )
+        ? pll_current_language()
+        : ( defined( 'ICL_LANGUAGE_CODE' ) ? ICL_LANGUAGE_CODE : null );
+
+    if ( ! $current_lang ) {
+        return;
+    }
+    ?>
+    <script id="wb-lang-pref">
+      (function () {
+        try {
+          var current = <?php echo wp_json_encode( $current_lang ); ?>;
+          var stored = localStorage.getItem('wb_lang_pref');
+          // On click of any switcher link, store the chosen language
+          document.querySelectorAll('.wb-lang-switcher a').forEach(function (a) {
+            a.addEventListener('click', function () {
+              try { localStorage.setItem('wb_lang_pref', a.getAttribute('lang')); } catch (e) {}
+            });
+          });
+          // If user lands on root with a stored pref different from current, redirect
+          var path = location.pathname;
+          var isRoot = path === '/' || path === '';
+          if (isRoot && stored && stored !== current) {
+            // routing-prefix navigation — Polylang's pll_home_url maps to the target
+            var target = (<?php echo wp_json_encode( pll_home_url( $current_lang ) ); ?>)
+              .replace('/' + current + '/', '/' + stored + '/');
+            if (target !== location.href) { location.replace(target); }
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <?php
+}, 50 );
+?>
+```
+
+Adapt the WPML branch similarly using `wpml_language_url` filter.
+
+**Accessibility verification.** The custom-template-part path (above) ships WCAG-compliant markup by construction (`<nav aria-label>`, `aria-current` on active language, real `<a>` elements with proper `lang` + `hreflang`, 44×44px tap targets via theme.json spacing presets, focus ring from design system phase 17). The plugin widgets vary in a11y quality — Polylang's default widget is mostly clean; WPML's stock widget needs explicit overrides for `aria-current`. The agent runs phase 22 (a11y audit) verification regardless of which path the user picked.
+
+**i18n string source.** `strings.json` (Layer 3) ships as the theme's `lang/{slug}.pot` source bundle + per-locale `lang/{slug}-{lang}.po`/`.mo` files (per §5 in `adapters/stack-wordpress.md`). The `strings.nav.language_switcher_label` key becomes the `aria-label="<?php esc_attr_e( 'Language', 'still-humans' ); ?>"` PHP call. Polylang + WPML both ship a String Translation panel for in-admin string overrides; the agent's default is `.po`-file-based translation (phase 16 inline OR Pattern 2 handoff).
+
+**Known WP gotchas:**
+
+- **Caching plugins must vary cache by locale.** WP Rocket, W3 Total Cache, LiteSpeed Cache all need explicit per-locale-cache-key configuration. Without it, all visitors see the same cached language regardless of switcher action. Verify at phase 28 deploy + after every cache flush.
+- **CDN configuration.** Cloudflare's "Always Online" or "Page Rules" may bypass WordPress entirely and serve a stale locale. Set Cloudflare "Cache Level: Standard" + use Cache Rules to vary by `Accept-Language` header OR by URL prefix.
+- **URL rewriting.** Polylang + WPML both write `.htaccess` rules for routing. Conflicts with other rewrite plugins (Redirection, custom Yoast rewrites) can break the switcher. Test routing-strategy switches in staging before prod cutover.
+- **Permalink structure.** The switcher's deep-link logic depends on the permalink structure (`/%postname%/` is the canonical WP setting for prefix routing). `/?p={id}` URLs break the prefix-rewrite contract — verify at phase 28.
+- **Default-language URL ambiguity.** Polylang's default is "hide URL language information for default language" → `/about` (EN) + `/de/about` (DE). Decide at phase 12: keep the toggle on for cleaner URLs OR force `/en/about` for consistency. Either is valid; consistency matters more than choice.
+
+**Cross-reference:** `adapters/stack-wordpress.md` §"i18n integration" (this Captain's authored §5), `i18n/hreflang.md#wordpress` (paired hreflang emission), `i18n/strings-schema.md` (CDJSON contract), `i18n/rtl.md` (RTL switcher mirroring is automatic via CSS logical properties).
 
 ---
 
