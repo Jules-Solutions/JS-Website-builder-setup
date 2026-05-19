@@ -5,6 +5,43 @@ fixture_baseline: phase-11-complete
 
 expected_per_phase:
 
+  # Phase 11 — connector-setup (MCP ecosystem audit per §2 of adapter)
+  phase_11_connector_setup:
+    canonical_foundation_mcp: WordPress/mcp-adapter   # successor to archived Automattic/wordpress-mcp
+    canonical_foundation_status: active   # v0.5.0 2026-04-15, 1098 stars, not archived (verified 2026-05-20)
+    archived_predecessor_documented: Automattic/wordpress-mcp   # archived 2025-08; the §2 doctrine block names the pivot explicitly
+    authority_pivot_explicit_in_section_2: true
+    mcps_recommended_at_setup:
+      foundation:
+        - WordPress/mcp-adapter   # library; auto-creates default MCP server via Abilities API
+      cms_page_builder:
+        - msrbuilds/elementor-mcp   # only when user picks Elementor at phase 12 fallback
+        - iOSDevSK/mcp-for-woocommerce   # only when transactional=true
+        - epicwp/polylang-mcp   # default i18n per §5
+        - bjornfix/mcp-abilities-sitepress   # WPML upgrade path
+      seo:
+        - bjornfix/mcp-abilities-rankmath
+        - puneetindersingh/bulk-seo-meta-editor-for-ai-agents   # Yoast + RankMath unified
+      cross_cutting:
+        - playwright (foundation; already in plugin's stack)
+        - github/github-mcp-server   # deploys at phase 28-29
+        - cloudflare/mcp-server-cloudflare   # DNS analytics ONLY (NOT DNS record CRUD)
+        - stripe/ai @stripe/mcp   # phase 24b
+        - bytebase/dbhub   # MySQL/MariaDB advanced ops
+        - getsentry/plausible-mcp   # privacy-first analytics
+        - FGRibreau/mcp-matomo   # self-hosted Matomo analytics
+      hosting:
+        - jacob-hartmann/kinsta-mcp   # very new, 0 stars 2026-05-18 — verify at phase 28
+    mcps_negative_findings:   # no canonical MCP exists as of 2026-05-20
+      - MonsterInsights (fallback: wp-cli option get/update OR REST /wp-json/wp/v2/settings)
+      - Yoast-only standalone (fallback: bulk-seo-meta-editor-for-ai-agents covers it jointly with RankMath)
+      - WP Engine / SiteGround / Cloudways / Hostinger / Bluehost / DreamHost (fallback: REST + SFTP/SSH per host)
+      - Standalone Gutenberg block MCP (fallback: WordPress/mcp-adapter once block-editor abilities registered)
+      - WP Rocket / W3 Total Cache / LiteSpeed Cache (fallback: plugin-specific wp-cli commands)
+      - Cloudflare DNS record CRUD (cloudflare/mcp-server-cloudflare monorepo has dns-analytics only; fallback: Cloudflare REST + wrangler CLI)
+    setup_doctrine: "MCP server setup is part of the connector-setup step, not bundled with the plugin. Agent recommends; user installs. Pattern mirrors mcp__playwright__* in this plugin's foundation."
+    fallback_always_available: true   # REST + curl + wp-cli over SSH cover every path
+
   # Phase 12 — CMS decision
   phase_12_cms:
     cms_recommendation: wordpress-core
@@ -100,6 +137,26 @@ expected_per_phase:
     pot_file_generated: wp-content/themes/still-humans-theme/lang/still-humans.pot
     po_file_generated: wp-content/themes/still-humans-theme/lang/still-humans-de.po
     cache_locale_variance_configured: true   # caching plugin + Cloudflare per §6 hreflang
+    mcps_used:
+      if_installed:
+        - epicwp/polylang-mcp   # Polylang default path
+        - bjornfix/mcp-abilities-sitepress   # WPML upgrade path
+      fallback: Polylang/WPML REST + wp-cli polylang/wpml-cli over SSH
+
+  # Phase 24a-c — Commerce (when transactional=true; not in this fixture but expected_per_phase documents the contract)
+  phase_24_commerce_mcps_used:
+    if_installed:
+      - iOSDevSK/mcp-for-woocommerce   # WC CRUD
+      - stripe/ai @stripe/mcp   # Stripe payment ops + refund
+    fallback: WC REST /wp-json/wc/v3/* + Stripe REST via Bash + curl
+    note: "fixture has transactional=false so this phase doesn't fire; entry documents the contract"
+
+  # Phase 26 — SEO
+  phase_26_seo_mcps_used:
+    if_installed:
+      - bjornfix/mcp-abilities-rankmath   # RankMath path
+      - puneetindersingh/bulk-seo-meta-editor-for-ai-agents   # Yoast + RankMath unified
+    fallback: Yoast/RankMath REST + meta-field updates via WP REST
 
   # Phase 28 — Deploy
   phase_28_deploy:
@@ -119,6 +176,23 @@ expected_per_phase:
       - cloudflare (CDN)
     lighthouse_target: 80
     deploy_verification_via_playwright: true   # phase 29 walk per extraction/playwright-walk.md
+    mcps_used:
+      if_installed:
+        - github/github-mcp-server   # push-to-master + Actions monitoring
+        - cloudflare/mcp-server-cloudflare dns-analytics   # post-cutover DNS verification ONLY (not record CRUD)
+        - jacob-hartmann/kinsta-mcp   # only when host=Kinsta AND verified at phase 28
+      fallback:
+        - git + gh CLI for repo ops
+        - Cloudflare REST + wrangler for DNS record CRUD (the MCP doesn't cover this)
+        - host-specific REST + SFTP/SSH for non-Kinsta managed hosts
+
+  # Phase 30 + 34 — Post-launch analytics (recurring)
+  phase_30_34_analytics_mcps_used:
+    if_installed:
+      - getsentry/plausible-mcp   # Plausible self-hosted path
+      - FGRibreau/mcp-matomo   # Matomo self-hosted path
+    fallback_for_monsterinsights: wp-cli option get/update OR REST /wp-json/wp/v2/settings (no canonical MCP)
+    fallback_for_ga4: direct GA4 Reporting API via Bash + curl
 
 # Per-stack expected limitations (what the adapter SHOULD surface as cannot-do)
 expected_limitations:
@@ -171,3 +245,10 @@ schema_compliance:
   cms_pairing_h2_separate_from_deploy: true   # Risk S4
   context7_lookups_present: true
   references_present: true
+  mcp_servers_h3_in_section_2_canonical_by_name: true   # Round 3 — replaces generic categories with canonical repos
+  mcp_audit_documents_authority_pivot: true             # Automattic/wordpress-mcp ARCHIVED → WordPress/mcp-adapter
+  mcp_audit_includes_negative_findings: true            # MonsterInsights / Yoast-only / non-Kinsta hosts / Cloudflare-DNS-records — documented
+  mcp_audit_specifies_install_commands: true            # composer require, npx, docker for each candidate
+  mcp_audit_specifies_per_phase_usage: true             # phase 11/12/13-16/17/18/22/24/26/28-30/34 routing
+  mcp_audit_specifies_fallback_per_candidate: true      # REST + wp-cli over SSH always documented
+  mcp_setup_doctrine_matches_playwright_pattern: true   # "setup is part of connector-setup step, not bundled"

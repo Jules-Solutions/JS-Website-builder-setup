@@ -104,17 +104,265 @@ WordPress's REST CRUD vocabulary translates non-obviously into website-builder v
 
 **Native CLI peer:** `wp-cli` (`wp post create ...`, `wp media import ...`) is available on self-hosted + managed-WP that offer SSH. The agent uses REST as primary, `wp-cli` over SSH as fallback when REST is rate-limited or auth is unavailable.
 
-### MCP servers (verify at phase 11)
+### MCP servers (recommended at setup)
 
-The WordPress ecosystem has multiple MCP servers in active development as of 2026-05. **Agent invokes `mcp__context7__resolve-library-id` for "WordPress MCP" at phase 11 to confirm which is most-maintained.** Common surfaces (subject to drift):
+> **Doctrine** (matches `mcp__playwright__*` in this plugin): MCP server setup is **part of the connector-setup step**, not bundled with the plugin. Agent surfaces the recommended MCP candidates per phase, points the user at install commands + `.mcp.json` / `~/.claude.json` entries, and falls back to REST + wp-cli over SSH where MCPs aren't installed. The agent never hard-requires any single MCP.
+>
+> **Authority pivot** (verified 2026-05-20): the previously-canonical Automattic-authored MCP (`Automattic/wordpress-mcp`) is **archived** as of 2025-08 (last release v0.2.5, 2025-07-24). Automattic's archive notice points to the successor — **`WordPress/mcp-adapter`** under the WordPress organization itself — which is now the canonical foundation. The pivot is to the WordPress **Abilities API** + **MCP Adapter library** model, where individual plugins (WooCommerce, Polylang, WPML, Elementor, Yoast, RankMath, etc.) register their own abilities and the adapter exposes them as MCP tools.
 
-- **WordPress MCP** — REST API wrapper; CRUD on posts, pages, media, custom post types.
-- **WooCommerce MCP** — products, orders, customers, coupons.
-- **Gutenberg block MCP** — block registration + content insertion.
-- **WP-CLI MCP** — wraps WordPress' command-line tool for plugin/theme management, user creation, DB operations.
-- **ACF MCP** — Advanced Custom Fields management.
+#### A. Foundation — WordPress core
 
-Where MCPs aren't available or aren't reliable, agent falls back to direct REST API calls via `Bash` (curl) or `wp-cli` via SSH (self-hosted).
+**1. `WordPress/mcp-adapter`** (canonical)
+- URL: `https://github.com/WordPress/mcp-adapter`
+- Maintainer: WordPress organization. GPL-2.0. v0.5.0 released 2026-04-15; last push 2026-05-19; 1,098 stars; not archived. Verified 2026-05-20.
+- **Type:** library (not a turnkey MCP server) — bridges WordPress Abilities API to MCP spec; auto-creates a default MCP server exposing every registered ability.
+- **Transports:** stdio + HTTP (MCP 2025-06-18 spec). Custom via `McpTransportInterface`.
+- **Install** (in user's WordPress site):
+  ```bash
+  composer require wordpress/mcp-adapter
+  # On WordPress 6.8, also:
+  composer require wordpress/abilities-api   # WP 6.9+ ships Abilities API in core
+  ```
+  Then in a plugin or theme bootstrap:
+  ```php
+  if ( class_exists( \WP\MCP\Core\McpAdapter::class ) ) {
+      \WP\MCP\Core\McpAdapter::instance();
+  }
+  ```
+- **Built-in abilities exposed:** `mcp-adapter/discover-abilities`, `mcp-adapter/get-ability-info`, `mcp-adapter/execute-ability`. Domain-specific abilities (posts/pages/media/Gutenberg/WooCommerce/etc.) are registered by other plugins via `wp_register_ability()`.
+- **Auth:** WordPress Application Passwords (HTTP transport via `@automattic/mcp-wordpress-remote` proxy); stdio uses `wp-cli` with `--user=admin`.
+- **WordPress version:** 6.8+ minimum; 6.9+ recommended (Abilities API in core). PHP ≥7.4.
+- **MCP client config — stdio (local dev):**
+  ```json
+  {
+    "mcpServers": {
+      "wordpress": {
+        "command": "wp",
+        "args": ["--path=/path/to/site", "mcp-adapter", "serve",
+                 "--server=mcp-adapter-default-server", "--user=admin"]
+      }
+    }
+  }
+  ```
+- **MCP client config — HTTP (deployed sites, via the official Automattic proxy):**
+  ```json
+  {
+    "mcpServers": {
+      "wordpress": {
+        "command": "npx",
+        "args": ["-y", "@automattic/mcp-wordpress-remote@latest"],
+        "env": {
+          "WP_API_URL": "https://example.com/wp-json/mcp/mcp-adapter-default-server",
+          "WP_API_USERNAME": "admin",
+          "WP_API_PASSWORD": "xxxx xxxx xxxx xxxx xxxx xxxx"
+        }
+      }
+    }
+  }
+  ```
+- **Used at phases:** 11 (stack confirm + connector-setup prompt) / 12 (CMS confirm) / 13-16 (content authoring) / 17 (design system via theme.json abilities once registered) / 18 (component-build companion when paired with the Elementor MCP or a Gutenberg block ability set) / 22 (i18n verification when paired with Polylang/WPML ability plugins) / 6.5 (re-runnable ingestion against live REST).
+- **Fallback when not installed:** direct REST via Bash + curl against `/wp-json/wp/v2/*` (Application Password Basic Auth — see §2 CRUD vocabulary table); `wp-cli` over SSH for managed-WP hosts with shell access.
+
+**2. `mcp-wp/ai-command`** (archived) — historical WP-CLI MCP
+- URL: `https://github.com/mcp-wp/ai-command`
+- Status: **archived** 2025-12-07. 117 stars. Was a WP-CLI command (`wp ai mcp`) exposing site control via MCP. Listed for completeness; superseded by the Abilities API path. **Do not recommend new installs.** Last release semantics — agent surfaces the archived status if the user asks about it.
+
+**3. `awesomemotive/wpvibe-ai-mcp`** (community)
+- URL: `https://github.com/awesomemotive/wpvibe-ai-mcp` (WordPress.org slug: Vibe AI)
+- Maintainer: Awesome Motive (the same outfit behind MonsterInsights, WPForms, OptinMonster). 6 stars; last push 2026-05-15.
+- **Type:** WordPress plugin (MCP server endpoint at `/wp-json/mcp/v1/...`). Bundles theme editing + content management + REST API + WP-CLI surfaces + the WordPress Abilities API.
+- **Use case:** when the user wants a single drop-in plugin that exposes a broader-than-default MCP surface without composer-installing the mcp-adapter library themselves. Trade-off: less canonical than the WordPress/mcp-adapter path.
+- **Used at phases:** 11/12 (alternative to mcp-adapter for non-developer users who can't run `composer require`).
+
+#### B. CMS / page-builder MCPs (per phase 12 + phase 18 pairings)
+
+**4. `msrbuilds/elementor-mcp`** (Elementor — actively maintained, the canonical Elementor MCP)
+- URL: `https://github.com/msrbuilds/elementor-mcp`
+- Maintainer: msrbuilds. GPL-3.0. v1.5.1 released 2026-05-10; last push 2026-05-18; 332 stars; not archived. Verified 2026-05-20.
+- **Type:** WordPress plugin (extends `WordPress/mcp-adapter` to register 97 Elementor abilities). Activate from `Plugins > Add New > Upload Plugin`; configure at `Settings > MCP Tools for Elementor`.
+- **Transports:** HTTP (Basic Auth) + WP-CLI stdio + Node.js proxy.
+- **Surface (97 tools):** Build/Layout (11 — containers, element ordering, batch updates); Widget Operations (51 — universal add/update + 27 free shortcuts + 22 Elementor-Pro-conditional tools); Query/Discovery (7); Page Management (5 — create/import/export); Template/Theme (8 — save, apply, popups, dynamic tags); Global Settings (2 — color palettes + typography); Stock Assets (4); Custom Code (4); Composite (1 — build complete page from JSON in one call).
+- **Elementor version:** ≥ 3.20 (container support required).
+- **Auth:** WordPress Application Password, base64 Basic Auth header. Permission checks: `edit_posts` / `manage_options` / `upload_files` / `unfiltered_html`.
+- **MCP client config (HTTP):**
+  ```json
+  {
+    "mcpServers": {
+      "elementor-mcp": {
+        "type": "http",
+        "url": "https://example.com/wp-json/mcp/elementor-mcp-server",
+        "headers": { "Authorization": "Basic BASE64_CREDENTIALS" }
+      }
+    }
+  }
+  ```
+- **Used at phases:** 12 (CMS decision — only when user picks Elementor at page-builder fallback); 18 (component-build via Elementor widgets); 22 (multilingual Elementor pages); 24a-c (only when WooCommerce uses Elementor checkout templates).
+- **Fallback when not installed:** Elementor's own REST endpoints (`/wp-json/elementor/v1/*`) via Bash + curl; template import/export via `wp-cli elementor` over SSH.
+
+**5. `iOSDevSK/mcp-for-woocommerce`** (community WooCommerce MCP)
+- URL: `https://github.com/iOSDevSK/mcp-for-woocommerce`
+- Maintainer: community (iOSDevSK). 14 stars; last push 2026-04-22; not archived. Built on top of Automattic's archived `wordpress-mcp` (legacy authority); migration to `WordPress/mcp-adapter` likely pending. Verified 2026-05-20.
+- **Type:** WordPress plugin (stdio + HTTP streamable; optional JWT auth).
+- **Use case:** WooCommerce products/orders/customers/coupons CRUD when `transactional=true`.
+- **Used at phases:** 24a (product creation + shop pages), 24b (order/payment status queries), 24c (refund/T&Cs management).
+- **Caveat:** community plugin, not Automattic-affiliated. Verify last-push status at phase 24a; if drifted, fall back to WC REST.
+- **Fallback when not installed:** WooCommerce REST API (`/wp-json/wc/v3/*`) via Bash + curl with WC consumer key + secret; `wp-cli wc` over SSH.
+
+**6. `techspawn/woocommerce-mcp-server`** (community peer to #5)
+- URL: `https://github.com/techspawn/woocommerce-mcp-server`
+- Maintainer: Techspawn. 90 stars; last push 2025-11-10; not archived but older.
+- Alternative to #5. Surface similar (WC products + orders). Verify maintenance status at phase 24a; #5 is more recent.
+
+**7. `woocommerce/wc-mcp-ability`** (WooCommerce-org demo)
+- URL: `https://github.com/woocommerce/wc-mcp-ability`
+- Maintainer: WooCommerce organization (official). 5 stars; last push 2025-09-22. **Labeled "Demo Plugin"** in description — not a turnkey production MCP. The official WooCommerce MCP work via the Abilities API is in early-stage as of 2026-05.
+
+**8. `epicwp/polylang-mcp`** (Polylang i18n)
+- URL: `https://github.com/epicwp/polylang-mcp`
+- Maintainer: epicwp. 0 stars; last push 2026-02-23; not archived. Early-stage community plugin built on the Abilities API.
+- **Use case:** translation operations on Polylang sites — list available languages, translate posts, sync translations.
+- **Used at phases:** 22 (i18n exit verification — translation sync if Pattern 1 inline-at-phase-16 didn't catch everything); 6.5 (re-ingest after translator round-trip in Pattern 2).
+- **Fallback when not installed:** Polylang's REST endpoints + `wp-cli polylang` over SSH; manual `.po` file generation via WordPress's gettext tools.
+
+**9. `bjornfix/mcp-abilities-sitepress`** (WPML i18n)
+- URL: `https://github.com/bjornfix/mcp-abilities-sitepress`
+- Maintainer: bjornfix. 1 star; last push 2026-03-17; not archived. SitePress is the technical name for WPML.
+- **Use case:** WPML language / translation / plugin status management via Abilities API.
+- **Used at phases:** 22 (when user picked WPML at phase 12 instead of Polylang).
+- **Fallback when not installed:** WPML's REST + `wpml-cli` over SSH.
+
+#### C. SEO MCPs (phase 26)
+
+**10. `bjornfix/mcp-abilities-rankmath`** (RankMath SEO)
+- URL: `https://github.com/bjornfix/mcp-abilities-rankmath`
+- Maintainer: bjornfix. 9 stars; last push 2026-03-17; not archived.
+- **Surface:** RankMath meta descriptions, titles, focus keywords via Abilities API.
+- **Used at phases:** 26 (SEO audit + meta optimization).
+- **Fallback when not installed:** RankMath's REST + meta-field updates via WP REST (`wp/v2/posts/{id}` `meta` field).
+
+**11. `puneetindersingh/bulk-seo-meta-editor-for-ai-agents`** (Yoast + RankMath unified)
+- URL: `https://github.com/puneetindersingh/bulk-seo-meta-editor-for-ai-agents`
+- Maintainer: puneetindersingh. 1 star; last push 2026-05-05; not archived.
+- **Surface:** Bulk update Yoast + RankMath meta; CSV import/export.
+- **Used at phases:** 26 (bulk SEO meta operations); cleanup phases.
+- **Note:** no canonical Yoast-only MCP as of 2026-05-20 — this is the closest unified option. Fallback otherwise: Yoast's REST + `wp-cli yoast`.
+
+#### D. Cross-cutting MCPs (not WordPress-specific; used by the plugin's broader pipeline)
+
+**12. `playwright (foundation)` — already in this plugin's stack**
+- URL: `https://github.com/microsoft/playwright-mcp` (Microsoft official)
+- Used by: phase 6.5 (live-site walks + DOM dumps for Stitch / AI-output ingestion per `extraction/playwright-walk.md`); phase 20 (responsive); phase 22 (a11y); phase 29 (deploy verification). Already exposed in this plugin's foundation pack as `mcp__playwright__*`.
+- **Pairs with:** `WordPress/mcp-adapter` HTTP transport for combined site-walk + REST-state extraction.
+
+**13. `github/github-mcp-server`** (GitHub deploys + repo ops)
+- URL: `https://github.com/github/github-mcp-server`
+- Maintainer: GitHub (official). MIT. v1.0.5 released 2026-05-18; last push 2026-05-19; 29,977 stars; not archived. Verified 2026-05-20.
+- **Type:** Go binary + Docker + remote HTTP at `https://api.githubcopilot.com/mcp/`.
+- **Install (Docker, recommended):**
+  ```bash
+  docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN=<token> ghcr.io/github/github-mcp-server
+  ```
+- **Surface:** repos / PRs / issues / Actions / releases / commits / file ops / security / code search.
+- **Auth:** PAT with `repo` + `read:org` + `security_events` scopes (or GitHub App).
+- **MCP client config (remote HTTP):**
+  ```json
+  {
+    "mcpServers": {
+      "github": {
+        "type": "http",
+        "url": "https://api.githubcopilot.com/mcp/",
+        "headers": { "Authorization": "Bearer GITHUB_PAT" }
+      }
+    }
+  }
+  ```
+- **Used at phases:** 28-29 (deploy via host git integration — push to GitHub triggers managed-WP host's auto-deploy webhook); 31-34 (release tagging + changelog operations).
+- **Fallback when not installed:** raw `git` + `gh` CLI; manual git push via SFTP/SSH for hosts without git integration.
+
+**14. `cloudflare/mcp-server-cloudflare`** (DNS — but only DNS Analytics, NOT DNS records)
+- URL: `https://github.com/cloudflare/mcp-server-cloudflare`
+- Maintainer: Cloudflare (official). Apache-2.0. Sub-server `workers-bindings@0.4.7` released 2026-04-30; last push 2026-04-30; 3,756 stars; not archived. Verified 2026-05-20.
+- **Type:** monorepo of 18 sub-servers (ai-gateway / auditlogs / autorag / browser-rendering / cloudflare-one-casb / demo-day / dex-analysis / **dns-analytics** / docs-ai-search / docs-autorag / docs-vectorize / graphql / logpush / radar / sandbox-container / workers-bindings / workers-builds / workers-observability).
+- **Important caveat:** the monorepo provides `dns-analytics` (query traffic + debug DNS) but **NOT a DNS-records management sub-server**. For DNS record CREATION (CNAMEs, A records, TXT for SSL verification) the agent uses Cloudflare's REST API directly or `wrangler` CLI — not this MCP. The §10 Deploy H2's earlier "Cloudflare MCP for DNS" reference is corrected here: at phase 28 the agent uses the REST API for record CRUD + this MCP's `dns-analytics` sub-server for verification.
+- **Install per sub-server:**
+  ```bash
+  npx mcp-remote https://dns-analytics.mcp.cloudflare.com/mcp   # for dns-analytics
+  # Other sub-servers swap the subdomain. Auth via Cloudflare API token in dashboard.
+  ```
+- **Used at phases:** 28 (DNS analytics post-cutover); 30 (traffic verification); 34 (ongoing DNS performance monitoring).
+- **Fallback when not installed:** Cloudflare REST API via Bash + curl (`POST /client/v4/zones/{zone_id}/dns_records`).
+
+**15. `stripe/ai` (`@stripe/mcp`)** (commerce; pairs with WC at phase 24b)
+- URL: `https://github.com/stripe/ai` (repo name "ai"; the MCP code lives at `tools/modelcontextprotocol/`)
+- Maintainer: Stripe (official). MIT. Last push 2026-05-19; 1,557 stars; not archived. Verified 2026-05-20.
+- **Type:** npm package + remote server at `https://mcp.stripe.com`.
+- **Install (local with secret key):**
+  ```bash
+  npx -y @stripe/mcp --api-key=YOUR_STRIPE_SECRET_KEY
+  ```
+  Or use the remote server with OAuth.
+- **Surface:** products / prices / payment intents / customers / refunds / subscriptions (refer to docs for full method coverage).
+- **Auth:** Stripe restricted API key (`rk_*` recommended over `sk_*` for scoped access).
+- **Used at phases:** 24a (Stripe product setup for WooCommerce-via-Stripe path); 24b (payment intent monitoring + test charge verification); 34 (post-launch subscription monitoring).
+- **Fallback when not installed:** Stripe REST via Bash + curl with `sk_*` Bearer auth.
+
+**16. `bytebase/dbhub`** (MySQL/MariaDB for advanced ops)
+- URL: `https://github.com/bytebase/dbhub`
+- Maintainer: Bytebase. Multi-database (Postgres, MySQL, SQL Server, MariaDB, SQLite). 2,790 stars; last push 2026-04-21; not archived. Verified 2026-05-20.
+- **Use case:** advanced DB ops that bypass the REST API — bulk content migrations, custom field-table queries, post-migration data fixes. **Not the default path** — REST + wp-cli should cover 95% of WordPress ops. Reach for dbhub only when those fail.
+- **Used at phases:** 6.5 (rare: complex migration ingestion); 12 (rare: heavy CPT schema audit); 34 (rare: ad-hoc DB queries).
+- **Fallback when not installed:** `wp-cli db` over SSH; raw `mysql` client over SSH.
+
+**17. `getsentry/plausible-mcp`** (Plausible Analytics)
+- URL: `https://github.com/getsentry/plausible-mcp`
+- Maintainer: getsentry (under Sentry's umbrella). 2 stars; last push 2026-05-13; not archived. The most-recent of three Plausible MCPs; peers: `AVIMBU/plausible-mcp-server` (older, 7 stars), `alexanderop/plausible-mcp` (6 stars).
+- **Use case:** query Plausible Analytics traffic / conversions / period-over-period for privacy-first WordPress sites that picked Plausible at §10 analytics injection.
+- **Used at phases:** 30 (post-launch analytics review); 34 (ongoing traffic monitoring).
+- **Fallback when not installed:** Plausible REST API via Bash + curl.
+
+**18. `FGRibreau/mcp-matomo`** (Matomo Analytics)
+- URL: `https://github.com/FGRibreau/mcp-matomo`
+- Maintainer: FGRibreau. 10 stars; last push 2026-05-08; not archived. Most-recent Matomo MCP.
+- **Use case:** Matomo self-hosted analytics queries for WordPress sites that picked Matomo at §10.
+- **Used at phases:** 30 / 34 (same as Plausible).
+- **Fallback when not installed:** Matomo REST API via Bash + curl.
+
+#### E. Hosting-specific MCPs (verify per host at phase 28)
+
+**19. `jacob-hartmann/kinsta-mcp`** (Kinsta — early-stage community)
+- URL: `https://github.com/jacob-hartmann/kinsta-mcp`
+- Maintainer: jacob-hartmann (community, not Kinsta-official). 0 stars; last push 2026-05-18; not archived. **Very new — verify carefully at phase 28.**
+- **Use case:** if confirmed working at phase 28, supplements Kinsta's REST API for deploy + backup + cache-purge operations.
+- **Used at phases:** 28 (deploy + cache-purge); 29 (deploy verification); 34 (ongoing site management).
+- **Fallback when not installed:** Kinsta REST API via Bash + curl (Kinsta has a documented API at `https://kinsta.com/help/kinsta-api/`).
+
+**20-22. WP Engine / SiteGround / Cloudways / Hostinger / Bluehost / DreamHost** — **negative finding** (verified 2026-05-20)
+- No canonical first-party MCP servers as of the audit date. WP Engine has a documented REST API; SiteGround / Cloudways expose proprietary control panels with limited API surface; the rest rely on hosting-control-panel-only ops.
+- **Fallback for these hosts:** REST API via Bash + curl where the host exposes one; SFTP/SSH for file ops; the managed-WP host's web UI for backup + cache-purge (no automation surface).
+- **Recommend:** at phase 28, agent surfaces the lack of an MCP + asks the user whether to script around the REST API (effort cost) or accept manual operations.
+
+#### F. Negative findings (no canonical MCP found, fallback only)
+
+- **MonsterInsights MCP:** no canonical MCP found 2026-05-20. Fallback: MonsterInsights stores GA4 IDs in WP options — the agent reads/writes via `wp-cli option get/update` or the WP REST `settings` endpoint.
+- **WP Rocket / W3 Total Cache / LiteSpeed Cache MCPs:** none found. Fallback: plugin-specific WP-CLI commands (`wp rocket clean`, `wp w3-total-cache flush all`, `wp litespeed-purge all`).
+- **Yoast SEO standalone MCP:** none found; the closest is `puneetindersingh/bulk-seo-meta-editor-for-ai-agents` (§C entry #11) which covers Yoast + RankMath jointly.
+- **Stand-alone Gutenberg block MCP:** none found as a separate package. Gutenberg block operations route through `WordPress/mcp-adapter` once block-editor abilities are registered (or, for Elementor-managed pages, through `msrbuilds/elementor-mcp`).
+
+#### G. Setup-time recommendation matrix (per project shape)
+
+| Project shape | Recommend installing |
+|---|---|
+| Greenfield WP, Polylang i18n, no commerce | #1 mcp-adapter + #8 polylang-mcp + #13 github-mcp + #12 playwright + chosen host's analytics MCP (#17 or #18) |
+| Greenfield WP, WPML i18n, WooCommerce | #1 mcp-adapter + #9 mcp-abilities-sitepress + #5 mcp-for-woocommerce + #15 @stripe/mcp + #13 github-mcp + #12 playwright |
+| Existing WP site to extend (no admin install rights) | #1 mcp-adapter HTTP transport via `@automattic/mcp-wordpress-remote` proxy + #12 playwright (for live-walk) |
+| Elementor page-builder path (phase-12 fallback) | #4 elementor-mcp + #1 mcp-adapter + #8 polylang-mcp (if multilingual) + #13 github-mcp |
+| Kinsta-hosted site | All above + #19 kinsta-mcp (verify working at phase 28) |
+| Privacy-first WP (Plausible-only analytics, no GA4) | All above + #17 getsentry/plausible-mcp |
+| Heavy custom-DB migration | Above + #16 bytebase/dbhub (only when REST + wp-cli can't do it) |
+
+Agent invokes context7 (`mcp__context7__resolve-library-id` for each MCP candidate) at phase 11 to confirm currency before recommending install — repos drift, maintainers archive, the v0.5.0 versioning of the canonical mcp-adapter implies further breaking changes ahead.
+
+Where any MCP is not installed at user setup-time, the agent **always** falls back to documented REST + wp-cli paths (catalogued in §2 CRUD vocabulary table). MCPs accelerate; they never gate.
 
 ### Custom block-theme scaffold
 
@@ -359,6 +607,17 @@ If the target WordPress site requires authentication (private dev site, staging,
 
 Two-factor-authenticated sites can't be auto-walked — user provides screenshots from their own session for the agent to pass into Stitch's screenshot mode (per `extraction/playwright-walk.md` §"Failure modes").
 
+### MCP pairings for phase 6.5
+
+When the user has installed MCPs at the connector-setup step (§2), phase 6.5 leverages them as accelerators (REST + curl + wp-cli remain the fallbacks):
+
+- **`mcp__playwright__*`** (foundation) — primary tool for live-walks per `extraction/playwright-walk.md`. Always available.
+- **WordPress mcp-adapter** (§2 entry #1) over HTTP transport — when the target WP site has the adapter installed AND the user has an Application Password. Lets the agent enumerate posts/pages/media via MCP tools (Abilities API `discover-abilities` then `execute-ability`) rather than raw REST. Cleaner audit trail.
+- **`msrbuilds/elementor-mcp`** (§2 entry #4) — when the target site uses Elementor; the MCP exposes Elementor templates + widget data the REST API alone doesn't surface cleanly.
+- **`mcp-for-woocommerce`** (§2 entry #5) — for sites with WooCommerce, exposes product + order inventories.
+
+When the user is operating against a deployed-but-not-yet-MCP-equipped site, the Playwright walker + REST-via-Bash path stays the canonical extraction route.
+
 ### Round-trip ingestion output paths (phase-18 handoff round-trip)
 
 When the agent emits a `component-request-v1` brief and the user goes external (v0 / Cursor / ChatGPT / human freelancer), the round-trip back through phase 6.5 with **`extraction/ai-output.md`** lands in:
@@ -415,6 +674,16 @@ Agent configures the chosen plugin via WC REST or by direct DB update (admin-onl
 
 Refund / shipping / T&Cs pages created as WP pages via REST. Linked from checkout flows in WC settings (Checkout endpoints registered in `wp-admin/admin.php?page=wc-settings&tab=advanced`). EU-specific compliance (revFADP for Switzerland / GDPR / EU consumer rights) addressed via Iubenda / CookieYes / Complianz WP plugins installed at phase 25.
 
+### MCP pairings for commerce
+
+If installed at connector-setup (§2):
+
+- **`iOSDevSK/mcp-for-woocommerce`** (§2 entry #5) — WC product/order/customer CRUD via MCP. Setup prerequisite for phase 24a operations on this stack.
+- **`stripe/ai` / `@stripe/mcp`** (§2 entry #15) — Stripe-side operations (payment intent verification, refund processing, subscription monitoring). Pairs with WC's Stripe gateway plugin.
+- **WC org demo** (§2 entry #7 `woocommerce/wc-mcp-ability`) — surface to monitor; not turnkey yet (2026-05).
+
+When MCPs aren't installed, the agent uses WC REST (`/wp-json/wc/v3/*`) for WooCommerce ops and Stripe REST via Bash + curl for Stripe ops. Both paths are documented in §C of §2 and in the WC + Stripe REST docs.
+
 ### Booking flows (transactional_kind: bookings or both)
 
 - **Cal.com / Calendly / SimplyBook.me** embedded via custom Gutenberg block wrapping the embed script (per locked decision 54 — Cal.com is MVP default for free booking).
@@ -446,6 +715,17 @@ When user wants to keep WordPress content but use a different CMS abstraction la
 - **Pods, Toolset** — niche.
 
 These are addons within WP-core CMS — not replacements. Agent installs the chosen plugin when content shape demands it.
+
+### MCP pairings for CMS-side operations
+
+If installed at connector-setup (§2):
+
+- **`WordPress/mcp-adapter`** (§2 entry #1) — foundational; exposes CMS ops (page hierarchy reads/writes, custom-field CRUD, taxonomy management) once domain-ability plugins are registered.
+- **`epicwp/polylang-mcp`** (§2 entry #8) — Polylang translations (default i18n per §5).
+- **`bjornfix/mcp-abilities-sitepress`** (§2 entry #9) — WPML translations (upgrade path per §5).
+- **`msrbuilds/elementor-mcp`** (§2 entry #4) — only when the user picked Elementor as page-builder at phase 12 (CMS pairing fallback).
+
+For ACF / Meta Box custom-field CRUD specifically — no canonical MCP found 2026-05-20 (negative finding §F of §2). Agent uses `wp-cli post meta update` over SSH or direct REST POST with `meta` payload.
 
 ### Compatibility matrix
 
@@ -507,6 +787,15 @@ Each builder has its own widget/module library. When user picks one at phase 12,
 
 Lock-in trade-off flagged at phase 12. Phase 18 component-build doctrine changes to the chosen builder's pattern.
 
+### MCP pairings for component build (phase 18)
+
+If installed at connector-setup (§2):
+
+- **`WordPress/mcp-adapter`** (§2 entry #1) — Gutenberg block registration + post-content updates via the Abilities API. No stand-alone "Gutenberg block MCP" exists as of 2026-05-20 (negative finding §F); the mcp-adapter path is the canonical successor to the now-archived `Automattic/wordpress-mcp` block-editor surface.
+- **`msrbuilds/elementor-mcp`** (§2 entry #4) — only when user picked Elementor; exposes widget operations + 27+ free shortcuts + 22 Pro-conditional tools at the component-build layer. 97 total tools.
+
+Without MCPs, phase 18 codegen lands `block.json` + `render.php` + `edit.tsx` directly into `wp-content/plugins/{slug}-blocks/blocks/{slug}/` via `Edit`/`Write` (per `skills/wb-component-build/references/per-stack-codegen.md#wordpress`); deployment happens via git-push + the managed-host auto-deploy.
+
 ### Cross-reference
 
 - `skills/wb-component-build/references/per-stack-codegen.md#wordpress` — phase-18 codegen patterns + per-block scaffold flow + theme.json token-mapping recipe (the read-only Phase-2.B anchor).
@@ -567,11 +856,25 @@ Agent recommends Bedrock for users coming from modern PHP backgrounds; trade-off
 
 ### DNS + SSL
 
-Cloudflare MCP (when available) for DNS configuration; host-provided SSL (Let's Encrypt automated by every modern managed-WP host; agent verifies at phase 28). For self-hosted, agent walks user through `certbot` setup or recommends Cloudflare's free SSL proxy.
+DNS record CRUD (CNAME / A records / TXT for SSL verification): agent uses Cloudflare's REST API via Bash + curl OR `wrangler` CLI. **Important — verified 2026-05-20:** `cloudflare/mcp-server-cloudflare` (§2 entry #14) does NOT include a DNS-records management sub-server; it offers `dns-analytics` (traffic + debug) but not record CRUD. Earlier references in this adapter to "Cloudflare MCP for DNS" are corrected here — the MCP supplements verification, REST does the writes.
+
+Host-provided SSL (Let's Encrypt automated by every modern managed-WP host; agent verifies at phase 28). For self-hosted, agent walks user through `certbot` setup or recommends Cloudflare's free SSL proxy.
+
+**MCP pairings for deploy + DNS** (if installed at connector-setup per §2):
+
+- **`github/github-mcp-server`** (§2 entry #13) — Push-to-master triggers the managed-WP host's webhook; this MCP automates the push + verifies the resulting deployment status + monitors Actions runs.
+- **`cloudflare/mcp-server-cloudflare` dns-analytics sub-server** (§2 entry #14) — post-cutover traffic verification + DNS propagation debug. **Not for DNS record CRUD** — that's REST/wrangler.
+- **`jacob-hartmann/kinsta-mcp`** (§2 entry #19) — only when the chosen managed-WP host is Kinsta AND the MCP is verified working at phase 28 (very new, low star count — exercise caution). For other hosts (WP Engine / SiteGround / Cloudways / etc.), no canonical MCPs exist as of 2026-05-20 — REST APIs + SFTP/SSH are the fallback (§2 §E negative findings).
 
 ### Analytics injection
 
 Agent installs **MonsterInsights plugin** (GA4 integration) OR injects directly via theme's `functions.php` with the `wp_head` hook (lighter-weight; avoids the plugin). Server-side analytics (**Plausible self-hosted**, **Matomo**) supported when user has privacy-first requirements.
+
+**MCP pairings for post-launch analytics** (if installed at connector-setup per §2):
+
+- **`getsentry/plausible-mcp`** (§2 entry #17) — Plausible query operations; pairs with the Plausible self-hosted path. Used at phases 30 + 34 for traffic monitoring.
+- **`FGRibreau/mcp-matomo`** (§2 entry #18) — Matomo query operations; pairs with self-hosted Matomo.
+- **MonsterInsights MCP:** none exists as of 2026-05-20 (negative finding §F of §2). The MonsterInsights plugin stores GA4 IDs in `wp_options`; agent reads/writes via `wp-cli option get/update` or REST `/wp-json/wp/v2/settings`.
 
 ### Performance budget
 
@@ -693,6 +996,8 @@ The agent invokes context7 at these phases (per `cross-cutting/DESIGN-context7-i
 | 18 | If DaisyUI option — Tailwind v4 + DaisyUI | `/tailwindlabs/tailwindcss.com` + `/saadeghi/daisyui` | "Tailwind v4 + DaisyUI custom theme with oklch() colors + WordPress build chain" |
 | 24a | Commerce (if transactional) — WooCommerce | `/woocommerce/woocommerce-rest-api-docs` | "product create + Stripe gateway + tax/shipping configuration via REST" |
 | 28-30 | Deploy — host integration + Cloudflare | (verify per host) + Cloudflare context7 | "managed-WP git deploy + DNS + SSL + Cloudflare integration" |
+| 11 (connector-setup) | MCP ecosystem confirm — verify candidates from §2 are still maintained | (resolve via `mcp__context7__resolve-library-id` for each) | "current maintained status + install command for `WordPress/mcp-adapter`, `msrbuilds/elementor-mcp`, `iOSDevSK/mcp-for-woocommerce`, `epicwp/polylang-mcp`, `bjornfix/mcp-abilities-sitepress`, `bjornfix/mcp-abilities-rankmath`, `github/github-mcp-server`, `cloudflare/mcp-server-cloudflare`, `stripe/ai` `@stripe/mcp`" |
+| 11 (connector-setup) | WordPress Abilities API + mcp-adapter schema | `/wordpress/mcp-adapter` (if context7-indexed; otherwise WebFetch the README) | "current Abilities API surface + McpAdapter init + Application Password HTTP transport via @automattic/mcp-wordpress-remote" |
 
 ### WebFetch fallback (when context7 coverage is thin)
 
@@ -702,8 +1007,29 @@ WordPress + Block Editor coverage on context7 is moderate-to-thin in places. Web
 - **Phase 18 — Block API v3 + `block.json`:** `https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/` + `https://developer.wordpress.org/block-editor/getting-started/create-block/` + `https://developer.wordpress.org/block-editor/getting-started/fundamentals/`.
 - **Phase 18 — block patterns auto-registration:** `https://developer.wordpress.org/themes/patterns/registering-patterns/` — the file-header-based auto-registration is current 2026 standard.
 - **Phase 24a — WooCommerce REST:** `https://woocommerce.github.io/woocommerce-rest-api-docs/`.
+- **Phase 11 connector-setup — canonical MCP repos** (WebFetch each at recommend-time to verify maintained / not archived / current install command, since the ecosystem is in flux):
+  - `https://github.com/WordPress/mcp-adapter` — foundation; canonical successor to the archived `Automattic/wordpress-mcp`.
+  - `https://github.com/msrbuilds/elementor-mcp` — Elementor MCP.
+  - `https://github.com/iOSDevSK/mcp-for-woocommerce` — WC MCP (community; verify currency).
+  - `https://github.com/epicwp/polylang-mcp` — Polylang i18n MCP.
+  - `https://github.com/bjornfix/mcp-abilities-sitepress` — WPML i18n MCP.
+  - `https://github.com/bjornfix/mcp-abilities-rankmath` — RankMath SEO MCP.
+  - `https://github.com/github/github-mcp-server` — GitHub MCP (official).
+  - `https://github.com/cloudflare/mcp-server-cloudflare` — Cloudflare MCP (official; DNS analytics only — not record CRUD).
+  - `https://github.com/stripe/ai` — Stripe MCP (`@stripe/mcp`).
+  - `https://github.com/bytebase/dbhub` — MySQL/MariaDB MCP (for advanced DB ops).
+  - `https://github.com/getsentry/plausible-mcp` + `https://github.com/FGRibreau/mcp-matomo` — analytics MCPs.
 
 Cache fetched docs to `.website-builder/library/docs/wordpress-{surface}.md` (e.g. `wordpress-theme-json.md`, `wordpress-block-api.md`, `wordpress-rest.md`, `wordpress-woocommerce.md`). Re-fetch threshold 30 days; freshness flag on cache files.
+
+### Verified-current MCP-ecosystem notes (freshness 2026-05-20)
+
+- **Authority pivot:** `Automattic/wordpress-mcp` is archived (2025-08); successor is `WordPress/mcp-adapter` (WordPress org, v0.5.0 2026-04-15, 1,098 stars, actively maintained). Adapter is a **library**, not a turnkey MCP server — it bridges the WordPress Abilities API to the MCP spec and auto-creates a default MCP server.
+- **WordPress Abilities API** ships in core as of WP 6.9+; on 6.8 it requires the separate `wordpress/abilities-api` Composer package. Domain plugins (WooCommerce, Polylang, WPML, Elementor, Yoast, RankMath) register their own abilities via `wp_register_ability()`.
+- **Elementor MCP** (`msrbuilds/elementor-mcp`) is fully maintained — v1.5.1 (2026-05-10), 332 stars, 97 tools.
+- **No canonical Yoast-only MCP** — `puneetindersingh/bulk-seo-meta-editor-for-ai-agents` is the closest unified Yoast + RankMath option.
+- **No canonical MonsterInsights MCP**, **no canonical first-party WP Engine / SiteGround / Cloudways / Hostinger / Bluehost MCPs**. Kinsta has a brand-new community MCP (`jacob-hartmann/kinsta-mcp`, 0 stars, 2026-05-18) — exercise caution.
+- **Cloudflare monorepo** ships 18 sub-servers but NO DNS-records management server — only `dns-analytics`. DNS record CRUD goes through Cloudflare REST API + `wrangler` directly, not the MCP.
 
 ### Verified-current notes (freshness 2026-05-20)
 
