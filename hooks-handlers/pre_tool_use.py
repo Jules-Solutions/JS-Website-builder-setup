@@ -206,14 +206,6 @@ SIDE_CHANNEL_PHASE = "6.5"
 COMMERCE_SUBPHASES: frozenset[str] = frozenset({"24a", "24b", "24c"})
 
 
-def _phase_index(phase: str) -> int:
-    """Position of a phase id in PHASE_ORDER, or -1 if unknown."""
-    try:
-        return PHASE_ORDER.index(phase)
-    except ValueError:
-        return -1
-
-
 def normalize_phase(raw: object) -> str | None:
     """Map a raw project.yaml current_phase value onto a canonical phase id.
 
