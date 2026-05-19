@@ -1,0 +1,116 @@
+# tests/adapters/framer/expected.yaml
+# Declarative spec of what the Framer adapter SHOULD produce per pipeline phase,
+# given the fixture/ state. Phase 3 manual-verification scope; Phase 5+ wires the runner.
+# See tests/adapters/framer/README.md.
+
+fixture_baseline: phase-11-complete
+
+expected_per_phase:
+
+  phase_12_cms:
+    cms_recommendation: framer-cms                # default per adapter §8 "CMS pairing"
+    confidence: high                              # stack-native default; no ambiguity for greenfield + non-transactional
+    notes: |
+      Framer CMS is the recommended default. Strings collection will be created
+      with flat field names per the S6 flattening recipe (adapter §3 + §4 L3 row).
+
+  phase_17_design_system:
+    tokens_written_to:
+      - .website-builder/brand.yaml                # source of truth in user project
+      - Framer Color Styles                        # created via Editor / Plugins API per adapter §3 L1 row
+      - Framer Text Styles                         # created via Editor / Plugins API per adapter §3 L1 row
+      - code/tokens.ts                             # spacing + motion (no Framer first-class equivalent)
+    drift_check: pass                              # tokens match fixture brand.yaml exactly
+    mcps_used:                                     # per adapter §2 "MCP servers (recommended at setup)"
+      preferred: framer-marketplace-mcp-plugin     # Tommy D. Rossi's MCP — pushes Color/Text Styles into the live canvas
+      fallback: plugins-api-rest                   # framer.plugins.* + REST direct via curl wrapper
+    notes: |
+      Adapter §3 + §12 surface "Framer has no first-class spacing tokens" — spacing/motion
+      live in code/tokens.ts; user does not see them as Styles in Editor.
+
+  phase_18_component_build:
+    components_generated:
+      - HeroBlock
+      - NavBar
+      - FooterBlock
+      - LanguageSwitcher                           # multilingual fixture → added by adapter §5 / i18n/language-switcher.md#framer
+      - HreflangTags                               # multilingual fixture → added by i18n/hreflang.md#framer (escape hatch 2 default)
+    output_paths:
+      HeroBlock: code/HeroBlock.tsx
+      NavBar: code/NavBar.tsx
+      FooterBlock: code/FooterBlock.tsx
+      LanguageSwitcher: code/LanguageSwitcher.tsx
+      HreflangTags: code/HreflangTags.tsx
+    codegen_pattern: addPropertyControls
+    codegen_anchor: skills/wb-component-build/references/per-stack-codegen.md#framer
+    api_imports_expected:
+      - 'import { addPropertyControls, ControlType } from "framer"'
+      - 'import { useLocaleInfo } from "framer"'   # in LanguageSwitcher + (optionally) HreflangTags
+    control_types_used:
+      - String
+      - Number
+      - Boolean
+      - Color
+      - Enum
+      - ResponsiveImage
+      - Object
+      - Array
+    palette_validator: pass                        # no hardcoded colors expected; everything via Framer Color Styles or brand tokens
+    a11y_audit: pass                               # heading hierarchy, ARIA, keyboard nav per components.yaml accessibility blocks
+    mcps_used:                                     # per adapter §2 "MCP servers (recommended at setup)"
+      preferred: framer-marketplace-mcp-plugin     # Tommy D. Rossi or Design Bridge — insert Code Components directly via running plugin
+      fallback: framer-push-cli                    # `framer push` from code/{Component}.tsx files
+
+  phase_22_i18n:
+    hreflang_emitted: true                         # native Framer auto-emit + HreflangTags fallback per i18n/hreflang.md#framer
+    language_switcher_added: true                  # LanguageSwitcher Code Component dropped on header by user
+    locale_routing: prefix                         # /en/... and /de/... per project.yaml.language_routing
+    strings_flattening_validates: true             # cta.subscribe → cta_subscribe etc. round-trip cleanly per adapter §3 strings recipe
+    rtl_handling: n/a                              # fixture has no RTL languages
+    mcps_used:                                     # per adapter §2 "MCP servers (recommended at setup)"
+      preferred: playwright-mcp                    # @playwright/mcp (Microsoft) for post-emit hreflang/switcher walks
+      fallback: manual-curl-head                   # user curls <head> manually; agent reasons from pasted output
+
+  phase_28_deploy:
+    target: framer-publish                         # per adapter §10 "Deploy"
+    dns_handoff_ready: true                        # CNAME / A-record instructions provided per Framer dashboard
+    ssl_strategy: automatic                        # Framer edge handles SSL
+    analytics: framer-builtin                      # default; agent surfaces GA4/Plausible escape hatch at phase 30
+    mcps_used:                                     # per adapter §2 "MCP servers (recommended at setup)" + §10 cross-ref
+      preferred: cloudflare-mcp                    # https://mcp.cloudflare.com/mcp (OAuth) — DNS record automation when user's DNS is on Cloudflare
+      preferred_secondary: github-mcp              # https://api.githubcopilot.com/mcp/ — if user wants Code Components in their own repo
+      fallback: manual-dns-handoff                 # agent emits copy-paste-ready record values; user creates in their DNS provider dashboard
+    notes: |
+      Phase 29 deploy verification walk uses Playwright MCP per phase_22 above.
+      For non-Cloudflare DNS (Namecheap, Route53, etc.), no MCP available — manual handoff.
+
+  phase_6_5_ingestion:
+    # Not exercised by greenfield fixture (no existing site to ingest).
+    # Phase 5+ walkthrough fixtures (sibling tests) cover this.
+    exercised: false
+    mcps_used_when_exercised:                      # for future Phase 5+ walkthrough fixtures
+      preferred: [playwright-mcp, framer-marketplace-mcp-plugin]   # Playwright for hover/scroll/auth-walled state capture; Framer MCP for live canvas state
+      fallback: [user-screenshots, framer-rest-readback]           # user captures screenshots manually; agent pulls canvas via REST
+      notes: see adapter §6 "Phase 6.5 ingestion" cross-ref to MCP section
+
+expected_limitations:
+  # Per adapter §12 "Limitations + escape hatches"
+  - "Cannot compose finished pages programmatically (canvas-as-source-of-truth — user composes Frames on canvas via per-page wireframe brief)"
+  - "Cannot bypass Framer Publish hosting"
+  - "Framer CMS field shape is flat (no nested objects — strings flattening recipe addresses)"
+  - "No granular spacing/motion tokens at project level (live in code/tokens.ts inside Code Components)"
+  - "Deep version control of canvas-composed Frames is shallow (git tracks .website-builder/ + code/; canvas state in Framer's own history)"
+  - "No public project-creation REST API (user creates Framer project via Editor; agent operates against existing project ID)"
+  - "No public publish-trigger REST API (publish is human-in-the-loop in Editor)"
+
+expected_failure_modes_covered:
+  # Per adapter §12 "Failure modes" table
+  - "Plugins API 401/403 (FRAMER_API_TOKEN missing or revoked)"
+  - "framer push failure (CLI surface drift)"
+  - "CMS addItems slug collision"
+  - "Localization REST 404 (plan-tier unsupported)"
+  - "useLocaleInfo() undefined during pre-hydration render"
+  - "Color Style rename without canvas cascade"
+  - "Strings flattening ambiguous re-nesting"
+  - "Bundle size exceeds Framer edge limits"
+  - "RTL layout breaks (physical vs logical CSS properties)"

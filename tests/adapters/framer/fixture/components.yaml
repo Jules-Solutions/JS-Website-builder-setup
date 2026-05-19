@@ -1,0 +1,39 @@
+# Layer 2 — Component specs (per DESIGN-content-layers.md)
+# Three components for the baseline fixture; each generates one code/{Component}.tsx
+# Framer Code Component with addPropertyControls per the adapter recipe.
+
+components:
+  - name: HeroBlock
+    props:
+      headline: { type: string, max_chars: 60, required: true }
+      sub: { type: string, max_chars: 120, required: true }
+      cta_text: { type: string, max_chars: 24, required: true }
+      background_image: { type: image, required: false }
+    responsive:
+      mobile_360: { headline_size: 32px, layout: stacked, padding_inline: 16px }
+      tablet_768: { headline_size: 48px, padding_inline: 32px }
+      desktop_1280: { headline_size: 64px, padding_inline: 64px }
+    accessibility:
+      heading_hierarchy: "headline = h1 (only on home), h2 elsewhere"
+      alt_text_required: background_image
+      contrast_ratio: "4.5:1 against headline color"
+      keyboard_nav: "CTA tabbable; focus ring visible"
+
+  - name: NavBar
+    props:
+      links: { type: array, required: true }   # sourced from sitemap.yaml navigation.primary
+      logo_text: { type: string, max_chars: 32, required: true }
+      show_language_switcher: { type: boolean, default: true }
+    responsive:
+      mobile_360: { layout: hamburger }
+      desktop_1280: { layout: inline }
+    accessibility:
+      role: navigation
+      keyboard_nav: "Tab + Arrow keys; focus visible"
+
+  - name: FooterBlock
+    props:
+      links: { type: array, required: true }
+      copyright_text: { type: string, max_chars: 64, required: true }
+    accessibility:
+      role: contentinfo
