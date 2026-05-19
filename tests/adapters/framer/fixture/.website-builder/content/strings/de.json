@@ -1,0 +1,33 @@
+{
+  "$language": "de",
+  "$schema": "spec/strings-v1.json",
+
+  "cta": {
+    "subscribe": "Newsletter abonnieren",
+    "subscribe_loading": "Wird abonniert...",
+    "subscribe_success": "Eingetragen! Schau in dein Postfach.",
+    "subscribe_error": "Hat nicht geklappt. Nochmal versuchen?"
+  },
+
+  "errors": {
+    "network": "Verbindungsfehler. Internet prüfen und nochmal versuchen.",
+    "validation_email": "Das sieht nicht nach einer gültigen E-Mail aus.",
+    "server_500": "Bei uns ist etwas schiefgelaufen. Bitte gleich nochmal versuchen."
+  },
+
+  "nav": {
+    "primary": {
+      "home": "Start",
+      "about": "Über",
+      "contact": "Kontakt"
+    },
+    "skip_to_content": "Zum Inhalt springen",
+    "language_switcher_label": "Sprache"
+  },
+
+  "forms": {
+    "email_label": "E-Mail-Adresse",
+    "email_placeholder": "du@beispiel.ch",
+    "submit": "Absenden"
+  }
+}

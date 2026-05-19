@@ -1,0 +1,37 @@
+# Synthetic phase-11-complete fixture state for the Framer stack adapter.
+# See tests/adapters/framer/README.md for what this exercises.
+
+project_name: "Synthetic Fixture Site"
+version: 1
+stack: framer
+
+# Phase-11 sibling decisions
+transactional: false
+entry_mode: greenfield
+
+# i18n (default-on per DESIGN-i18n.md)
+languages: [en, de]
+default_language: en
+language_routing: prefix         # per locked decision 38
+fallback_strategy: missing-key-shows-default-and-warn
+rtl_languages: []
+language_regions: {}             # bare codes (en, de); no region-targeting for this fixture
+
+# Deploy + canonical (set at phase 28 — placeholder here for fixture completeness)
+canonical_host: https://synthetic-fixture.framer.app
+deploy_target: framer-publish
+
+# Extraction config (placeholder — greenfield doesn't ingest)
+extraction:
+  stitch:
+    enabled: true
+    pair_with_playwright: auto
+  divmagic:
+    enabled: false
+  playwright_walker:
+    enabled: true
+
+# Framer-specific
+framer:
+  project_id: "syn_fixture_001"   # placeholder — real ID set at user setup
+  api_token_env: FRAMER_API_TOKEN
