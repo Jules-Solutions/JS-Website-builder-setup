@@ -1,0 +1,71 @@
+# Sitemap — fixture. 5 pages, en + de per-locale (Pattern A — shared structure).
+# Maps to Next.js: app/[lang]/{slug}/page.tsx per route per language.
+
+pages:
+  - slug: home
+    path: /
+    page_type: home
+    purpose: "Introduce the consultancy + drive contact"
+    languages: [en, de]
+    sections: [hero, services-summary, footer]
+
+  - slug: about
+    path: /about
+    page_type: content
+    purpose: "Voice + story + credibility"
+    languages: [en, de]
+    sections: [hero, bio, footer]
+
+  - slug: services
+    path: /services
+    page_type: content
+    purpose: "What we offer + service tiers"
+    languages: [en, de]
+    sections: [hero, services-detail, footer]
+
+  - slug: contact
+    path: /contact
+    page_type: contact
+    purpose: "Lead-gen form (non-transactional)"
+    languages: [en, de]
+    sections: [hero, contact-form, footer]
+
+  - slug: blog
+    path: /blog
+    page_type: index
+    purpose: "Index of essays"
+    languages: [en, de]
+    sections: [hero, blog-list, footer]
+
+navigation:
+  primary:
+    items:
+      - label: "{strings.nav.primary.home}"
+        target: home
+      - label: "{strings.nav.primary.services}"
+        target: services
+      - label: "{strings.nav.primary.about}"
+        target: about
+      - label: "{strings.nav.primary.blog}"
+        target: blog
+      - label: "{strings.nav.primary.contact}"
+        target: contact
+    location: header
+    pattern: inline
+
+  footer:
+    items:
+      - label: "{strings.nav.primary.about}"
+        target: about
+      - label: "{strings.nav.primary.contact}"
+        target: contact
+
+  utility:
+    items:
+      - type: language_switcher
+
+  breadcrumbs:
+    enabled: false   # 5-page site — no breadcrumbs needed
+
+  mobile:
+    pattern: hamburger

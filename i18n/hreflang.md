@@ -217,29 +217,210 @@ addPropertyControls(HreflangTags, {
 
 ### Next.js + shadcn
 
-<!-- TODO — authored by Phase 3 Captain G per INST-wb-phase3-captain-nextjs.md.
-     This section MUST cover:
-     - App Router `app/[lang]/layout.tsx` or root layout `<head>` injection via Next.js `<Head>` / metadata API
-     - next-intl + `generateMetadata()` pattern: emit `alternates.languages` map
-     - Code snippet:
-       ```ts
-       export async function generateMetadata({ params }): Promise<Metadata> {
-         return {
-           alternates: {
-             languages: {
-               'en': `${BASE}/about`,
-               'de-CH': `${BASE}/de/about`,
-               // ...
-               'x-default': `${BASE}/about`,
-             },
-           },
-         };
-       }
-       ```
-     - Per-page hreflang for dynamic routes (blog posts, product pages) — same pattern via `generateStaticParams()` + per-locale generation
-     - Verification: production build → curl `<head>` → grep `hreflang` → cross-check reciprocity
-     - Cross-reference: `adapters/stack-nextjs.md#i18n-recipe`, `i18n/language-switcher.md#nextjs`
--->
+**Emission mechanism:** Next.js Metadata API — `generateMetadata()` exported from each page (`app/[lang]/{slug}/page.tsx`) OR from `app/[lang]/layout.tsx` for layout-level coverage. The Metadata API's `alternates.languages` map renders to `<link rel="alternate" hreflang="...">` tags in the `<head>` server-side per request. No manual `<head>` injection; no Client Component plumbing.
+
+**Pattern — per-page hreflang (preferred for explicit per-route control):**
+
+```tsx
+// app/[lang]/about/page.tsx — Server Component
+import type { Metadata } from 'next';
+import { routing } from '@/i18n/routing';
+
+const BASE = process.env.NEXT_PUBLIC_CANONICAL_HOST || 'https://example.com';
+
+// Optional region-targeted hreflang codes when project.yaml.language_regions is set
+const HREFLANG_CODES: Record<string, string> = {
+  en: 'en',
+  de: 'de-CH',
+  fr: 'fr-CH',
+  it: 'it-CH',
+};
+
+function buildLanguagesMap(slug: string) {
+  const languages: Record<string, string> = {};
+  for (const loc of routing.locales) {
+    const code = HREFLANG_CODES[loc] ?? loc;
+    languages[code] = `${BASE}/${loc}/${slug}`;
+  }
+  // x-default per Google spec — points to default-language URL
+  languages['x-default'] = `${BASE}/${routing.defaultLocale}/${slug}`;
+  return languages;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    title: 'About',
+    description: 'About page description',
+    alternates: {
+      canonical: `${BASE}/${lang}/about`,
+      languages: buildLanguagesMap('about'),
+    },
+  };
+}
+
+export default async function AboutPage() {
+  return <div>About content</div>;
+}
+```
+
+**Pattern — layout-level hreflang (when slug is parameter-driven and dynamic):**
+
+```tsx
+// app/[lang]/[slug]/layout.tsx — for dynamic routes (blog posts, products)
+import type { Metadata } from 'next';
+import { routing } from '@/i18n/routing';
+
+const BASE = process.env.NEXT_PUBLIC_CANONICAL_HOST || 'https://example.com';
+const HREFLANG_CODES: Record<string, string> = { en: 'en', de: 'de-CH', fr: 'fr-CH', it: 'it-CH' };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string; slug: string }>;
+}): Promise<Metadata> {
+  const { lang, slug } = await params;
+  const languages: Record<string, string> = {};
+  for (const loc of routing.locales) {
+    const code = HREFLANG_CODES[loc] ?? loc;
+    languages[code] = `${BASE}/${loc}/${slug}`;
+  }
+  languages['x-default'] = `${BASE}/${routing.defaultLocale}/${slug}`;
+  return {
+    alternates: {
+      canonical: `${BASE}/${lang}/${slug}`,
+      languages,
+    },
+  };
+}
+
+export default function DynamicLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
+```
+
+**Pattern — shared helper (recommended for projects ≥10 pages):**
+
+Extract the language-map builder into `lib/hreflang.ts` to keep per-page boilerplate down + ensure reciprocity:
+
+```ts
+// lib/hreflang.ts
+import { routing } from '@/i18n/routing';
+
+const BASE = process.env.NEXT_PUBLIC_CANONICAL_HOST || 'https://example.com';
+const HREFLANG_CODES: Record<string, string> = {
+  en: 'en', de: 'de-CH', fr: 'fr-CH', it: 'it-CH',
+};
+
+export function hreflangMap(slug: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const loc of routing.locales) {
+    const code = HREFLANG_CODES[loc] ?? loc;
+    out[code] = `${BASE}/${loc}/${slug}`;
+  }
+  out['x-default'] = `${BASE}/${routing.defaultLocale}/${slug}`;
+  return out;
+}
+
+export function canonicalUrl(lang: string, slug: string): string {
+  return `${BASE}/${lang}/${slug}`;
+}
+```
+
+Then every page's `generateMetadata` uses the same helper — reciprocity is guaranteed by construction (every page emits the SAME hreflang set per slug across locales).
+
+**Per-page hreflang for dynamic routes (blog posts, product pages):**
+
+Same pattern via `generateStaticParams()` + per-locale generation. Example for blog posts:
+
+```tsx
+// app/[lang]/blog/[slug]/page.tsx
+import { routing } from '@/i18n/routing';
+import { hreflangMap, canonicalUrl } from '@/lib/hreflang';
+import { getAllBlogSlugs, getBlogPost } from '@/lib/content';
+
+export async function generateStaticParams() {
+  const params = [];
+  for (const lang of routing.locales) {
+    const slugs = await getAllBlogSlugs(lang);
+    for (const slug of slugs) params.push({ lang, slug });
+  }
+  return params;
+}
+
+export async function generateMetadata({ params }) {
+  const { lang, slug } = await params;
+  const post = await getBlogPost(lang, slug);
+  return {
+    title: post.title,
+    alternates: {
+      canonical: canonicalUrl(lang, `blog/${slug}`),
+      languages: hreflangMap(`blog/${slug}`),
+    },
+  };
+}
+```
+
+**Configuration source for `HREFLANG_CODES`:** read from `project.yaml.language_regions` at scaffold time. When `language_regions` is set (e.g., `de: de-CH`), the agent codegens `HREFLANG_CODES` with those values; when unset, bare ISO 639-1 codes (`de`, `fr`, `it`) are used. Agent regenerates `lib/hreflang.ts` whenever `project.yaml.language_regions` changes.
+
+**`x-default` discipline:** the agent points `x-default` at the `default_language` URL (per `project.yaml.default_language`), NOT at the apex unprefixed root (unless `routing.default_language_at_root` is set — see below). Spec-compliant; matches the language-switcher's preference-detection behavior.
+
+**Hosting URL discipline:** `BASE` reads from `NEXT_PUBLIC_CANONICAL_HOST` env var (set in Vercel Project Settings → Environment Variables at phase 28). The agent NEVER hardcodes `https://example.com` in production code — the placeholder above is only for clarity in the snippet. Production env: `NEXT_PUBLIC_CANONICAL_HOST=https://stillhumans.com` (or per project). Localhost dev: env-var unset → falls through to localhost-safe placeholder (which won't satisfy the absolute-URL rule, but dev pages shouldn't be search-indexed anyway — `robots.txt` blocks dev via `app/robots.ts` conditional logic).
+
+**Apex unprefixed root (when configured):**
+
+Some projects serve the default-language version at `/` AND `/{default_lang}/`. When `project.yaml.routing.default_language_at_root: true`, the agent additionally emits an apex variant in the hreflang map:
+
+```ts
+// For routing.default_language_at_root === true
+out[HREFLANG_CODES[routing.defaultLocale] ?? routing.defaultLocale] =
+  `${BASE}/${slug}`;  // apex URL (no /en/ prefix)
+out['x-default'] = `${BASE}/${slug}`;
+```
+
+The agent reads this config at the helper's load + adjusts. Without it, the canonical URL is always locale-prefixed.
+
+**Validation (production):**
+
+1. **Build verification:** `pnpm build` produces a successful build with no Next.js Metadata warnings.
+2. **Production curl:** `curl -s https://example.com/en/about | grep -E 'rel=.alternate.*hreflang'` returns ≥(locale-count + 1) lines (one per locale + x-default).
+3. **Reciprocity check:** for each page across all locales, `curl` + `grep` + compare hreflang sets — all locale-variants of the same slug MUST emit the SAME hreflang set. The agent's `hreflangMap()` helper guarantees this by construction; a deviation indicates a per-page override that bypassed the helper.
+4. **`x-default` presence:** `grep 'x-default'` returns one line per page.
+5. **Absolute URLs:** `grep 'href="/' page.html` returns ZERO matches inside hreflang tags (all hreflang `href` values start with `http://` or `https://`).
+
+**Phase 26 (SEO audit) verification:**
+
+The agent automates the curl-grep loop at phase 26 — walks every page in `sitemap.yaml`, fetches the production URL, extracts `<link rel="alternate" hreflang="...">` tags via regex, asserts:
+
+- Count = locale-count + 1 (the +1 is x-default)
+- All URLs are absolute + match `BASE`
+- All URLs resolve (HTTP 200)
+- All locale-variants of the same slug emit identical hreflang sets
+
+Failures surface to the user with the diff + the canonical fix path.
+
+**Phase 30 (post-deploy) verification:**
+
+The agent submits sitemap.xml (auto-generated via `app/sitemap.ts`) to Google Search Console. After 24-72 hours, the agent (or user) reviews Search Console → International Targeting report for hreflang errors. Common findings: missing reciprocity (caught earlier by build-time check; should be empty here), non-200 hreflang URLs (deploy-time issue), region-mismatch warnings (cosmetic if `language_regions` config matches user's audience).
+
+**Known Next.js gotchas:**
+
+- **Metadata API requires the function to be ASYNC** when accessing `params` (Next.js 15+ — `params` is a Promise). Synchronous `generateMetadata` ignored without runtime error.
+- **`alternates.canonical`** is the per-page canonical URL — the agent ALWAYS sets it alongside `alternates.languages` (both are spec-recommended). Missing canonical hurts SEO independently of hreflang.
+- **Static export (`output: 'export'`)** emits all hreflang tags at build time — fine. But the `BASE` env var MUST be set at BUILD time (not runtime) for static export — agent passes via `NEXT_PUBLIC_CANONICAL_HOST=https://... pnpm build` in the deploy script.
+- **Trailing slashes:** Vercel's default is no trailing slash; if user opts into `trailingSlash: true` in `next.config.mjs`, the hreflang URLs MUST match (otherwise Vercel redirects + Search Console flags the mismatch). The agent verifies config consistency.
+- **Locale-fallback collisions:** if `routing.defaultLocale = 'en'` and a route is missing the English version (only `/de/about` exists, no `/en/about`), the hreflang map points `en` AND `x-default` at a 404. The agent's content-validation hook flags missing per-locale content before deploy.
+- **`searchParams` change does NOT re-emit metadata** in static rendering — agent always uses path-based hreflang, never query-string-based.
+
+**Cross-references:**
+
+- `adapters/stack-nextjs.md` §"i18n integration" — the per-stack setup this section consumes (routing config, default-language pattern)
+- `i18n/language-switcher.md#next-js--shadcn` — paired switcher component (uses the same locale set)
+- `Workstreams/website-builder/foundation/DESIGN-i18n.md` §"hreflang tags" — the design-doc anchor
 
 ### WordPress
 
