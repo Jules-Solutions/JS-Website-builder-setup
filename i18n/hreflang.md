@@ -84,15 +84,136 @@ Per-stack sections below carry the specific emission code + verification mechani
 
 ### Framer
 
-<!-- TODO — authored by Phase 3 Captain F per INST-wb-phase3-captain-framer.md.
-     This section MUST cover:
-     - Framer's native localization auto-emits hreflang — confirm via context7 at phase 11 (auth behavior may evolve)
-     - For Frames where Framer's native emission misses (e.g. canvas-composed pages with manual locale variants): inject via project-level "Custom Code" → head panel
-     - Custom Component option: a `<HreflangTags />` component the user drops in the header section of each Frame
-     - Reciprocal hreflang verification: paste the production URL into Google Search Console's International Targeting report (post-phase-30)
-     - Known Framer gotchas: hreflang on draft Frames; hreflang on per-locale variant Frames
-     - Cross-reference: `adapters/stack-framer.md#i18n-recipe`, `i18n/language-switcher.md#framer`
--->
+> Cross-reference: `adapters/stack-framer.md` §"i18n integration" + §"context7 lookups for this stack" + `i18n/language-switcher.md#framer`. Verified-current API surface 2026-05-19 via context7 (`/websites/framer_developers`) + WebFetch (`https://www.framer.com/developers/components-reference`).
+
+**Default mechanism — Framer native auto-emit:** when project locales are configured in the Framer Editor (Project Settings → Localization), Framer's runtime auto-emits `<link rel="alternate" hreflang="...">` tags in the page `<head>` for every locale + `x-default`. The agent confirms this is active at phase 26 via context7 + a Playwright walk on the published site that curls the `<head>` and greps for `hreflang`. Auto-emit behavior is the recommended path — minimum custom code, evolves with Framer's locale model.
+
+**Escape hatch 1 — project-level "Custom Code" head injection** (use when native auto-emit misses, e.g. canvas-composed pages with per-locale variant Frames, or Frames where Framer's locale routing diverges from the project's `language_routing` strategy):
+
+1. Project Settings → "Custom Code" → "Head" panel.
+2. Inject a `<script>` tag that builds hreflang `<link>` tags dynamically per page based on the page's slug + the locale list. The agent generates this script from `sitemap.yaml` + `project.yaml.languages` + `project.yaml.canonical_host` + (optional) `project.yaml.language_regions`.
+
+Reference shape:
+
+```html
+<!-- injected into Framer project's Custom Code → head -->
+<script>
+(function () {
+  var host = "https://example.com";         // from project.yaml.canonical_host
+  var defaultLocale = "en";                 // from project.yaml.default_language
+  var locales = ["en", "de", "fr"];         // from project.yaml.languages
+  var regions = { en: "en", de: "de-CH", fr: "fr-CH" };  // optional from project.yaml.language_regions
+
+  // Detect current path (strip locale prefix per "prefix" routing)
+  var path = window.location.pathname.replace(/^\/(?:de|fr|it)(?=\/|$)/, "") || "/";
+
+  locales.forEach(function (l) {
+    var lp = (l === defaultLocale) ? path : "/" + l + path;
+    var link = document.createElement("link");
+    link.rel = "alternate";
+    link.hreflang = regions[l] || l;
+    link.href = host + lp;
+    document.head.appendChild(link);
+  });
+
+  // x-default
+  var xd = document.createElement("link");
+  xd.rel = "alternate";
+  xd.hreflang = "x-default";
+  xd.href = host + path;
+  document.head.appendChild(xd);
+})();
+</script>
+```
+
+**Escape hatch 2 — `<HreflangTags />` Code Component dropped in each Frame's header section.** Same logic as the head script but rendered via React. The agent generates the component; user drops on each Frame. Useful when the user wants per-page hreflang overrides (e.g. a `pricing.en.md` page that exists ONLY in English and intentionally has NO de/fr alternates):
+
+```tsx
+// code/HreflangTags.tsx (Framer Code Component)
+import { addPropertyControls, ControlType } from "framer"
+import { useLocaleInfo } from "framer"
+import { useEffect } from "react"
+
+type Props = {
+  canonical_host: string
+  locales: string[]
+  default_locale: string
+  language_regions: Record<string, string>   // optional region map
+  page_path: string                          // e.g. "/about" — sourced from Frame slug per sitemap.yaml
+  emit_x_default: boolean
+}
+
+export function HreflangTags(props: Props) {
+  useEffect(() => {
+    if (typeof document === "undefined") return
+    const created: HTMLLinkElement[] = []
+
+    props.locales.forEach((l) => {
+      const lp = l === props.default_locale ? props.page_path : `/${l}${props.page_path}`
+      const link = document.createElement("link")
+      link.rel = "alternate"
+      link.hreflang = props.language_regions?.[l] || l
+      link.href = `${props.canonical_host}${lp}`
+      document.head.appendChild(link)
+      created.push(link)
+    })
+
+    if (props.emit_x_default) {
+      const xd = document.createElement("link")
+      xd.rel = "alternate"
+      xd.hreflang = "x-default"
+      xd.href = `${props.canonical_host}${props.page_path}`
+      document.head.appendChild(xd)
+      created.push(xd)
+    }
+
+    return () => created.forEach((el) => document.head.removeChild(el))
+  }, [props.canonical_host, props.default_locale, props.page_path, props.emit_x_default])
+
+  return null   // emits to head only; no visible render
+}
+
+HreflangTags.defaultProps = {
+  canonical_host: "https://example.com",
+  locales: ["en", "de", "fr"],
+  default_locale: "en",
+  language_regions: {},
+  page_path: "/",
+  emit_x_default: true,
+}
+
+addPropertyControls(HreflangTags, {
+  canonical_host: { type: ControlType.String, title: "Canonical host", placeholder: "https://example.com" },
+  locales: { type: ControlType.Array, title: "Locales", control: { type: ControlType.String } },
+  default_locale: { type: ControlType.String, title: "Default locale" },
+  language_regions: {
+    type: ControlType.Object,
+    title: "Region overrides (optional)",
+    controls: {
+      en: { type: ControlType.String, title: "en →", placeholder: "en or en-US" },
+      de: { type: ControlType.String, title: "de →", placeholder: "de-CH" },
+      fr: { type: ControlType.String, title: "fr →", placeholder: "fr-CH" },
+    },
+  },
+  page_path: { type: ControlType.String, title: "Page path", placeholder: "/about", description: "Path without locale prefix" },
+  emit_x_default: { type: ControlType.Boolean, title: "Emit x-default", defaultValue: true },
+})
+```
+
+**Reciprocal hreflang verification (post-phase-30):**
+
+1. Manual: paste each published URL into Google Search Console → International Targeting report; verify the reciprocity map matches expected.
+2. Automated (Playwright at phase 29): walk each page, curl the `<head>`, extract hreflang tags, build a reciprocity matrix in-memory, surface any non-reciprocal entries to the user.
+
+**Region codes (when to use):** per the parent doc's "Region-targeting" table, Swiss multilingual sites (DE/FR/IT/EN) typically use `de-CH`, `fr-CH`, `it-CH` — configured via `project.yaml.language_regions` and consumed by the head-script / Code Component as shown above. Framer's native auto-emit MAY use bare codes; if region codes are required, fall back to the head-script escape hatch.
+
+**Known Framer gotchas:**
+
+- **hreflang on draft Frames:** Framer doesn't emit hreflang for unpublished Frames (correct behavior — search engines shouldn't see drafts). If the user has a draft that NEEDS to be discoverable, publish it (or move the discoverable content to a published Frame).
+- **hreflang on per-locale variant Frames:** when Frames are per-locale variants (Pattern B), Framer's auto-emit binds each variant to its locale automatically — verify at phase 26 via curl.
+- **Cached hreflang via Framer's edge:** Framer's CDN may cache hreflang for ~minutes after locale config changes. If a fresh-curl shows stale hreflang post-change, wait + re-curl OR force-publish the site.
+- **`canonical_host` mismatch with Framer-assigned subdomain:** Framer projects get a default `<project>.framer.app` subdomain. hreflang URLs MUST use the user's `project.yaml.canonical_host` (the custom domain configured at deploy), NOT the framer.app subdomain. The head-script / Code Component sources `canonical_host` from project config; the agent flags any mismatch at phase 28.
+- **Sites Framer's localization plan-tier doesn't cover:** verify the user's Framer plan supports localization at phase 11 (Pro recommended; lower tiers may not expose locale config). If unsupported, the agent surfaces "localization unavailable on this plan" — either upgrade or accept single-language (which still emits a self-referential hreflang via the head-script escape hatch).
 
 ### Next.js + shadcn
 

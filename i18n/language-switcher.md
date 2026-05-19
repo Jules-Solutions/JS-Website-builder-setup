@@ -64,18 +64,137 @@ Per-stack sections below carry the specific component code, library bindings, ro
 
 ### Framer
 
-<!-- TODO — authored by Phase 3 Captain F per INST-wb-phase3-captain-framer.md.
-     This section MUST cover:
-     - Custom Component file path (e.g. `code/LanguageSwitcher.tsx`)
-     - Framer-CMS-driven vs prop-driven approach
-     - useLocale() / Link-with-locale binding
-     - hreflang emission via Framer's project-level locale config (or manual in head injection)
-     - Pattern auto-pick (inline vs dropdown) wired to Framer prop control
-     - localStorage persistence pattern (Framer-CMS-aware)
-     - Accessibility verification (Framer canvas + property controls)
-     - Known Framer gotchas
-     - Cross-reference: `adapters/stack-framer.md#i18n-recipe`, `i18n/hreflang.md#framer`
--->
+> Cross-reference: `adapters/stack-framer.md` §"i18n integration" + §"context7 lookups for this stack" + `i18n/hreflang.md#framer`. Verified-current API surface 2026-05-19 via context7 (`/websites/framer_developers`) + WebFetch (`https://www.framer.com/developers/components-reference`).
+
+**Component file:** `code/LanguageSwitcher.tsx` (Framer Code Component; pushed via `framer push` or the Plugins API code-upload). The user drops the component into the header (or footer) Frame on the canvas; it auto-reads project locales + emits navigation per the project's routing strategy.
+
+**Approach — prop-driven with `useLocaleInfo()` fallback:** the switcher reads locale labels + display pattern from `addPropertyControls` props (canvas-editable), and reads the active locale + locale list at runtime from Framer's `useLocaleInfo()` hook. This gives the user canvas-level control over labels/pattern AND keeps the locale-binding live with Framer's project state.
+
+**Verified-current API note:** the hook is `useLocaleInfo()` (returns `{ activeLocale, locales, setLocale }`), NOT `useLocale()` (the older placeholder used in some pre-2026-04 docs including `DESIGN-stack-framer.md` line 117). The agent invokes context7 at phase 18 to re-confirm before generating.
+
+```tsx
+// code/LanguageSwitcher.tsx
+import { addPropertyControls, ControlType } from "framer"
+import { useLocaleInfo } from "framer"
+import { useEffect } from "react"
+
+type Props = {
+  pattern: "inline" | "dropdown" | "auto"
+  language_labels: Record<string, string>   // e.g. { en: "English", de: "Deutsch", fr: "Français" }
+  aria_label: string                         // from strings.nav.language_switcher_label
+}
+
+export function LanguageSwitcher(props: Props) {
+  const { activeLocale, locales, setLocale } = useLocaleInfo()
+
+  // localStorage persistence — last-selected language
+  useEffect(() => {
+    if (activeLocale?.id) {
+      try { window.localStorage.setItem("wb_lang_pref", activeLocale.id) } catch {}
+    }
+  }, [activeLocale?.id])
+
+  if (!activeLocale || !locales?.length) return null   // gate: pre-hydration / single-locale projects
+
+  // Pattern auto-pick: ≤3 → inline; ≥4 → dropdown (overridable via prop)
+  const resolvedPattern =
+    props.pattern === "auto" ? (locales.length <= 3 ? "inline" : "dropdown") : props.pattern
+
+  const onSelect = (id: string) => {
+    const target = locales.find((l) => l.id === id)
+    if (target) setLocale(target)
+  }
+
+  if (resolvedPattern === "inline") {
+    return (
+      <nav aria-label={props.aria_label} role="navigation">
+        {locales.map((locale) => (
+          <button
+            key={locale.id}
+            onClick={() => onSelect(locale.id)}
+            aria-current={locale.id === activeLocale.id ? "true" : undefined}
+            style={{ minWidth: 44, minHeight: 44, padding: "8px 12px" }}
+          >
+            {props.language_labels[locale.id] ?? locale.name}
+          </button>
+        ))}
+      </nav>
+    )
+  }
+
+  return (
+    <select
+      aria-label={props.aria_label}
+      value={activeLocale.id}
+      onChange={(e) => onSelect(e.target.value)}
+      style={{ minHeight: 44, padding: "8px 12px" }}
+    >
+      {locales.map((locale) => (
+        <option key={locale.id} value={locale.id}>
+          {props.language_labels[locale.id] ?? locale.name}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+LanguageSwitcher.defaultProps = {
+  pattern: "auto",
+  language_labels: { en: "English", de: "Deutsch", fr: "Français", it: "Italiano" },
+  aria_label: "Language",
+}
+
+addPropertyControls(LanguageSwitcher, {
+  pattern: {
+    type: ControlType.Enum,
+    title: "Pattern",
+    options: ["auto", "inline", "dropdown"],
+    optionTitles: ["Auto (count-based)", "Inline chips", "Dropdown"],
+    defaultValue: "auto",
+  },
+  language_labels: {
+    type: ControlType.Object,
+    title: "Locale labels",
+    controls: {
+      en: { type: ControlType.String, title: "English label", defaultValue: "English" },
+      de: { type: ControlType.String, title: "German label", defaultValue: "Deutsch" },
+      fr: { type: ControlType.String, title: "French label", defaultValue: "Français" },
+      it: { type: ControlType.String, title: "Italian label", defaultValue: "Italiano" },
+    },
+  },
+  aria_label: {
+    type: ControlType.String,
+    title: "ARIA label",
+    description: "From strings.nav.language_switcher_label",
+    defaultValue: "Language",
+  },
+})
+```
+
+**Routing rewrite:** delegated to Framer. `setLocale()` triggers Framer's internal locale-aware navigation — Framer rewrites the URL per the project's configured routing strategy (`prefix` default per locked decision 38; subdomain/TLD configured at the Framer project / DNS level). The switcher does NOT manually construct URLs; trust Framer's locale router.
+
+**Display pattern auto-pick:** wired to the `pattern: ControlType.Enum` prop. The component switches to inline chips for ≤3 locales, dropdown for ≥4. User can override on the canvas.
+
+**localStorage persistence:** the `useEffect` on `activeLocale.id` writes to `window.localStorage.wb_lang_pref` per the required-behavior contract. On root-path visit, a small initialization hook (separate `code/LocaleBootstrap.tsx` Code Component dropped on the root Frame) reads `wb_lang_pref` + `Accept-Language` header, calls `setLocale(...)` to redirect to the preferred locale.
+
+**hreflang emission:** Framer's native localization layer auto-emits hreflang tags when project locales are configured (verify via context7 at phase 26). For Frames where native emission misses, see `i18n/hreflang.md#framer` for the manual head-injection escape hatch.
+
+**Accessibility verification:** the component ships with:
+- `role="navigation"` + `aria-label` on the inline variant (semantic landmark)
+- `aria-current="true"` on the active locale (inline variant)
+- Native `<select>` for dropdown variant (browser-provided keyboard + screen-reader semantics)
+- 44×44 minimum tap target (CSS inline; verified at phase 22 a11y audit)
+- Property controls expose `aria_label` for translation per `strings.nav.language_switcher_label`
+
+Phase 22 Playwright walk verifies keyboard nav + screen reader announcement.
+
+**Known Framer gotchas:**
+
+- `useLocaleInfo()` returns `undefined` during static / pre-hydration render — the `if (!activeLocale || !locales?.length) return null` gate handles it.
+- The hook is only available in Framer Code Components; CANNOT be used in a regular React app outside Framer's runtime.
+- Locale `id` casing matches what's configured in Framer project settings (typically ISO 639-1: `en`, `de`, `fr`); the agent verifies casing at phase 11 setup.
+- Canvas-composed Frames that hardcode locale-specific URLs (e.g. a Frame-level link element typed as `/de/about`) won't auto-switch — they need Framer's locale-aware Link wrapper. Agent flags any such bindings during phase 6.5 re-ingestion.
+- Pre-launch on a single-locale project, `useLocaleInfo()` returns one-item list — the gate makes the switcher render nothing, which is correct (no switcher needed for monolingual sites).
 
 ### Next.js + shadcn
 
