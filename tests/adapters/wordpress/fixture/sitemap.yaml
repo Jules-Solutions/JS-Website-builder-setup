@@ -1,0 +1,36 @@
+# Synthetic .website-builder/sitemap.yaml — 3 pages exercising hierarchy + nav.
+
+pages:
+  - slug: /
+    page_type: home
+    purpose: "Introduce the project; drive newsletter signup"
+    parent: null
+    sections: [hero, signup-cta]
+  - slug: /about
+    page_type: about
+    purpose: "Establish credibility + voice"
+    parent: null
+    sections: [bio, philosophy]
+  - slug: /contact
+    page_type: contact
+    purpose: "Contact form + social links"
+    parent: null
+    sections: [contact-form]
+
+# navigation: block (phase 10 output) — drives the custom navigation block in parts/header.html
+navigation:
+  primary:
+    items:
+      - { label: "{strings.nav.primary.home}", target: / }
+      - { label: "{strings.nav.primary.about}", target: /about }
+      - { label: "{strings.nav.primary.contact}", target: /contact }
+  footer:
+    items:
+      - { label: "{strings.nav.primary.about}", target: /about }
+      - { label: "{strings.nav.primary.contact}", target: /contact }
+  utility:
+    items:
+      - { kind: language-switcher, position: header }
+  breadcrumbs:
+    enabled: false   # 3-page shallow site; breadcrumbs not needed
+  mobile_pattern: hamburger-drawer

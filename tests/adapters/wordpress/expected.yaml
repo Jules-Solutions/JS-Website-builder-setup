@@ -1,0 +1,173 @@
+# Expected per-phase adapter output for the WordPress fixture.
+# Per tests/adapters/README.md schema. Phase 5+ wires this against tests/run-tests.sh.
+
+fixture_baseline: phase-11-complete
+
+expected_per_phase:
+
+  # Phase 12 — CMS decision
+  phase_12_cms:
+    cms_recommendation: wordpress-core
+    confidence: high   # WP IS the CMS per §8 of adapters/stack-wordpress.md
+    addons_surfaced:
+      - ACF (when components.yaml needs richer fields)
+      - Meta Box (alternative)
+    anti_fit_surfaced:
+      - Decap (git-backed; split-source-of-truth anti-pattern)
+      - Payload (its own backend; two CMSes = pick one)
+      - Strapi / Sanity / Directus / Keystone / Ghost (same — pick one)
+
+  # Phase 17 — Design system
+  phase_17_design_system:
+    tokens_written_to:
+      - brand.yaml (canonical source — Layer 1)
+      - wp-content/themes/{slug}/theme.json (settings.* mapping per §4 row L1)
+    theme_json_version: 3   # per stack-wordpress.md §13 verified-current notes
+    theme_json_schema_url: https://schemas.wp.org/trunk/theme.json
+    expected_theme_json_partial:
+      version: 3
+      settings:
+        color:
+          palette:
+            - { slug: primary, color: "oklch(64% 0.18 30)", name: Primary }
+            - { slug: neutral-900, color: "oklch(15% 0 0)", name: "Neutral 900" }
+            - { slug: neutral-50, color: "oklch(98% 0 0)", name: "Neutral 50" }
+        typography:
+          fontFamilies:
+            - { slug: display, fontFamily: "Fraunces, serif", name: Display }
+            - { slug: body, fontFamily: "Inter, sans-serif", name: Body }
+          fontSizes:
+            - { slug: h1, size: "64px", name: H1, fluid: { min: "40px", max: "64px" } }
+            - { slug: h2, size: "40px", name: H2, fluid: { min: "28px", max: "40px" } }
+            - { slug: body, size: "18px", name: Body, fluid: { min: "16px", max: "18px" } }
+        spacing:
+          spacingSizes:
+            - { slug: "0", size: "0px", name: None }
+            - { slug: "1", size: "4px", name: XS }
+            - { slug: "2", size: "8px", name: S }
+            - { slug: "3", size: "16px", name: M }
+            - { slug: "4", size: "32px", name: L }
+    generated_css_custom_properties:
+      - --wp--preset--color--primary
+      - --wp--preset--color--neutral-900
+      - --wp--preset--color--neutral-50
+      - --wp--preset--font-family--display
+      - --wp--preset--font-family--body
+      - --wp--preset--font-size--h1
+      - --wp--preset--font-size--h2
+      - --wp--preset--font-size--body
+      - --wp--preset--spacing--1
+      - --wp--preset--spacing--2
+      - --wp--preset--spacing--3
+      - --wp--preset--spacing--4
+    motion_custom_properties_in_style_css:
+      - --wb-motion-duration-med   # no native theme.json slot per §3 + §4 L1
+      - --wb-motion-easing-default
+    drift_check: pass
+
+  # Phase 18 — Component build
+  phase_18_component_build:
+    components_generated: [HeroBlock, NavBar, FooterBlock]
+    block_plugin_location: wp-content/plugins/still-humans-blocks/
+    one_block_per_component: true   # per §9 doctrine in stack-wordpress.md
+    block_api_version: 3   # per stack-wordpress.md §13 verified-current notes
+    output_paths:
+      HeroBlock: wp-content/plugins/still-humans-blocks/blocks/hero-block/
+      NavBar: wp-content/plugins/still-humans-blocks/blocks/nav-bar/
+      FooterBlock: wp-content/plugins/still-humans-blocks/blocks/footer-block/
+    files_per_block:
+      - block.json   # apiVersion: 3 + $schema: https://schemas.wp.org/trunk/block.json
+      - render.php   # dynamic — variant=dynamic
+      - edit.tsx
+      - style.scss
+      - editor.scss
+    scaffolded_via: "npx @wordpress/create-block@latest {name} --variant=dynamic"
+    palette_validator: pass   # all components reference --wp--preset--color--* tokens
+    a11y_audit: pass          # heading hierarchy + alt-text + aria-label correct per components.yaml
+
+  # Phase 22 — i18n exit verification
+  phase_22_i18n:
+    multilingual: true
+    i18n_plugin: polylang   # default per §5 framing
+    hreflang_emitted: true
+    hreflang_x_default: true
+    hreflang_region_codes: [en, de-CH]   # per project.yaml.language_regions
+    language_switcher_added: true
+    language_switcher_location: parts/header.html   # per i18n/language-switcher.md#wordpress
+    language_switcher_pattern: inline   # 2 languages → inline per auto-pick
+    rtl_handling: n/a   # rtl_languages: [] in fixture
+    polylang_url_modifications: enabled   # per i18n/hreflang.md#wordpress
+    pot_file_generated: wp-content/themes/still-humans-theme/lang/still-humans.pot
+    po_file_generated: wp-content/themes/still-humans-theme/lang/still-humans-de.po
+    cache_locale_variance_configured: true   # caching plugin + Cloudflare per §6 hreflang
+
+  # Phase 28 — Deploy
+  phase_28_deploy:
+    target: managed-wp-host   # default per §10 Deploy / Managed-WP H3
+    hosting_decision_separate_from_cms: true   # CRITICAL per Risk S4 — splits §10 from §8
+    hosting_h3_options_surfaced:
+      - managed-wp-hosts (Kinsta / WP Engine / SiteGround / Cloudways / Bluehost / Hostinger)
+      - self-hosted (VPS / cloud — DigitalOcean / Linode / Vultr / Hetzner)
+      - wordpress-com (Business+ minimum for custom themes)
+      - containerized (Bedrock / Trellis / wp-env)
+    dns_handoff_ready: true
+    ssl_strategy: lets-encrypt-via-host   # host-provided
+    analytics_strategy: monsterinsights-plugin   # OR direct wp_head inject
+    perf_plugins:
+      - wp-rocket OR w3-total-cache OR litespeed-cache (host-dependent)
+      - shortpixel OR imagify OR smush
+      - cloudflare (CDN)
+    lighthouse_target: 80
+    deploy_verification_via_playwright: true   # phase 29 walk per extraction/playwright-walk.md
+
+# Per-stack expected limitations (what the adapter SHOULD surface as cannot-do)
+expected_limitations:
+  - "Paid hosting required for serious sites (no free-tier custom-theme path)"
+  - "PHP runtime required (cannot statically export)"
+  - "Each request hits WordPress PHP bootstrap (caching mitigates; never matches static-export)"
+  - "Plugin sprawl is a risk surface (maintenance + perf + attack surface per plugin)"
+  - "PHP 8.0+ required for modern blocks + @wordpress/scripts"
+  - "Programmatic page composition with high visual fidelity is awkward (block-markup serialization)"
+  - "Override host-level constraints not possible (some managed-WP hosts disable plugins)"
+  - "Visual-canvas-after-launch is awkward vs Framer (Gutenberg is a step down)"
+  - "WordPress.com free/personal/premium plans cannot install custom themes"
+
+# Per-stack expected failure modes the adapter handles
+expected_failure_modes_covered:
+  - "REST 401/403 on write (Application Password expired)"
+  - "REST 429 rate-limited by managed host (switch to wp-cli over SSH)"
+  - "block.json schema invalid OR editorScript path wrong"
+  - "theme.json changes don't appear (block editor cache; theme toggle to flush)"
+  - "Polylang/WPML serves wrong language (caching plugin not varying by locale)"
+  - "Custom block doesn't show in inserter (plugin not active or block category invalid)"
+  - "wp-env start fails (port collision; WP_ENV_PORT=8889)"
+  - "MySQL latin1 charset (convert to utf8mb4 via wp-cli)"
+  - "Page-builder mid-project pivot = structural pivot per decision 34"
+  - "Performance budget missed (plugin sprawl / no caching / unoptimized images)"
+  - "2FA-walled admin can't be auto-walked by Playwright (user provides screenshots)"
+
+# Cross-references the adapter must populate correctly
+expected_cross_references:
+  - i18n/language-switcher.md#wordpress (paired switcher implementation)
+  - i18n/hreflang.md#wordpress (paired hreflang emission)
+  - i18n/strings-schema.md (stack-agnostic CDJSON contract)
+  - i18n/rtl.md (stack-agnostic RTL discipline)
+  - skills/wb-component-build/references/per-stack-codegen.md#wordpress (phase 18 codegen)
+  - Workstreams/website-builder/stacks/DESIGN-stack-wordpress.md (design-doc anchor)
+  - Workstreams/website-builder/components/DESIGN-components-tailwind.md (DaisyUI pairing)
+
+# Schema compliance
+schema_compliance:
+  fourteen_h2_sections_present: true
+  h2_order_correct: true
+  content_layer_table_present: true
+  content_layer_row_labels_verbatim:
+    - L1 brand.yaml.tokens
+    - L2 sitemap.yaml + sections.yaml
+    - L3 strings/{lang}.json
+    - L4 content/pages/*.md
+    - L5 briefs/{component}.json
+  deploy_h2_has_hosting_split: true   # Risk S4 — hosting decision separated into ≥4 H3
+  cms_pairing_h2_separate_from_deploy: true   # Risk S4
+  context7_lookups_present: true
+  references_present: true

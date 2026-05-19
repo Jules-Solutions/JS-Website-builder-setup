@@ -1,0 +1,38 @@
+# Synthetic .website-builder/project.yaml at phase-11-complete for the WordPress adapter test.
+# Per tests/adapters/README.md — minimal-but-valid project state ready for phase 12.
+
+# Stack decision (phase 11)
+stack: wordpress
+stack_reasoning: |
+  WordPress picked because the post-launch editorial team is non-developer and will publish
+  ~2 articles per week in /wp-admin. The Gutenberg block editor matches their existing
+  authoring intuition. Custom block theme + 3 section-bound custom blocks per the
+  agent's MVP scaffold. Self-hosted on a managed-WP host (decision pending phase 28).
+
+# Transactional sibling (phase 11) — verbatim two-question answers
+transactional: false
+transactional_kind: none
+transactional_reasoning: |
+  No payments. No bookings. Newsletter signup only (form, not transactional).
+
+# Entry mode (set at session start)
+entry_mode: greenfield
+
+# i18n — multilingual exercising Polylang default + Pattern A
+languages: [en, de]
+default_language: en
+language_routing: prefix
+fallback_strategy: missing-key-shows-default-and-warn
+rtl_languages: []
+language_regions:
+  en: en
+  de: de-CH  # Swiss-targeted DE per the §5 example in the adapter
+
+# Canonical host (set at phase 28; placeholder here for fixture)
+canonical_host: https://example.com
+
+# Breakpoints (used by phase-14 responsive specs + theme.json fluid typography)
+breakpoints:
+  mobile_360: 360
+  tablet_768: 768
+  desktop_1280: 1280

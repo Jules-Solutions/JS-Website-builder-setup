@@ -1,0 +1,44 @@
+# Synthetic .website-builder/components.yaml — 3 components for the WordPress adapter test.
+# Each becomes one custom Gutenberg block per §9 in adapters/stack-wordpress.md.
+
+components:
+  - name: HeroBlock
+    purpose: "Top-of-page hero with headline + sub + CTA"
+    props:
+      headline: { type: string, max_chars: 60, required: true }
+      sub: { type: string, max_chars: 120, required: true }
+      cta_text: { type: string, max_chars: 24, default: "{strings.cta.subscribe}" }
+      background_image: { type: image, required: false }
+    responsive:
+      mobile_360: { headline_size: 32px, layout: stacked }
+      desktop_1280: { headline_size: 64px, layout: stacked }
+    accessibility:
+      heading_hierarchy: "headline = h1 (only on home), h2 elsewhere"
+      alt_text_required: background_image
+      contrast_ratio: "4.5:1 against headline color"
+      keyboard_nav: "CTA tabbable; focus ring visible"
+
+  - name: NavBar
+    purpose: "Primary navigation; hosts language switcher per sitemap navigation.utility"
+    props:
+      items: { type: array, required: true }
+      current_path: { type: string, required: true }
+      logo_src: { type: image, required: false }
+    responsive:
+      mobile_360: { layout: hamburger-drawer }
+      desktop_1280: { layout: inline }
+    accessibility:
+      aria_label: "{strings.nav.primary_label}"
+      keyboard_nav: "Tab through items; Esc closes drawer"
+      skip_to_content: true
+
+  - name: FooterBlock
+    purpose: "Site footer; secondary nav + copyright + language switcher fallback"
+    props:
+      copyright_text: { type: string, default: "© Still Humans 2026" }
+      items: { type: array, required: true }
+    responsive:
+      mobile_360: { layout: stacked }
+      desktop_1280: { layout: inline }
+    accessibility:
+      role: contentinfo
