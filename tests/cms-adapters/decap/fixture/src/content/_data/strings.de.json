@@ -1,0 +1,20 @@
+{
+  "$language": "de",
+  "nav": {
+    "home": "Startseite",
+    "about": "Über uns",
+    "blog": "Blog",
+    "contact": "Kontakt",
+    "language_switcher_label": "Sprache wählen"
+  },
+  "cta": {
+    "primary_button": "Loslegen",
+    "secondary_button": "Mehr erfahren",
+    "contact_button": "Kontaktieren Sie uns"
+  },
+  "errors": {
+    "form_required": "Dieses Feld ist erforderlich",
+    "form_invalid_email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "form_submission_failed": "Übermittlung fehlgeschlagen. Bitte versuchen Sie es erneut."
+  }
+}

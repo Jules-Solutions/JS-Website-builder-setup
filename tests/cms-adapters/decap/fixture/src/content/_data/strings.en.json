@@ -1,0 +1,20 @@
+{
+  "$language": "en",
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "blog": "Blog",
+    "contact": "Contact",
+    "language_switcher_label": "Choose language"
+  },
+  "cta": {
+    "primary_button": "Get started",
+    "secondary_button": "Learn more",
+    "contact_button": "Contact us"
+  },
+  "errors": {
+    "form_required": "This field is required",
+    "form_invalid_email": "Please enter a valid email",
+    "form_submission_failed": "Submission failed. Please try again."
+  }
+}

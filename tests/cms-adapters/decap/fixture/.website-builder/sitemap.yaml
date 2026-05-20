@@ -1,0 +1,33 @@
+# tests/cms-adapters/decap/fixture/.website-builder/sitemap.yaml
+# Layer 2 — sitemap. 4 pages, synthetic content.
+
+pages:
+  - slug: home
+    title: Home
+    layout:
+      - { type: hero }
+      - { type: rich_text }
+      - { type: cta }
+  - slug: about
+    title: About
+    layout:
+      - { type: hero }
+      - { type: rich_text }
+  - slug: blog
+    title: Blog
+    layout:
+      - { type: hero }
+      - { type: rich_text }
+  - slug: contact
+    title: Contact
+    layout:
+      - { type: hero }
+      - { type: rich_text }
+      - { type: cta }
+
+navigation:
+  primary:
+    - { label_key: nav.home, href: / }
+    - { label_key: nav.about, href: /about }
+    - { label_key: nav.blog, href: /blog }
+    - { label_key: nav.contact, href: /contact }

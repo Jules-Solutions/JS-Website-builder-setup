@@ -67,6 +67,10 @@ tests/coverage/
 # Exception: test fixtures DO ship — they ARE the per-adapter test contract
 !tests/adapters/*/fixture/.website-builder/
 !tests/adapters/*/fixture/.website-builder/**
+!tests/cms-adapters/*/fixture/.website-builder/
+!tests/cms-adapters/*/fixture/.website-builder/**
+!tests/commerce-adapters/*/fixture/.website-builder/
+!tests/commerce-adapters/*/fixture/.website-builder/**
 
 # Logs
 *.log
