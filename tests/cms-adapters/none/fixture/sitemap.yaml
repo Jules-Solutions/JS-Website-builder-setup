@@ -1,0 +1,33 @@
+---
+# tests/cms-adapters/none/fixture/sitemap.yaml
+# Layer-2 structural: pages + navigation. 3 pages (home, about, contact) per
+# tests/cms-adapters/README.md § "Minimum contents per CMS" minimum.
+
+pages:
+  - slug: /
+    file: content/pages/{lang}/home.md
+    title_key: nav.primary.home
+    primary_nav: true
+    nav_order: 1
+
+  - slug: /about
+    file: content/pages/{lang}/about.md
+    title_key: nav.primary.about
+    primary_nav: true
+    nav_order: 2
+
+  - slug: /contact
+    file: content/pages/{lang}/contact.md
+    title_key: nav.primary.contact
+    primary_nav: true
+    nav_order: 3
+
+navigation:
+  primary:
+    - slug: /
+    - slug: /about
+    - slug: /contact
+
+  footer:
+    - slug: /about
+    - slug: /contact
