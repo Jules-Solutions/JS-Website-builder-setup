@@ -1,0 +1,29 @@
+{
+  "$language": "en",
+  "$schema": "spec/strings-v1.json",
+
+  "cta": {
+    "subscribe": "Get the newsletter",
+    "subscribe_loading": "Subscribing...",
+    "subscribe_success": "You're in. Check your inbox.",
+    "subscribe_error": "Something didn't work. Try again?",
+    "send": "Send",
+    "cancel": "Cancel"
+  },
+
+  "errors": {
+    "network": "Connection failed. Check your internet and try again.",
+    "validation_email": "That doesn't look like a valid email.",
+    "validation_required": "This field is required."
+  },
+
+  "nav": {
+    "primary": {
+      "home": "Home",
+      "about": "About",
+      "contact": "Contact"
+    },
+    "skip_to_content": "Skip to content",
+    "language_switcher_label": "Language"
+  }
+}

@@ -1,0 +1,105 @@
+---
+# tests/cms-adapters/none/expected.yaml
+# Declarative spec of what cms-none.md SHOULD produce at each pipeline phase.
+# Schema per tests/cms-adapters/README.md § "expected.yaml".
+# Phase 4 manual verification — General walks the fixture through phases mentally
+# and confirms cms-none.md would produce this output. Phase 5+ test runner integration is
+# out of scope per BUILD-strategy.md.
+
+fixture_baseline: phase-12-complete
+
+expected_per_phase:
+
+  phase_12_cms:
+    cms_selected: none
+    admin_url: "n/a (file-based — no admin UI)"
+    auth_configured: "n/a (no auth surface; repo write access = full edit rights)"
+    first_content_item_created: "content/pages/en/about.md (committed to git)"
+    # Per S1 CRUD vocabulary: creation = create file + git add + git commit + git push.
+    # The fixture's content/pages/en/about.md represents the post-commit state; the
+    # actual git history is not part of the fixture (no .git/ checked in).
+    schema_config_path: "src/content/config.ts (Zod schema generated from components.yaml block types — Astro pairing)"
+    crud_vocabulary_documented: true
+    # Cross-reference: cms-none.md § "Auth + setup" → "### CRUD vocabulary"
+
+  phase_17_design_system:
+    tokens_written_to: "src/styles/tokens.css"
+    # Astro pairing — brand.yaml.tokens compile to CSS custom properties at build.
+    # No CMS-side BrandTokens collection (cms-none has no CMS layer); tokens live
+    # in the stack's CSS path directly per Layer 1 mapping.
+    drift_check: pass
+
+  phase_18_component_build:
+    components_generated:
+      - HeroBlock        # → src/components/HeroBlock.astro
+      - NavBar           # → src/components/NavBar.astro
+      - FooterBlock      # → src/components/FooterBlock.astro
+    schema_validation: pass
+    # The Zod schema in src/content/config.ts uses z.discriminatedUnion('type', ...)
+    # over the 3 section types — hero, navbar, footer. Frontmatter sections[]
+    # arrays in content/pages/{lang}/*.md validate at build time.
+    palette_validator: pass
+    a11y_audit: pass
+
+  phase_22_i18n:
+    per_locale_files_present: true
+    # Fixture confirms: home.en.md + home.de.md + about.en.md + about.de.md
+    # exist in per-language-folder pattern (Pattern A per DESIGN-i18n.md Decision 39).
+    # contact.de.md is intentionally absent to exercise the missing-string fallback
+    # detection path (Decision 41) — render-time falls back to default-locale string;
+    # session-start lint surfaces drift.
+    missing_string_fallback: documented
+    # cms-none.md § "i18n integration" → "String-missing fallback" covers Decision 41.
+    language_switcher_added: true
+    # Cross-reference: i18n/language-switcher.md (Phase 3 substrate).
+    hreflang_emitted: true
+    # Cross-reference: i18n/hreflang.md (Phase 3 substrate).
+    routing_strategy: prefix
+    # Decision 38 default — confirmed at project.yaml.language_routing: prefix.
+
+  phase_24a_commerce: "n/a (transactional=false in fixture; commerce branch not exercised. Phase 10+ scope for cms-none-commerce companion fixture)"
+
+expected_limitations:
+  # What cms-none.md SHOULD surface as cannot-do — per § "Limitations + escape hatches" hard rows.
+  - "Editor must be comfortable in a code editor; non-developer editors struggle without onboarding"
+  - "No live preview from a separate admin UI; VS Code's markdown preview is the closest"
+  - "No multi-user real-time collab; git-based with merge-conflict semantics on simultaneous edits"
+  - "No fine-grained permissions; repo write access = full edit rights"
+  - "No member-only content / paywalls / subscriptions (Ghost or Payload territory)"
+  - "No revision history beyond git; git log IS the history"
+  - "Rich-text editing limited to markdown's expressiveness; no drag-drop block editor"
+  - "No webhook receivers / server-side endpoints natively; add serverless functions per-need"
+  - "No editor mobile workflow; editing on a phone is painful (github.dev mitigates on tablets)"
+
+expected_failure_modes_covered:
+  # Failure paths the adapter handles — surface via lint + build backstop per § "Authoring patterns → Common pitfalls".
+  - "Frontmatter typo (tile: vs title:) → pre-commit Zod schema lint blocks; CI is backstop"
+  - "Forgetting to commit a new file → wb:publish helper script does git add + commit + push in one"
+  - "Image references break after rename → lint:images hook walks all ![...](...) references pre-commit"
+  - "Markdown body vs frontmatter sections confusion → schema lint flags structurally-misplaced fields"
+  - "Conflict on push when working from two machines → bootstrap surfaces git pull --rebase workflow"
+  - "Forgetting frontmatter delimiters (--- open/close) → YAML lint catches"
+  - "Smart quotes from Word / Google Docs paste → lint:smart-quotes hook sanitizes pre-commit"
+  - "Per-locale file drift (new section in EN missing in DE) → session-start lint walks for completeness"
+  - "Slug collisions (two files claiming same slug) → lint detects"
+  - "Pre-commit hook bypass via --no-verify → CI build re-runs lint as backstop"
+  - "Deploy succeeds but site shows old content (CDN cache) → deploy hook purges Cloudflare cache automatically"
+
+# Verification checklist for Phase 4 manual review (General walks this with the fixture)
+phase_4_manual_verification_checklist:
+  - "Walk content/pages/en/about.md frontmatter against cms-none.md § 'Authoring patterns' Pattern 2 — confirm sections[] discriminated-union shape matches Zod schema in adapter file"
+  - "Walk content/pages/en/about.md → en/de pair against § 'i18n integration' → per-language folders pattern"
+  - "Walk content/strings/{en,de}.json against § 'Content layer mapping' L3 row + § 'i18n integration' string-missing fallback"
+  - "Walk components.yaml against § 'Content layer mapping' L2 row — confirm 3 component shapes map to 3 Zod discriminated-union members"
+  - "Confirm § 'Auth + setup' → '### CRUD vocabulary' subsection documents create / edit / publish / unpublish / schedule / view-revisions / upload-media / create-type / delete in filesystem+git terms"
+  - "Confirm § 'Stack pairings' table verdicts match cross-CMS × stack anchor in cms-adapters/README.md verbatim"
+  - "Confirm § 'context7 lookups for this CMS' enumerates positive (Astro/Hugo/markdownlint MCP) AND negative (11ty/Pagefind/image-opt MCP) findings"
+  - "Confirm § 'Commerce integration (if transactional=true)' conditional heading is verbatim per schema; fixture's transactional=false means section is not exercised"
+
+# Notes for future Phase 5+ test-runner integration
+future_runner_notes:
+  - "No external setup required — fixture is fully self-contained markdown"
+  - "Runner can validate Zod schema (src/content/config.ts) generation by parsing components.yaml + diffing against expected output"
+  - "Runner can validate per-locale file presence: content/pages/{lang}/{slug}.md for each lang × slug combination per sitemap.yaml"
+  - "Runner can validate strings file shape: content/strings/{lang}.json matches CDJSON schema (i18n/strings-schema.md)"
+  - "Runner cannot validate actual git operations (no .git/ in fixture) — runner can check file presence + frontmatter shape, not commit-message semantics"

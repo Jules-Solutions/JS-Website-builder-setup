@@ -1,0 +1,29 @@
+{
+  "$language": "de",
+  "$schema": "spec/strings-v1.json",
+
+  "cta": {
+    "subscribe": "Newsletter abonnieren",
+    "subscribe_loading": "Wird abonniert...",
+    "subscribe_success": "Du bist dabei. Schau in dein Postfach.",
+    "subscribe_error": "Etwas hat nicht funktioniert. Erneut versuchen?",
+    "send": "Senden",
+    "cancel": "Abbrechen"
+  },
+
+  "errors": {
+    "network": "Verbindung fehlgeschlagen. Prüfe deine Internetverbindung und versuche es erneut.",
+    "validation_email": "Das sieht nicht nach einer gültigen E-Mail-Adresse aus.",
+    "validation_required": "Dieses Feld ist erforderlich."
+  },
+
+  "nav": {
+    "primary": {
+      "home": "Startseite",
+      "about": "Über uns",
+      "contact": "Kontakt"
+    },
+    "skip_to_content": "Zum Inhalt springen",
+    "language_switcher_label": "Sprache"
+  }
+}

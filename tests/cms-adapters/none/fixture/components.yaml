@@ -1,0 +1,46 @@
+---
+# tests/cms-adapters/none/fixture/components.yaml
+# Layer-2 structural: components. 3 minimum per README (HeroBlock, NavBar, FooterBlock).
+# These become the Zod discriminated-union types in src/content/config.ts at phase 18.
+
+components:
+  - name: HeroBlock
+    section_type: hero        # the `type` discriminator value used in page frontmatter sections[]
+    props:
+      headline: { type: string, max_chars: 60, required: true }
+      sub: { type: string, max_chars: 120, optional: true }
+      cta_text: { type: string, max_chars: 24, optional: true }
+      cta_href: { type: string, optional: true }
+      background_image: { type: image, optional: true }
+    responsive:
+      mobile_360: { headline_size: 32px, layout: stacked }
+      desktop_1280: { headline_size: 56px, layout: stacked }
+    accessibility:
+      heading_hierarchy: "headline = h1 (only on home), h2 elsewhere"
+      alt_text_required: background_image
+
+  - name: NavBar
+    section_type: navbar       # included as a section type for fixture completeness; in real sites NavBar is a layout-level component
+    props:
+      brand: { type: string, max_chars: 24, required: true }
+      links: { type: array, items: { url: string, label_key: string }, required: true }
+      cta_text: { type: string, max_chars: 24, optional: true }
+      cta_href: { type: string, optional: true }
+    responsive:
+      mobile_360: { layout: hamburger }
+      desktop_1280: { layout: horizontal }
+    accessibility:
+      landmark: nav
+      skip_to_content: required
+
+  - name: FooterBlock
+    section_type: footer
+    props:
+      tagline: { type: string, max_chars: 120, optional: true }
+      links: { type: array, items: { url: string, label_key: string }, required: true }
+      copyright: { type: string, required: true }
+    responsive:
+      mobile_360: { layout: stacked }
+      desktop_1280: { layout: horizontal }
+    accessibility:
+      landmark: contentinfo
