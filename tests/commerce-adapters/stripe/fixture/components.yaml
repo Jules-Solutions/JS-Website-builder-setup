@@ -1,0 +1,44 @@
+# tests/commerce-adapters/stripe/fixture/components.yaml
+# Component registry — minimum 2-3 components per fixture convention, including
+# a buy-button or product-card for commerce. Layer 2/Layer 5 cross-reference
+# per DESIGN-content-layers.md.
+
+components:
+  - name: HeroBlock
+    type: section
+    description: Home-page hero with headline + subheadline + primary CTA
+    locales: [en, de]
+
+  - name: PricingCard
+    type: section
+    description: >
+      Per-product card displaying title + description + price + buy-button.
+      Renders one card per product in the courses index. Price displayed in
+      transaction currency (CHF primary, EUR secondary toggle).
+    locales: [en, de]
+
+  - name: BuyButton
+    type: button
+    description: >
+      Primary commerce CTA — initiates Stripe Checkout Session creation via
+      Next.js Route Handler (POST /api/checkout) and redirects to Stripe-hosted
+      page. Per-product instance with product_id prop.
+    locales: [en, de]
+    stripe_integration:
+      mode: 2                            # Mode 2 = server-side Checkout Session
+      endpoint: /api/checkout
+      success_url_template: /success?sid={CHECKOUT_SESSION_ID}
+      cancel_url_template: /cancel
+
+  - name: ConsultationContactForm
+    type: form
+    description: >
+      Embedded contact form for the consultation product — alternative path
+      to Buy Button when customer wants pre-booking conversation. Triggers
+      Buy Button on submission after lead qualification.
+    locales: [en, de]
+
+  - name: LanguageSwitcher
+    type: nav
+    description: en ⇄ de toggle in header
+    locales: [en, de]

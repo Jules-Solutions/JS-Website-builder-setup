@@ -1,0 +1,50 @@
+# tests/commerce-adapters/calcom/fixture/components.yaml
+# Component registry — booking-focused components per fixture convention
+# ("embed-block for booking" — tests/commerce-adapters/README.md line 60).
+
+components:
+  - name: HeroBlock
+    type: section
+    description: Home-page hero with primary booking CTA
+    locales: [en]
+
+  - name: AboutSection
+    type: section
+    description: About-page biography + credentials section
+    locales: [en]
+
+  - name: CalEmbedInline
+    type: embed
+    description: >
+      Cal.com inline embed widget — renders the booking widget directly on
+      the /book page. Wraps @calcom/embed-react Cal Atoms. Accepts event-type
+      slug + theme override props.
+    locales: [en]
+    calcom_integration:
+      mode: inline
+      embed_package: "@calcom/embed-react"
+      atoms_supported: true
+      event_types: [consult-30, coaching-60]
+
+  - name: CalEmbedPopup
+    type: button
+    description: >
+      "Book a call" CTA button that triggers Cal.com popup overlay on click.
+      Embedded site-wide via header/footer. Lighter integration than inline
+      embed.
+    locales: [en]
+    calcom_integration:
+      mode: popup
+      embed_package: "@calcom/embed-react"
+      event_types: [consult-30]
+
+  - name: CalEmbedFloatingButton
+    type: button
+    description: >
+      Persistent floating "Book" CTA in bottom-right corner. High-conversion
+      pattern for service-business sites.
+    locales: [en]
+    calcom_integration:
+      mode: floating-button
+      embed_package: "@calcom/embed-react"
+      event_types: [consult-30]

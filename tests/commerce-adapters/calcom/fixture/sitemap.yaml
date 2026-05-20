@@ -1,0 +1,52 @@
+# tests/commerce-adapters/calcom/fixture/sitemap.yaml
+# Layer 2 (page composition) — booking-focused page set.
+
+pages:
+  - slug: /
+    title: Solo Consultant — Helping You Move From Stuck to Shipped
+    type: home
+    locales: [en]
+
+  - slug: /about
+    title: About
+    type: content
+    locales: [en]
+
+  - slug: /book
+    title: Book a Call
+    type: booking_page
+    locales: [en]
+    # Embedded Cal.com inline widget renders here
+    calcom_embed_mode: inline
+    calcom_event_types: [consult-30, coaching-60]
+
+  # Booking-success / cancelled pages handled inside Cal.com (off-site),
+  # but the user can configure custom return URLs to these on-site pages.
+  - slug: /booking-confirmed
+    title: Your Booking Is Confirmed
+    type: post_booking_success
+    locales: [en]
+
+  - slug: /booking-cancelled
+    title: Booking Cancelled
+    type: post_booking_cancel
+    locales: [en]
+
+  # Legal pages — minimal for free bookings (cancellation policy + privacy)
+  - slug: /legal/cancellation-policy
+    title: Cancellation Policy
+    type: legal
+    locales: [en]
+
+  - slug: /legal/privacy
+    title: Privacy Policy
+    type: legal
+    locales: [en]
+
+nav:
+  primary:
+    - { slug: /about, label: { en: About } }
+    - { slug: /book, label: { en: Book a Call } }
+  footer:
+    - { slug: /legal/cancellation-policy, label: { en: Cancellation } }
+    - { slug: /legal/privacy, label: { en: Privacy } }

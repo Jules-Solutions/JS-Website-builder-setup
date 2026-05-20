@@ -1,0 +1,145 @@
+# tests/commerce-adapters/stripe/expected.yaml
+# Phase 4 Captain L — declarative spec of what the commerce-stripe adapter
+# SHOULD produce at each pipeline phase when run against the fixture.
+#
+# Per tests/commerce-adapters/README.md:
+#   - Phase 4: manual verification at General review against this file
+#   - Phase 5+: runner integration wires the actual diff-check
+#
+# Schema per tests/commerce-adapters/README.md § "expected.yaml" (commerce schema)
+
+fixture_baseline: phase-24-complete    # full commerce flow exercised (24a + 24b + 24c)
+
+expected_per_phase:
+
+  # PHASE 24a — Commerce platform setup
+  phase_24a_commerce:
+    platform_selected: stripe-checkout
+    mode: 2                                    # Mode 2 = server-side Checkout Session
+
+    # Stripe Products created via API (3 products per the muggle Swiss-creator scenario)
+    products_created:
+      - prod_foundations_chf
+      - prod_applied_chf
+      - prod_consult_chf
+
+    # Stripe Prices created (per-product per-currency; 5 prices total)
+    prices_created:
+      - price_foundations_chf_4900   # CHF 49 one-time
+      - price_foundations_eur_4500   # EUR 45 one-time
+      - price_applied_chf_14900      # CHF 149 one-time
+      - price_applied_eur_13900      # EUR 139 one-time
+      - price_consult_chf_29900_q    # CHF 299/quarter recurring (subscription)
+
+    # Checkout flow generated per stack (Next.js Route Handler pattern)
+    checkout_flow_mode: checkout-sessions      # Mode 2; vs payment-links (Mode 1)
+    success_url_set: true
+    cancel_url_set: true
+
+    # Customer Portal required for subscription mode (prod_consult_chf)
+    customer_portal_configured: true
+
+    # Test-mode rehearsal passes with standard Stripe test cards
+    test_mode_rehearsal: pass
+
+    # Stripe MCP used for canonical Session creation patterns
+    mcp_used: stripe-mcp                       # claude.com/plugins/stripe
+
+  # PHASE 24b — Payment provider wiring
+  # CRITICAL: TWINT assertions per S6 + payment-config-schema.md TWINT contract
+  phase_24b_payment:
+    primary_provider: stripe
+
+    # Enabled payment methods per audience
+    enabled_methods: [card, apple_pay, google_pay, twint]
+    enabled_currencies: [CHF, EUR]
+
+    # Webhook configuration
+    webhook_configured: true
+    webhook_signing_verified: true
+
+    # 3DS/SCA mandatory for EU customers
+    sca_3ds_verified_eu: true
+
+    # Domain verification mandatory for Apple Pay / Google Pay
+    domain_verified_apple_google_pay: true
+
+    # MANDATORY TWINT assertions per:
+    #   - BUILD-strategy.md Phase 4 DoD line 202
+    #   - commerce-adapters/README.md § "TWINT-for-Switzerland — non-negotiable rule"
+    #   - commerce-adapters/payment-config-schema.md § "TWINT contract"
+    #   - tests/commerce-adapters/README.md § "TWINT-required fixture rule"
+    twint_enabled: true                        # MANDATORY: true (the CH-region-simulation contract)
+    chf_currency_enabled: true                 # MANDATORY: true
+
+    # Stripe-side requirements surfaced for test→live cutover
+    stripe_account_required_for_live: true     # surfaces the test→live cutover requirement
+
+    # Other regional methods per audience
+    # NL audience absent → ideal_enabled: false (irrelevant)
+    # BNPL audience absent → klarna_enabled: false (acceptable; user has no AOV >100 EUR product)
+    ideal_enabled: false                       # NL absent from audience_regions
+    klarna_enabled: false                      # AOV <100 EUR for foundations course
+
+    # PayPal secondary provider configured for legacy-trust
+    secondary_provider: paypal
+    secondary_provider_enabled: true
+
+    # Regional override forces TWINT-enabled flow for CH transactions
+    regional_overrides_present:
+      CH: stripe
+      DE: stripe
+      AT: stripe
+
+  # PHASE 24c — Commerce-specific legal
+  phase_24c_legal:
+    refund_policy_present: true                # /legal/refund-policy
+    shipping_policy_present: false             # digital products only — no shipping
+    tcs_of_sale_present: true                  # /legal/tcs-of-sale
+    imprint_present: true                      # /legal/imprint (DACH audience triggers this)
+    subscription_disclosure_present: true      # required for consult subscription product
+    receipt_format_configured: true            # Stripe default + customization in Dashboard
+
+    # User is MoR — tax handling burden surfaced
+    user_is_mor: true
+    tax_handling_disclosed: true               # surfaced via TCs of Sale § 5
+    stripe_tax_optional: true                  # user can opt into Stripe Tax (+0.5%) if needed
+
+  # PHASE 22 — Transactional flag (not mid-flip in this fixture; transactional from start)
+  phase_22_transactional:
+    transactional: true
+    transactional_kind: products
+    transactional_change_logged: false         # not mid-flip; transactional from project init
+
+# Adapter-specific limitations the fixture is aware of
+expected_limitations:
+  - "Stripe Checkout has no catalog / browse / search — fixture intentionally avoids storefront features"
+  - "User is Merchant of Record — tax compliance is user's burden (surfaced via TCs of Sale § 5; Stripe Tax remains optional)"
+  - "TWINT only works on CHF transactions — fixture enforces per-currency rendering rule"
+  - "TWINT capped at 5,000 CHF per transaction — fixture's products all under this limit (max is CHF 299/quarter for consult)"
+  - "Hosted Checkout limited UI customization — fixture relies on Stripe-default styling + logo upload"
+
+# Failure modes the fixture explicitly exercises
+expected_failure_modes_covered:
+  - "Test mode keys deployed to production — fixture sets test_mode: true; live-flip requires explicit user confirmation"
+  - "TWINT not enabled for Swiss audience — fixture asserts twint_enabled: true (FAIL signal if false)"
+  - "Webhook signature not verified — fixture's webhook handler MUST include construct_event signature check"
+  - "Apple Pay / Google Pay domain not verified — fixture asserts domain_verified_apple_google_pay: true"
+  - "Currency mismatch (TWINT for non-CHF) — fixture's per-currency payment-method picker prevents this at code-gen"
+
+# Fixture verification notes
+verification_notes: |
+  Phase 4 manual verification (Captain L self-check + General review):
+    1. Read project.yaml — confirms audience_regions: [CH], currencies: [CHF, EUR]
+    2. Read payment-config.yaml — confirms 5 TWINT contract conditions met
+    3. Read commerce-config.yaml — confirms Stripe Mode 2 + 3 products + 5 prices + Customer Portal
+    4. Read content/pages/refund-policy.md + tcs-of-sale.md + imprint.md — confirms DACH legal presence
+    5. Read content/strings/en.json + de.json — confirms bilingual coverage
+    6. Confirm twint_enabled: true + chf_currency_enabled: true in this file
+
+  Phase 5+ runner integration (deferred):
+    - Load project.yaml + payment-config.yaml + commerce-config.yaml
+    - Invoke commerce-stripe adapter's phase 24a / 24b / 24c logic
+    - Diff actual output against this expected.yaml
+    - TWINT contract assertion via payment-config-schema.md § "TWINT contract"
+    - External setup: Stripe sandbox account + test-mode keys (not needed for Phase 4 manual)
