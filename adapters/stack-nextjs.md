@@ -152,14 +152,20 @@ The audit below is exhaustive per Round 3. Every MCP investigated is listed, inc
 
 ##### Cloudflare MCP — when DNS is on Cloudflare (recommend at phase 28)
 
+> **Two distinct Cloudflare MCPs exist** — pick the right one:
+> - **`https://mcp.cloudflare.com/mcp`** (hosted OAuth): two-tool `search()` + `execute()` surface over 2,500+ Cloudflare API endpoints; DNS record CRUD available via `execute()`. Preferred for deploy phases needing DNS record creation.
+> - **`github.com/cloudflare/mcp-server-cloudflare`** (open-source monorepo): 18 focused sub-servers; `dns-analytics` for traffic verification only. **Does NOT include a DNS-records-management sub-server** — for DNS record creation/CRUD, fall back to Cloudflare REST API + `wrangler` CLI.
+>
+> The hosted OAuth path below is the recommended default for this adapter at phase 28 (DNS record CRUD via `execute()`). The open-source monorepo's `dns-analytics` sub-server is a supplementary verification surface at phase 30 / 34.
+
 - **Canonical URL:** https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/ (official Cloudflare-hosted set) + https://developers.cloudflare.com/agent-setup/claude-code/ (Claude Code setup). Verified 2026-05-20.
 - **Maintainer + recency:** Cloudflare (official); also community options: `cloudflare-dns-mcp` (uv-based zero-install), `daniil-shumko/cloudflare-dns-mcp`, `@thelord/mcp-cloudflare`.
-- **Install (Claude Code, OAuth):** Cloudflare hosts official MCP servers with OAuth — no API-key management on the user side. Per `developers.cloudflare.com/agent-setup/claude-code/`:
+- **Install (Claude Code, OAuth, hosted):** Cloudflare hosts the official MCP server with OAuth — no API-key management on the user side. Per `developers.cloudflare.com/agent-setup/claude-code/`:
   ```bash
   claude mcp add --transport http cloudflare https://mcp.cloudflare.com
   ```
   First invocation triggers OAuth grant flow; user picks zones + permissions to expose.
-- **Used by agent at:** phase **28** (DNS-record set when custom domain is on Cloudflare — CNAME/A/AAAA records, MX if user has email on the domain, TXT for verification + SPF). Cross-ref §"Deploy" Phase 28 DNS.
+- **Used by agent at:** phase **28** (DNS-record set when custom domain is on Cloudflare — CNAME/A/AAAA records, MX if user has email on the domain, TXT for verification + SPF) via the hosted-OAuth `execute()` tool. Cross-ref §"Deploy" Phase 28 DNS.
 - **Fallback when not installed:** `Bash + curl` against Cloudflare REST API `https://api.cloudflare.com/client/v4/zones/{id}/dns_records` with a Cloudflare API token from `.env.local` (scoped to DNS-edit on the user's zone — never global). Or `wrangler` CLI for users who prefer Cloudflare's first-party tool. Or manual DNS-record set in the Cloudflare dashboard with agent emitting copy-paste instructions.
 
 ##### GitHub MCP — official, for git ops + PR automation (recommend at phases 28-30 + post-launch)
@@ -255,8 +261,13 @@ The audit below is exhaustive per Round 3. Every MCP investigated is listed, inc
     ```bash
     claude mcp add --transport http ga4 https://mcp-ga.stape.ai/mcp
     ```
-- **Plausible MCP:** Plausible Skill (https://mcpmarket.com/tools/skills/plausible-analytics) + community `alexanderop/plausible-mcp` (https://github.com/alexanderop/plausible-mcp, MIT). Stats API v2 + Site Provisioning API; env-var-driven API key + URL configuration. Verified 2026-05-20.
-  - Install (community, MIT):
+- **Plausible MCP:** **Preferred — `getsentry/plausible-mcp`** (https://github.com/getsentry/plausible-mcp; under Sentry's umbrella; last push 2026-05-13; multi-tenant; Stats API v2) — the more recently maintained of the available Plausible MCPs as of 2026-05-20. Peer alternatives: Plausible Skill (https://mcpmarket.com/tools/skills/plausible-analytics) and community `alexanderop/plausible-mcp` (https://github.com/alexanderop/plausible-mcp, MIT — older / less actively maintained). All env-var-driven API key + URL configuration. Verified 2026-05-20.
+  - Install (preferred, getsentry):
+    ```bash
+    claude mcp add plausible -- npx -y @getsentry/plausible-mcp
+    ```
+    Then set `PLAUSIBLE_API_KEY` + `PLAUSIBLE_SITE_ID` in `.env.local`.
+  - Install (peer alternative, alexanderop / MIT):
     ```bash
     claude mcp add plausible -- npx -y plausible-mcp
     ```
