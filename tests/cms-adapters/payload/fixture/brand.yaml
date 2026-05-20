@@ -1,0 +1,35 @@
+# tests/cms-adapters/payload/fixture/brand.yaml
+# Synthetic brand tokens at phase-12-complete; will seed BrandTokens global at phase 17 per cms-payload.md § "Pattern: Globals for site-wide settings + brand tokens".
+# OKLCH per DESIGN-content-layers.md Layer 1 rationale.
+
+tokens:
+  colors:
+    primary: oklch(64% 0.18 30)      # warm terracotta-ish
+    secondary: oklch(72% 0.12 180)   # muted teal
+    neutral_50: oklch(98% 0.01 80)   # near-white warm
+    neutral_900: oklch(15% 0 0)      # near-black neutral
+    semantic_error: oklch(60% 0.20 25)
+    semantic_success: oklch(60% 0.15 145)
+
+  typography:
+    display: "Fraunces, serif"
+    body: "Inter, sans-serif"
+    mono: "JetBrains Mono, monospace"
+    scale:
+      h1: { size: 64px, lh: 1.0, weight: 700 }
+      h2: { size: 40px, lh: 1.15, weight: 600 }
+      h3: { size: 28px, lh: 1.2, weight: 600 }
+      body: { size: 18px, lh: 1.5, weight: 400 }
+      small: { size: 14px, lh: 1.4, weight: 400 }
+
+  spacing:
+    base_unit: 4px
+    scale: [0, 4, 8, 12, 16, 24, 32, 48, 64, 96]
+
+  motion:
+    duration_fast: 150ms
+    duration_med: 300ms
+    duration_slow: 500ms
+    easing_default: cubic-bezier(0.4, 0, 0.2, 1)
+
+  dark_mode: auto                    # auto | light | dark

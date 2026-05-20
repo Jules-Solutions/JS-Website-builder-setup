@@ -1,0 +1,41 @@
+# tests/cms-adapters/payload/fixture/sitemap.yaml
+# Synthetic 4-page sitemap at phase-12-complete. Each page becomes one document in the Payload Pages collection (per locale) via seed pattern in cms-payload.md.
+
+pages:
+  - slug: /
+    title: Home
+    sections: [hero, features-grid, cta]
+    seo_title: Payload fixture — Home
+    seo_description: Synthetic fixture for Payload CMS adapter validation.
+    languages: [en, de]
+
+  - slug: /about
+    title: About
+    sections: [hero, rich-text]
+    seo_title: About — Payload fixture
+    seo_description: About-page fixture content.
+    languages: [en, de]
+
+  - slug: /services
+    title: Services
+    sections: [hero, features-grid, rich-text, cta]
+    seo_title: Services — Payload fixture
+    seo_description: Services-page fixture content.
+    languages: [en, de]
+
+  - slug: /contact
+    title: Contact
+    sections: [hero, rich-text]
+    seo_title: Contact — Payload fixture
+    seo_description: Contact-page fixture content.
+    languages: [en, de]
+
+navigation:
+  primary:
+    - { label_key: "nav.primary.home", href: "/" }
+    - { label_key: "nav.primary.about", href: "/about" }
+    - { label_key: "nav.primary.services", href: "/services" }
+    - { label_key: "nav.primary.contact", href: "/contact" }
+  footer:
+    - { label_key: "nav.footer.privacy", href: "/privacy" }
+    - { label_key: "nav.footer.terms", href: "/terms" }

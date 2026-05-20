@@ -1,0 +1,30 @@
+{
+  "$language": "en",
+  "$schema": "spec/strings-v1.json",
+  "cta": {
+    "subscribe": "Get the newsletter",
+    "subscribe_loading": "Subscribing...",
+    "subscribe_success": "You're in. Check your inbox.",
+    "subscribe_error": "Something didn't work. Try again?",
+    "contact_us": "Contact us"
+  },
+  "errors": {
+    "network": "Connection failed. Check your internet and try again.",
+    "validation_email": "That doesn't look like a valid email.",
+    "not_found": "Page not found."
+  },
+  "nav": {
+    "primary": {
+      "home": "Home",
+      "about": "About",
+      "services": "Services",
+      "contact": "Contact"
+    },
+    "footer": {
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "skip_to_content": "Skip to content",
+    "language_switcher_label": "Language"
+  }
+}
