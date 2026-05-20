@@ -255,7 +255,7 @@ WordPress's REST CRUD vocabulary translates non-obviously into website-builder v
 - **Pairs with:** `WordPress/mcp-adapter` HTTP transport for combined site-walk + REST-state extraction.
 
 **13. `github/github-mcp-server`** (GitHub deploys + repo ops)
-- URL: `https://github.com/github/github-mcp-server`
+- URL: `https://github.com/github/github-mcp-server` (Note: `@modelcontextprotocol/server-github` was deprecated April 2025; use `github/github-mcp-server` going forward — current canonical.)
 - Maintainer: GitHub (official). MIT. v1.0.5 released 2026-05-18; last push 2026-05-19; 29,977 stars; not archived. Verified 2026-05-20.
 - **Type:** Go binary + Docker + remote HTTP at `https://api.githubcopilot.com/mcp/`.
 - **Install (Docker, recommended):**
@@ -292,15 +292,24 @@ WordPress's REST CRUD vocabulary translates non-obviously into website-builder v
 - **Used at phases:** 28 (DNS analytics post-cutover); 30 (traffic verification); 34 (ongoing DNS performance monitoring).
 - **Fallback when not installed:** Cloudflare REST API via Bash + curl (`POST /client/v4/zones/{zone_id}/dns_records`).
 
+> **Two distinct Cloudflare MCPs exist** — pick the right one:
+> - **`https://mcp.cloudflare.com/mcp`** (hosted OAuth): two-tool `search()` + `execute()` surface over 2,500+ Cloudflare API endpoints; DNS record CRUD available via `execute()`. Preferred for deploy phases needing DNS record creation.
+> - **`github.com/cloudflare/mcp-server-cloudflare`** (open-source monorepo): 18 focused sub-servers; `dns-analytics` for traffic verification only. **Does NOT include a DNS-records-management sub-server** — for DNS record creation/CRUD, fall back to Cloudflare REST API + `wrangler` CLI.
+>
+> Entry #14 above is the **open-source monorepo** path. For DNS record CRUD at phase 28 specifically, the **hosted OAuth path (`https://mcp.cloudflare.com/mcp`)** is an additional option agents can pick — `claude mcp add --transport http cloudflare https://mcp.cloudflare.com` registers it; OAuth on first invocation; user picks zones + permissions to expose. The Framer and Next.js adapters in this plugin treat the hosted OAuth path as the recommended default for DNS record CRUD; the WordPress adapter (this file) historically defaulted to REST + `wrangler` because WordPress deploys often involve self-hosted DNS providers (registrars, managed-WP-host DNS) where neither MCP applies. When the user's DNS IS on Cloudflare, the hosted OAuth MCP is the most ergonomic path; the monorepo's `dns-analytics` remains the verification surface at phase 30 / 34.
+
 **15. `stripe/ai` (`@stripe/mcp`)** (commerce; pairs with WC at phase 24b)
-- URL: `https://github.com/stripe/ai` (repo name "ai"; the MCP code lives at `tools/modelcontextprotocol/`)
+- URL: `https://github.com/stripe/ai` (repo name "ai"; the MCP code lives at `tools/modelcontextprotocol/`). Alternative install path: Anthropic ships a blessed Stripe plugin at `https://claude.com/plugins/stripe` (install via `claude plugin install stripe@anthropic`) wrapping `@stripe/mcp` + shipping a `stripe-mcp` subagent. G's adapter treats this as the preferred path; pick either based on user preference for plugin-managed vs direct MCP install.
 - Maintainer: Stripe (official). MIT. Last push 2026-05-19; 1,557 stars; not archived. Verified 2026-05-20.
-- **Type:** npm package + remote server at `https://mcp.stripe.com`.
+- **Type:** npm package + remote server at `https://mcp.stripe.com` + Anthropic-plugin wrapper at `claude.com/plugins/stripe`.
 - **Install (local with secret key):**
   ```bash
   npx -y @stripe/mcp --api-key=YOUR_STRIPE_SECRET_KEY
   ```
-  Or use the remote server with OAuth.
+  Or use the remote server with OAuth. Or use the Anthropic plugin (recommended when the user wants a `stripe-mcp` subagent and plugin-managed lifecycle):
+  ```bash
+  claude plugin install stripe@anthropic
+  ```
 - **Surface:** products / prices / payment intents / customers / refunds / subscriptions (refer to docs for full method coverage).
 - **Auth:** Stripe restricted API key (`rk_*` recommended over `sk_*` for scoped access).
 - **Used at phases:** 24a (Stripe product setup for WooCommerce-via-Stripe path); 24b (payment intent monitoring + test charge verification); 34 (post-launch subscription monitoring).
