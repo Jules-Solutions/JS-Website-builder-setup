@@ -1,0 +1,111 @@
+# tests/cms-adapters/payload/expected.yaml
+# Declarative spec of what the Payload CMS adapter SHOULD produce at each pipeline phase, given the synthetic fixture/ at phase-12-complete.
+# Per tests/cms-adapters/README.md schema. Phase 4 manual verification: walk the fixture mentally; confirm the adapter file (cms-adapters/cms-payload.md) describes the production of these outputs.
+
+fixture_baseline: phase-12-complete
+paired_stack: nextjs
+
+expected_per_phase:
+  phase_12_cms:
+    cms_selected: payload
+    admin_url: /admin                             # mounts inside the Next.js app at app/(payload)/admin per cms-payload.md § Per-pairing recipe — Next.js + Payload
+    auth_configured: schema-only-not-runtime      # payload.config.ts + collections/Users.ts shape-valid; Postgres + Node runtime NOT required for Phase 4 manual verification (Phase 5+ runner integration scope)
+    db_decision: vercel-marketplace-neon          # S4 — three-way DB/hosting decision recorded explicitly; canonical muggle default per DESIGN-cms-payload.md line 564
+    db_adapter: postgres                          # @payloadcms/db-vercel-postgres in payload.config.ts (Vercel-Marketplace path is Neon-powered per Dec 2024 deprecation)
+    hosting_decision: vercel                      # frontend + Payload on Vercel; DB on Neon (via Vercel Marketplace)
+    blocks_localization_approach: 2               # Approach 2 (Decision 39 Pattern A default) — text fields inside blocks localized, NOT the layout itself
+    strings_layer_option: A                       # CDJSON kept in messages/{lang}.json via next-intl (default); Payload doesn't store strings
+    first_content_item_created: "payload.create({collection: 'pages', data: { title: 'Home', slug: '/', layout: [{blockType: 'hero', headline: 'Welcome...'}, ...] }, locale: 'en'}) via seed script"
+    schema_config_paths:
+      - payload.config.ts                          # master config — imports collections + globals; localization config; DB adapter; Lexical editor
+      - collections/Pages.ts                       # the canonical marketing-site collection; Blocks-field layout
+      - collections/Users.ts                       # auth: true + roles select
+      - collections/Media.ts                       # uploads with imageSizes
+      - blocks/Hero.ts
+      - blocks/RichText.ts
+      - blocks/FeaturesGrid.ts
+      - blocks/CallToAction.ts
+      - globals/BrandTokens.ts                     # bridges Layer 1 (brand.yaml.tokens) — text-field group per token category
+      - globals/SiteSettings.ts                    # site-name + tagline + logo + social array
+
+  phase_17_design_system:
+    tokens_written_to:
+      - "BrandTokens global (in admin) — seeded once at phase 17 from .website-builder/brand.yaml via payload.updateGlobal"
+      - "app/globals.css (in Next.js project) — :root + .dark CSS custom properties regenerated on BrandTokens.afterChange via revalidateTag('brand-tokens')"
+      - "tailwind.config.ts @theme inline { --color-x: var(--x) } pattern per stack-nextjs.md § Component library pairing"
+    drift_check: pass                              # brand.yaml ↔ BrandTokens global content in sync (one-way: brand.yaml is seed source; admin edits diverge — agent surfaces on phase 17 re-runs)
+    afterChange_hook_wired: true                   # BrandTokens.ts globals/BrandTokens.ts has afterChange hook calling revalidateTag
+
+  phase_18_component_build:
+    components_generated:
+      - Hero                                       # blocks/Hero.ts (matches components.yaml Hero entry)
+      - RichText                                   # blocks/RichText.ts
+      - FeaturesGrid                               # blocks/FeaturesGrid.ts
+      - CallToAction                               # blocks/CallToAction.ts
+    schema_validation: pass                        # All Block configs generate; types regenerate via payload generate:types; TypeScript compiles
+    palette_validator: pass                        # brand.yaml.tokens.colors values are valid OKLCH; BrandTokens defaults match
+    a11y_audit: pass                               # components.yaml accessibility annotations propagate into the React frontend renderers (heading hierarchy, alt_text_required)
+    migrations_runnable: pass                      # pnpm payload migrate:create generates SQL diff for the schema; pnpm payload migrate applies it (verified in Phase 5+ runner scope — Phase 4 is schema-shape-only)
+    types_regenerable: pass                        # pnpm payload generate:types regenerates payload-types.ts; TypeScript build of frontend Server Components consumes them
+    pages_seeded_from_sitemap: pass                # all sitemap.yaml entries (4 pages) created via payload.create({collection: 'pages'}); per locale (en + de — 8 documents total at phase 18)
+
+  phase_22_i18n:
+    per_locale_files_present: true                 # for Payload: localized: true fields store per-locale values in JSON columns (Postgres) or per-locale subdocs (Mongo)
+    localization_config_present: true              # payload.config.ts has localization: { locales: [en, de], defaultLocale: en, fallback: true }
+    locales_configured: [en, de]
+    default_locale: en
+    fallback_strategy: true                        # Decision 41 — Payload's fallback:true; missing locale values fall back to defaultLocale (en)
+    fields_localized: true                         # title, meta.title, meta.description on Pages; headline, sub, cta.label, item.title, item.description on Blocks
+    blocks_localization_approach: 2                # cross-checked against project.yaml.cms_config.blocks_localization_approach
+    missing_string_fallback: documented            # Decision 41 — agent additionally warns during validation when a localized field is empty per DESIGN-i18n.md § Validation
+    language_switcher_added: true                  # per i18n/language-switcher.md#next-js--shadcn — shadcn DropdownMenu (en + de = 2 locales, so could be inline buttons; agent picks default behavior at phase 22)
+    hreflang_emitted: true                         # per i18n/hreflang.md#next-js--shadcn — Next.js generateMetadata() produces alternates.languages map from locales list
+    translation_pattern: 1                         # Decision 40 default — agent translates inline at phase 16; payload.update({locale: 'de', data: {...}}) per locale
+
+  phase_24a_commerce: n/a                          # transactional=false in fixture; commerce branch not exercised
+                                                   # companion fixtures (payload-commerce/ with Stripe Pay plugin wired) are Phase 10+ scope per BUILD-strategy.md
+                                                   # The cms-payload.md § "Commerce integration (if transactional=true)" documents what WOULD happen if transactional=true:
+                                                   #   - install @payloadcms/plugin-stripe
+                                                   #   - add Products / Customers / Orders collections
+                                                   #   - configure webhook handlers in stripePlugin({...})
+                                                   #   - wire app/(frontend)/api/checkout/route.ts to create Stripe Checkout Sessions
+                                                   #   - enable TWINT in Stripe Dashboard for CHF Swiss-market audience (no Payload config change)
+
+expected_limitations:                              # What the adapter SHOULD surface as cannot-do (per cms-payload.md § Limitations + escape hatches)
+  - "Requires Node runtime — static-only hosts (GitHub Pages, plain S3, Cloudflare Pages static) cannot run admin"
+  - "Requires a database (Postgres / Mongo / SQLite) — no file-based mode"
+  - "No native admin for non-developers to add Collections (schema is code; editors can only edit content, not schema)"
+  - "Migrations must run on every deploy (pnpm payload migrate && pnpm build hardcoded in Vercel build command)"
+  - "Serverless cold-start cost — admin loads a full Next.js app from cold (mitigation: standby instances on Vercel Pro OR deploy Payload to persistent container on Render/Fly)"
+  - "Live preview requires frontend handling of ?draft=true param (boilerplate per-page-route)"
+  - "Media handling assumes a storage backend (default local-fs is ephemeral on Vercel; production needs @payloadcms/storage-s3 or -vercel-blob or -cloudinary)"
+  - "Admin URL (/admin) is publicly accessible by default (login-gated but visible; mitigate via CDN basic-auth or subdomain split)"
+  - "Admin UI bundle ~1-2 MB JS — overkill for 5-page static prose sites (route to cms-none / Decap instead)"
+  - "Custom admin components require React knowledge (default UI covers ~95% of cases)"
+  - "Lexical is structured JSON, NOT HTML (dangerouslySetInnerHTML the value WILL break; use <RichText /> renderer)"
+  - "Vercel Postgres deprecated Dec 2024 → migrated to Neon (the agent surfaces this so user understands what they're getting via Vercel Marketplace)"
+  - "TypeScript literacy required somewhere (schema, hooks, access control — all .ts files)"
+
+expected_failure_modes_covered:                    # What failure paths the adapter handles (per cms-payload.md § Common pitfalls)
+  - "Forgetting localized: true on the right level — agent picks Approach 2 (Decision 39 Pattern A default) by default; surfaces Approach 1 only when content varies per market"
+  - "Schema drift between code and DB — pnpm payload migrate:create + pnpm payload migrate enforced; Vercel build command includes the migration step"
+  - "Slug field collisions — beforeChange hook generates from title; agent extends with '-2' suffix branch for non-unique titles"
+  - "Block reuse across multiple Pages-like collections — each block in its own file; imported wherever used (no inlining)"
+  - "Nesting Blocks inside Blocks — possible but admin UX hairy past 2 levels; agent recommends flat layouts + cross-references via relationships"
+  - "Treating Lexical as HTML — agent uses @payloadcms/richtext-lexical/react <RichText /> renderer; never raw-renders Lexical JSON"
+  - "Missing useAsTitle on collections — agent sets in every CollectionConfig"
+  - "Unbounded versions.maxPerDoc — agent sets maxPerDoc: 50 on collections with drafts"
+  - "Slow admin on large collections without indexes — agent sets index: true on slug, _status, filterable relationship fields"
+  - "Missing access control on read — agent sets read access control on every collection (default 'anyone' is unsafe)"
+  - "Migration forgotten in production deploy — Vercel build command hardcoded with 'pnpm payload migrate && pnpm build' per phase 29 enforcement"
+  - "Wrong DB host picked at phase 12 — agent surfaces three-way decision (Payload Cloud / Vercel-Marketplace-Neon / direct-Neon-or-other) explicitly; user picks consciously; migration cost between Postgres options is connection-string swap"
+
+# S3 risk (two-deploy headless mode) is NOT exercised by this fixture (Next.js native pairing only).
+# The cms-payload.md § "Stack pairings" → "Per-pairing recipe — Headless mode" documents the canonical setup for Astro/SvelteKit consuming Payload via REST/GraphQL.
+# Fixtures for astro/payload-headless and sveltekit/payload-headless are Phase 10+ scope per tests/cms-adapters/README.md line 186.
+
+# S4 risk (three-way DB/hosting decision) IS exercised by this fixture via:
+#   - project.yaml.cms_config.db_decision: vercel-marketplace-neon (the canonical muggle default)
+#   - payload.config.ts uses @payloadcms/db-vercel-postgres adapter
+#   - expected_per_phase.phase_12_cms.db_decision + hosting_decision fields record the choice
+#   - cms-payload.md § "Auth + setup" → "Database + hosting choice (Phase 12 decision)" documents the three-way prompt
