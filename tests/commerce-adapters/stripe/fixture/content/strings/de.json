@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "courses": "Kurse",
+    "consulting": "Beratung",
+    "language_switcher_label": "Sprache"
+  },
+  "hero": {
+    "headline": "Bleib in der KI-Ära scharf",
+    "subheadline": "Praktisches Training und Beratung für Wissensarbeiter — mach KI zum täglichen Werkzeug, nicht zur Existenzfrage.",
+    "cta_primary": "Kurse ansehen",
+    "cta_secondary": "Beratung buchen"
+  },
+  "courses": {
+    "index_title": "Kurse",
+    "foundations_title": "Grundlagen der praktischen KI-Nutzung",
+    "foundations_description": "Sechswöchiges Kohorten-Programm zu den täglichen Workflows, die sich über die Woche aufsummieren.",
+    "foundations_buy_button": "Einschreiben — CHF 49",
+    "applied_title": "Angewandte KI für Wissensarbeiter",
+    "applied_description": "Aufbaukurs zu Agenten-gestützter Recherche, Schreiben und Entscheidungsunterstützung.",
+    "applied_buy_button": "Einschreiben — CHF 149"
+  },
+  "consult": {
+    "title": "Beratung — Einzelstrategie",
+    "description": "60-minütige Strategiesitzung, vierteljährlich buchbar. Für Führungskräfte und Senior-Wissensarbeiter.",
+    "buy_button": "Abonnieren — CHF 299/Quartal"
+  },
+  "checkout": {
+    "redirect_message": "Weiterleitung zum sicheren Bezahlvorgang..."
+  },
+  "post_checkout": {
+    "success_title": "Vielen Dank für Ihren Kauf",
+    "success_body": "Bestätigung und Zugangsdaten haben wir per E-Mail gesendet. Sollte etwas nicht stimmen, antworten Sie auf diese E-Mail — wir klären es innerhalb eines Werktages.",
+    "cancel_title": "Bezahlvorgang abgebrochen",
+    "cancel_body": "Ihre Transaktion wurde abgebrochen. Es ist keine Zahlung erfolgt. Setzen Sie fort, wann immer Sie bereit sind."
+  },
+  "footer": {
+    "refunds": "Erstattungen",
+    "tcs_of_sale": "Verkaufsbedingungen",
+    "imprint": "Impressum",
+    "privacy": "Datenschutz"
+  },
+  "payment_methods_disclosure": {
+    "ch": "In der Schweiz akzeptiert: TWINT, Visa, Mastercard, Apple Pay, Google Pay, PayPal.",
+    "eu": "In der EU akzeptiert: Visa, Mastercard, SEPA-Lastschrift, Apple Pay, Google Pay, PayPal."
+  }
+}

@@ -1,0 +1,49 @@
+# tests/commerce-adapters/stripe/fixture/project.yaml
+# Phase 4 Captain L — Stripe Checkout fixture.
+# Embodies the TWINT-required contract per:
+#   - commerce-adapters/README.md § "TWINT-for-Switzerland — non-negotiable rule"
+#   - commerce-adapters/payment-config-schema.md § "TWINT contract — non-negotiable for CH-audience projects"
+#   - tests/commerce-adapters/README.md § "TWINT-required fixture rule"
+#   - BUILD-strategy.md Phase 4 DoD line 202 ("TWINT path validates on Stripe Checkout (CH-region simulation)")
+#
+# CH audience + CHF + EUR currencies triggers the TWINT-required path. Without
+# audience_regions: [CH], the fixture is a generic Stripe fixture and the TWINT
+# rule does not apply.
+
+name: stillhumans-courses-fixture
+description: >
+  Synthetic fixture for the Stripe Checkout commerce adapter — a Swiss
+  knowledge-worker selling two courses + one consulting service in CHF (Swiss
+  audience primary) + EUR (EU audience secondary). Exercises Stripe Mode 2
+  (server-side Checkout Session) with TWINT enabled for CHF transactions.
+
+stack: nextjs
+cms: none
+
+# Transactional flag triggers phase-22/24a/24b/24c branching
+transactional: true
+transactional_kind: products    # vs bookings (covered by calcom fixture) or both
+
+# CRITICAL: audience_regions: [CH] triggers the TWINT-required path per
+# commerce-adapters/README.md non-negotiable rule + payment-config-schema.md
+# TWINT contract.
+audience_regions: [CH, DE, AT]
+
+# CHF mandatory for TWINT validation; EUR optional for EU customers
+currencies: [CHF, EUR]
+
+# Default language is en (Stripe Checkout auto-translates per browser locale)
+default_language: en
+
+# Swiss multilingual realism — muggle Swiss founder, German content for
+# DACH market alongside English for international.
+languages: [en, de]
+
+# Commerce platform pick at phase 24a
+commerce_platform: stripe-checkout
+commerce_mode: 2    # Mode 2 = server-side Checkout Session (vs Mode 1 = Payment Links)
+
+# Brand identity (minimal — full brand.yaml in sibling file)
+brand:
+  name: Still Humans
+  domain: stillhumans.example.ch

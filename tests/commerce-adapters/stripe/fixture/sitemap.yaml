@@ -1,0 +1,76 @@
+# tests/commerce-adapters/stripe/fixture/sitemap.yaml
+# Layer 2 (page composition) per DESIGN-content-layers.md.
+# Minimal page set for the Stripe Checkout commerce fixture: home + checkout flow + legal pages.
+
+pages:
+  - slug: /
+    title: Still Humans — Stay Sharp in the AI Era
+    type: home
+    locales: [en, de]
+
+  - slug: /courses
+    title: Courses
+    type: index
+    locales: [en, de]
+
+  - slug: /courses/foundations
+    title: Foundations of Practical AI Use
+    type: product
+    product_id: prod_foundations_chf
+    locales: [en, de]
+
+  - slug: /courses/applied
+    title: Applied AI for Knowledge Workers
+    type: product
+    product_id: prod_applied_chf
+    locales: [en, de]
+
+  - slug: /consult
+    title: Consulting — One-on-One Strategy
+    type: product
+    product_id: prod_consult_chf
+    locales: [en, de]
+
+  # Checkout flow pages — handled by Stripe Checkout (hosted), but
+  # marketing-site needs corresponding success/cancel destinations.
+  - slug: /success
+    title: Thank You for Your Purchase
+    type: post_checkout_success
+    locales: [en, de]
+
+  - slug: /cancel
+    title: Checkout Canceled
+    type: post_checkout_cancel
+    locales: [en, de]
+
+  # Legal pages required by phase 24c (commerce-specific legal — user is MoR)
+  - slug: /legal/refund-policy
+    title: Refund Policy
+    type: legal
+    locales: [en, de]
+
+  - slug: /legal/tcs-of-sale
+    title: Terms and Conditions of Sale
+    type: legal
+    locales: [en, de]
+
+  # Imprint required for DACH audience (CH + DE + AT)
+  - slug: /legal/imprint
+    title: Imprint
+    type: legal
+    locales: [en, de]
+
+  - slug: /legal/privacy
+    title: Privacy Policy
+    type: legal
+    locales: [en, de]
+
+nav:
+  primary:
+    - { slug: /courses, label: { en: Courses, de: Kurse } }
+    - { slug: /consult, label: { en: Consulting, de: Beratung } }
+  footer:
+    - { slug: /legal/refund-policy, label: { en: Refunds, de: Erstattungen } }
+    - { slug: /legal/tcs-of-sale, label: { en: Terms of Sale, de: Verkaufsbedingungen } }
+    - { slug: /legal/imprint, label: { en: Imprint, de: Impressum } }
+    - { slug: /legal/privacy, label: { en: Privacy, de: Datenschutz } }

@@ -1,0 +1,127 @@
+# tests/commerce-adapters/calcom/expected.yaml
+# Phase 4 Captain L — Cal.com booking adapter expected output (free-booking-only baseline).
+#
+# Schema per tests/commerce-adapters/README.md § "expected.yaml" (booking schema)
+
+fixture_baseline: phase-24a-complete    # free bookings; phase 24b/24c minimal (no payment)
+
+expected_per_phase:
+
+  # PHASE 24a — Booking platform setup (booking branch)
+  phase_24a_booking:
+    platform_selected: cal-com
+    deployment: cloud                         # vs self-hosted; Cloud Free tier
+    tier: free                                # $0/mo solo
+
+    # Event types created via Cal.com API at phase 24a (2 free event types)
+    event_types_created:
+      - consult-30                            # 30-min intro consult, Google Meet, free
+      - coaching-60                           # 1-hour coaching, Google Meet, free
+
+    # Availability configured (working hours, buffers, booking windows)
+    availability_configured: true
+
+    # Calendar integration declared in commerce-config; not actually connected at fixture
+    # (Phase 5+ runner scope adds real Google OAuth)
+    calendar_integration: google
+    calendar_connected: false                 # fixture: declared-not-connected
+    calendar_test_calendar_recommended: true  # to avoid polluting user's real calendar
+
+    # Video integration per event type — Google Meet for both
+    video_integration: google-meet
+    video_auto_meeting_links: true
+
+    # Embed mode — popup (muggle default per booking-calcom.md)
+    embed_mode: popup
+    embed_alternative_modes_documented: [inline, floating-button]
+    embed_react_package: "@calcom/embed-react"   # for Cal.com Atoms
+
+    # Webhooks subscribed (BOOKING_CREATED etc.)
+    webhooks_configured: true
+    webhook_signature_verified: true
+
+    # Test booking rehearsal passes (mock — Phase 4 manual; Phase 5+ runtime)
+    test_booking_rehearsal: pass
+
+    # MCP integration — Cal.com REST API (no official MCP; community FastMCP optional)
+    mcp_status: no-official-mcp
+    mcp_community_fastmcp_available: true     # Danielpeter-99/calcom-mcp
+    mcp_composio_hosted_available: true       # mcp.composio.dev/cal
+    mcp_agent_default_path: rest-api          # agent uses REST API directly (no MCP dependency)
+
+  # PHASE 24b — Payment provider wiring (ONLY runs for paid bookings)
+  # This fixture has NO paid bookings — phase 24b NOT applicable
+  phase_24b_payment:
+    applicable: false                         # free-booking variant; payment wiring skipped
+    rationale: |
+      Phase 4 fixture exercises free bookings only (per Captain 0 spec +
+      tests/commerce-adapters/README.md § "calcom/ fixture"). A paid-CH
+      variant (calcom-paid-ch/) at Phase 10+ would exercise the Cal.com →
+      Stripe → TWINT bridge chain for CHF event types.
+    # TWINT NOT applicable here (no paid bookings; TWINT only flows via paid
+    # Stripe-bridged CHF event types). Documented for future variant scope.
+    twint_enabled: null                       # n/a for free-booking variant
+    chf_currency_enabled: null                # n/a
+    bridge_to_payment_processor: null         # n/a; would be stripe for paid CHF variant
+    paid_booking_rehearsal: null              # n/a
+
+    # Future variant scope (documented but not exercised)
+    future_paid_ch_variant_scope: phase-10-plus
+    future_paid_ch_variant_path: tests/commerce-adapters/calcom-paid-ch/
+    future_paid_ch_variant_bridge: cal.com → stripe → twint
+    future_paid_ch_variant_paypal_incompatible: true
+
+  # PHASE 24c — Commerce-specific legal (booking branch, minimal for free bookings)
+  phase_24c_legal:
+    # For free bookings: cancellation policy + GDPR/privacy ONLY are mandatory
+    cancellation_policy_present: true         # /legal/cancellation-policy
+    no_show_policy_present: true              # bundled inside cancellation policy
+    tcs_of_service_present: false             # NOT required for free bookings only
+    imprint_present: false                    # NOT required (audience is en-US; no DACH)
+    gdpr_disclosure_present: true             # mandatory; booking data is personal data
+    privacy_processor_disclosed: cal-com      # Cal.com listed as processor in privacy policy
+
+    # User would be MoR for paid bookings; not applicable here
+    user_is_mor: false                        # n/a for free
+    tax_handling_disclosed: false             # n/a for free
+
+  # PHASE 22 — Transactional flag (booking from project init; not mid-flip)
+  phase_22_transactional:
+    transactional: true
+    transactional_kind: bookings
+    transactional_change_logged: false        # not mid-flip
+
+# Adapter-specific limitations the fixture is aware of
+expected_limitations:
+  - "Booking-only — no products/catalog/cart (would pair with commerce-stripe.md if mixed-mode needed)"
+  - "Cal.com Free tier is single-user — multi-staff round-robin requires Teams ($12/user/mo annual)"
+  - "AGPLv3 self-hosted license only relevant if user modifies + offers as service (not applicable to Cloud users; not applicable to muggle self-hosters using as-is)"
+  - "Embed customization moderate — Cal.com Atoms for white-label requires Organizations/Enterprise tier"
+  - "Calendar integration declared-not-connected at fixture level (Phase 5+ runner adds real Google OAuth)"
+  - "TWINT only via Stripe bridge for paid CHF event types (deferred to Phase 10+ calcom-paid-ch/ variant)"
+
+# Failure modes the fixture explicitly exercises
+expected_failure_modes_covered:
+  - "Calendar integration declared but not connected — surfaced explicitly in commerce-config.yaml.bookings.calendar_integration.fixture_note"
+  - "Test bookings on user's real calendar — fixture uses test_calendar_recommended: true to avoid pollution"
+  - "Webhook signature not verified — fixture asserts webhook_signature_verified: true"
+  - "Embed script not loading on stack X — fixture uses Next.js + @calcom/embed-react which handles CSP correctly"
+  - "Free-booking event type accidentally enabled as paid — fixture explicitly sets paid_bookings: false in project.yaml + all event types lack price field"
+
+# Fixture verification notes
+verification_notes: |
+  Phase 4 manual verification (Captain L self-check + General review):
+    1. Read project.yaml — confirms transactional_kind: bookings, paid_bookings: false, audience excludes CH (no TWINT scope creep)
+    2. Read commerce-config.yaml — confirms Cal.com Cloud Free + 2 free event types + popup embed + webhooks
+    3. Read content/pages/book.md + booking-confirmed.md + cancellation-policy.md + privacy.md — confirms booking-flow pages + GDPR
+    4. Confirm phase_24b_payment.applicable: false in this file (free-booking baseline)
+    5. Confirm future paid-CH variant deferred to Phase 10+ (documented in this file)
+
+  Phase 5+ runner integration (deferred):
+    - Load project.yaml + commerce-config.yaml
+    - Invoke booking-calcom adapter's phase 24a logic
+    - Diff actual output against this expected.yaml
+    - External setup: Cal.com sandbox account + Google sandbox calendar (not needed for Phase 4 manual)
+
+# Cross-link to sibling Stripe fixture (where TWINT contract IS exercised)
+cross_link_stripe_fixture_for_twint: tests/commerce-adapters/stripe/

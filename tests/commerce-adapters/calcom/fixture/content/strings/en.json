@@ -1,0 +1,35 @@
+{
+  "nav": {
+    "about": "About",
+    "book_a_call": "Book a Call"
+  },
+  "hero": {
+    "headline": "Helping you move from stuck to shipped",
+    "subheadline": "Independent consulting for senior knowledge workers who need a thinking partner — not another task tracker.",
+    "cta_primary": "Book a free consult",
+    "cta_secondary": "Learn more"
+  },
+  "about": {
+    "title": "About",
+    "intro": "Ten years across product strategy, engineering leadership, and operating in ambiguous environments. Available for a limited number of engagements at any given time.",
+    "credentials_heading": "How I work"
+  },
+  "book": {
+    "page_title": "Book a Call",
+    "page_intro": "Pick a time that works for you. All sessions are free for the first conversation. We'll meet on Google Meet — link arrives in your confirmation email.",
+    "consult_label": "30-min Intro Consult",
+    "consult_description": "Quick orientation call — what you're working on, where you're stuck, whether I'm a fit.",
+    "coaching_label": "1-hour Coaching Session",
+    "coaching_description": "Deeper working session for an issue you've already framed."
+  },
+  "post_booking": {
+    "confirmed_title": "Your booking is confirmed",
+    "confirmed_body": "Confirmation and calendar invitation sent to your email. If you need to reschedule or cancel, use the link in that email — Cal.com handles it without my involvement.",
+    "cancelled_title": "Booking cancelled",
+    "cancelled_body": "No charge — these sessions are free. Feel free to book another time whenever it works."
+  },
+  "footer": {
+    "cancellation_policy": "Cancellation",
+    "privacy": "Privacy"
+  }
+}

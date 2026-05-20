@@ -1,0 +1,105 @@
+# tests/commerce-adapters/stripe/fixture/commerce-config.yaml
+# Phase 24a output — commerce platform + products + checkout flow.
+#
+# Schema per DESIGN-phase-contracts.md phase 24a + commerce-adapters/commerce-stripe.md
+# § "Phase 24a/24b/24c integration".
+#
+# All prices in minor units (cents/centimes). 4900 = CHF 49.00; 14900 = CHF 149.00; etc.
+
+platform: stripe-checkout
+mode: 2                     # Mode 2 = server-side Checkout Session
+
+# Stripe MCP availability — used at phase 24a for canonical Session creation patterns
+mcp_integration:
+  primary: stripe-mcp       # claude.com/plugins/stripe (Anthropic blessed; 27078 installs as of 2026-05-20)
+  install: claude plugin install stripe@anthropic
+  fallback: stripe-node-sdk
+  fallback_docs: docs.stripe.com/api
+
+# Stripe Products created via API at phase 24a
+products:
+  - id: prod_foundations_chf
+    name: Foundations of Practical AI Use
+    description: 6-week cohort covering daily-driver AI workflows
+    type: digital
+    type_kind: course
+
+  - id: prod_applied_chf
+    name: Applied AI for Knowledge Workers
+    description: Intermediate course focusing on agent-assisted work patterns
+    type: digital
+    type_kind: course
+
+  - id: prod_consult_chf
+    name: One-on-One AI Strategy Consult
+    description: 60-minute consultation; bookable as a recurring quarterly subscription
+    type: service
+    type_kind: consultation
+
+# Stripe Prices (per product + per currency; minor units)
+prices:
+  # Foundations — CHF + EUR
+  - id: price_foundations_chf_4900
+    product_id: prod_foundations_chf
+    unit_amount: 4900
+    currency: CHF
+    type: one_time
+  - id: price_foundations_eur_4500
+    product_id: prod_foundations_chf
+    unit_amount: 4500
+    currency: EUR
+    type: one_time
+
+  # Applied — CHF + EUR
+  - id: price_applied_chf_14900
+    product_id: prod_applied_chf
+    unit_amount: 14900
+    currency: CHF
+    type: one_time
+  - id: price_applied_eur_13900
+    product_id: prod_applied_chf
+    unit_amount: 13900
+    currency: EUR
+    type: one_time
+
+  # Consult — CHF subscription (quarterly recurring)
+  - id: price_consult_chf_29900_q
+    product_id: prod_consult_chf
+    unit_amount: 29900
+    currency: CHF
+    type: recurring
+    recurring:
+      interval: month
+      interval_count: 3       # quarterly cadence
+
+# Checkout flow generation per stack
+# Maps to Next.js Route Handler pattern per adapters/stack-nextjs.md
+# § "Commerce integration → Phase 24a"
+checkout_flow:
+  endpoint: /api/checkout
+  endpoint_pattern: nextjs_route_handler
+  success_url: "{site_url}/success?sid={CHECKOUT_SESSION_ID}"
+  cancel_url: "{site_url}/cancel"
+  webhook_endpoint: /api/stripe-webhook
+  # Subscription Customer Portal — required for subscription mode
+  customer_portal:
+    enabled: true
+    endpoint: /api/customer-portal
+    return_url: "{site_url}/account"
+
+# Apple Pay / Google Pay domain verification required before live mode
+domain_verification:
+  apple_pay_required: true
+  google_pay_required: true
+
+# Test-mode rehearsal data (Stripe standard test cards)
+test_mode_rehearsal:
+  test_cards:
+    succeed: "4242 4242 4242 4242"
+    decline_insufficient_funds: "4000 0000 0000 9995"
+    requires_3ds: "4000 0027 6000 3184"
+  # TWINT runtime test rehearsal requires Stripe-side TWINT test simulator
+  # (Dashboard → Test mode → Payment method simulators); Phase 4 fixture-
+  # level verification covers config-shape validity; runtime TWINT rehearsal
+  # is Phase 5+ test-runner scope.
+  twint_runtime_test_scope: phase_5_plus
