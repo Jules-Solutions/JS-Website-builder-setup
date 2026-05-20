@@ -20,8 +20,12 @@ tests/commerce-adapters/
 │   │   ├── commerce-config.yaml    # phase 24a output
 │   │   ├── payment-config.yaml     # phase 24b output; MUST satisfy TWINT-required rule
 │   │   ├── content/
-│   │   │   ├── pages/
-│   │   │   │   └── checkout.md
+│   │   │   ├── pages/                # phase-24c legal + flow pages
+│   │   │   │   ├── cancel.md
+│   │   │   │   ├── imprint.md
+│   │   │   │   ├── refund-policy.md
+│   │   │   │   ├── success.md
+│   │   │   │   └── tcs-of-sale.md
 │   │   │   └── strings/
 │   │   │       └── en.json
 │   │   └── ...

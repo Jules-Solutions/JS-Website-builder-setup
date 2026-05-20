@@ -315,15 +315,24 @@ Verbatim verdicts from the cross-CMS × stack compatibility anchor in `cms-adapt
 
 | Stack (phase 11 choice) | Decap fit | Notes |
 |---|---|---|
+| **Framer** | **N/A** | Framer has its own first-party CMS; Decap-on-Framer is anti-fit (per `adapters/stack-framer.md` §"CMS pairings to avoid on Framer" line 406). |
+| **Next.js + shadcn** | **Possible** | Static export mode (`output: 'export'`). Pages live as MDX in `content/`; Decap commits MDX. Loses Next.js's dynamic features, gains Decap simplicity. Surface at phase 12 — if the user wants Next.js dynamic, Decap is the wrong CMS. |
+| **WordPress** | **N/A** | WordPress has its own CMS; Decap-on-WordPress is anti-fit (per `adapters/stack-wordpress.md` CMS-pairing table line 746). |
 | **Astro** | **Native** | Astro Content Collections + Decap is a top-tier muggle pattern. Astro's `glob()` content loader + Decap's folder collections align cleanly. **Default for "Astro + a CMS."** |
 | **Hugo** | **Native** | `static/admin/` for admin files; `content/<section>/*.md` for collections. Hugo's data files map to Decap file collections. |
+| **SvelteKit** | **Possible** | `adapter-static` + Decap. Less common but works. |
+| **Webflow** | **N/A** | Webflow has its own first-party CMS; Decap-on-Webflow is anti-fit (same category as Framer / WordPress). |
+| **Plain static HTML** | **Awkward** | Decap commits markdown, but plain HTML doesn't render markdown without a generator. Use a generator (Astro / Hugo / etc.). Phase 12 should challenge the choice. |
+
+### Supplementary pairings (not in the 8-stack cross-CMS anchor)
+
+These stacks are not in `cms-adapters/README.md`'s 8-stack column header but are documented per `DESIGN-cms-decap.md` as additional Decap-friendly targets. Captured here for completeness; phase-12 surfacing of these requires the Phase 10+ stack-adapter expansion.
+
+| Stack (supplementary) | Decap fit | Notes |
+|---|---|---|
 | **Jekyll** | **Native** | `_posts/`, `_data/` map directly. The original (Netlify CMS-era) Decap target. |
 | **Eleventy** | **Native** | Same shape as Jekyll. Passthrough copies `admin/` from input to output. |
 | **Gatsby** | **Native (legacy)** | Works but Gatsby's mindshare has shifted — Netlify acquired then de-prioritized Gatsby; the broader ecosystem is moving away. Pick Astro for new projects. |
-| **Next.js + shadcn (static export)** | **Possible** | Use with `output: 'export'`. Pages live as MDX in `content/`; Decap commits MDX. Loses Next.js's dynamic features, gains Decap simplicity. Surface at phase 12 — if the user wants Next.js dynamic, Decap is the wrong CMS. |
-| **SvelteKit (static)** | **Possible** | `adapter-static` + Decap. Less common but works. |
-| **Framer / WordPress / Webflow** | **N/A** | Those have their own CMSes. Decap-on-Framer / Decap-on-WordPress is anti-fit (per `adapters/stack-framer.md` §"CMS pairings to avoid on Framer" line 406 and `adapters/stack-wordpress.md` CMS-pairing table line 746). |
-| **Plain static HTML** | **Awkward** | Decap commits markdown, but plain HTML doesn't render markdown without a generator. Use a generator (Astro / Hugo / etc.). Phase 12 should challenge the choice. |
 
 ### Per-pairing recipe — Astro + Decap (default Native pairing)
 
@@ -715,7 +724,7 @@ Per Lock-3 freshness pattern. Cache home: `.website-builder/library/docs/decap-c
 | 28 (deploy) | `/websites/decapcms` | "OAuth provider setup — GitHub OAuth app + repo scope" |
 | 28 (deploy) | (Netlify Identity docs via WebFetch) | "Git Gateway setup if scope-limiting needed" — context7 coverage for Netlify Identity is thin; WebFetch fallback to https://docs.netlify.com/security/secure-access-to-sites/identity/ |
 
-### MCP-audit verbatim (Round-3 doctrine)
+### MCP availability audit (per Round-3 doctrine)
 
 | Surface | Negative-finding status (2026-05-20) | Canonical fallback |
 |---|---|---|
