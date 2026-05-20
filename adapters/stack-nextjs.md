@@ -580,7 +580,7 @@ Phase 12 (CMS decision) picks per project complexity. The MVP triplet (locked de
 | CMS | When to recommend | Anti-fit | Hosting |
 |---|---|---|---|
 | **none (file-based MDX)** *(default for content-light sites)* | 5-15 pages, infrequent updates, user is OK editing MDX directly | Multiple editors needing role-based access; non-developer editorial workflow | Same as Next.js (Vercel) |
-| **Decap CMS** | Git-backed visual editing; admin UI at `/admin`; commits land in user's repo; works for non-developer editors who can tolerate a basic UI | Heavy structured content (relations across content types); WYSIWYG-heavy editorial workflow. **Decap upstream is in maintenance mode (verified 2026-05-18)** — surface Sveltia CMS or Static CMS as active-fork upgrade paths if user wants long-term support | Same as Next.js (Vercel) — Decap is static |
+| **Decap CMS** | Git-backed visual editing; admin UI at `/admin`; commits land in user's repo; works for non-developer editors who can tolerate a basic UI | Heavy structured content (relations across content types); WYSIWYG-heavy editorial workflow. **Decap upstream state — verify current at phase 12 via context7** (re-verified 2026-05-20: Decap revitalized with v3.12.2 April 2026 active cadence; Sveltia CMS active fork; Static CMS archived 2024-09-09 — drop from recommendations) | Same as Next.js (Vercel) — Decap is static |
 | **Payload CMS** *(vault-canonical pick — decision 53)* | TypeScript-first; runs in same Next.js app (Payload v3 is Next-native — one-line install via `@payloadcms/next`); structured content + relations; drafts + versions; live preview; RBAC; the user wants a real CMS without leaving the Next.js stack | Tiny content-light sites where it's overkill | **Postgres separately needed** — Neon / Supabase / Railway / self-hosted; flag at phase 12 + draft `.website-builder/decisions/cms-12-payload-postgres-host.md` for phase 29 readiness |
 | **Sanity** *(expansion)* | Structured content + GROQ queries; great for content-heavy sites with editorial teams; managed SaaS | Solo muggle who doesn't want a separate SaaS account | Sanity Cloud (managed) |
 | **TinaCMS** *(expansion)* | MDX + visual editing; cloud-hosted or self-hosted | Sites without an editorial team | Tina Cloud or self-host |
@@ -591,7 +591,7 @@ Phase 12 (CMS decision) picks per project complexity. The MVP triplet (locked de
 
 **Default for muggle:** Decap CMS for content-light sites (sites with <15 pages, ~quarterly updates); Payload for content-heavy sites (editorial teams, multiple editors, structured relationships). The agent surfaces both at phase 12 and walks the trade-offs honestly.
 
-**Decap maintenance-mode caveat (cite to user at phase 12):** Decap upstream development is slow; the active forks are **Sveltia CMS** (https://github.com/sveltia/sveltia-cms) and **Static CMS** (https://github.com/StaticJsCMS/static-cms). The agent verifies current upstream + fork state via context7 + WebFetch at phase 12 and either uses Decap as-is (acknowledged risk), recommends Sveltia, or escalates to Payload.
+**Decap upstream verification (cite to user at phase 12):** The agent verifies current upstream + fork state via context7 + WebFetch at phase 12. Current state (re-verified 2026-05-20 per Captain J Phase-4 research): **Decap is in active maintenance** (v3.12.2 April 2026); the sole active fork is **Sveltia CMS** (https://github.com/sveltia/sveltia-cms); **Static CMS is archived** (2024-09-09, https://github.com/StaticJsCMS/static-cms). The agent recommends Decap by default + names Sveltia as a Svelte-based alternative; escalates to Payload only when structured content needs exceed Decap's `list + types` shape.
 
 **i18n strategy locked at phase 12** for multilingual sites (per `wb-architecture/SKILL.md` line 87): Decap → `structure: multiple_files` config; Payload → field-level `localized: true` + `localization.fallback: true`. None → per-locale MDX files at `content/pages/{lang}/{slug}.mdx` (the default migration recipe in §"Migration recipe").
 
@@ -908,7 +908,7 @@ Per Lock-3 freshness pattern. The agent invokes context7 at the following phases
 | Library ID | Question template |
 |---|---|
 | `/payloadcms/payload` | "Collections, Blocks field, field-level localization (`localized: true`), access control / roles, drafts/versions, live preview, Postgres adapter setup, the production build command" |
-| `/decaporg/decap-cms` (or WebFetch decapcms.org/docs — context7 coverage thin) | "config-schema, OAuth backends, `structure: multiple_files` i18n, upstream maintenance state (verify against active forks Sveltia CMS + Static CMS)" |
+| `/decaporg/decap-cms` (or WebFetch decapcms.org/docs — context7 coverage thin) + `/websites/decapcms` (per Captain J Phase-4 research, benchmark 93.5) | "config-schema, OAuth backends, `structure: multiple_files` i18n, current upstream + Sveltia fork state (re-verify each phase-12 invocation; Static CMS archived 2024-09-09 — do NOT recommend)" |
 
 ### Phase 17 (design system)
 
