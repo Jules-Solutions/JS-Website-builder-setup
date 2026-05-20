@@ -1,0 +1,35 @@
+/* tests/cms-adapters/decap/fixture/src/styles/tokens.css
+ * Layer 1 — design tokens generated from brand.yaml at phase 17.
+ * Decap doesn't manage these by default (the BrandTokens file collection is opt-in; this fixture doesn't enable it).
+ */
+
+:root {
+  --color-primary: oklch(64% 0.18 30);
+  --color-secondary: oklch(45% 0.15 250);
+  --color-neutral-dark: oklch(15% 0.02 270);
+  --color-neutral-light: oklch(96% 0.02 270);
+  --color-semantic-error: oklch(60% 0.20 25);
+
+  --font-display: "Fraunces", serif;
+  --font-body: "Inter", sans-serif;
+
+  --font-size-h1: 64px;
+  --font-size-h2: 40px;
+  --font-size-body: 18px;
+
+  --line-height-h1: 1.0;
+  --line-height-h2: 1.1;
+  --line-height-body: 1.5;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --duration-med: 300ms;
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+}
