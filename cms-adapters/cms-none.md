@@ -2,7 +2,7 @@
 
 > **Identity.** "No CMS." Content is markdown files committed to git. The static-site framework (Astro Content Collections / Hugo `content/` / Eleventy data cascade) reads files at build time and produces the deployed site. **CMS name + version baseline:** there is no CMS — the relevant version is whichever static-site framework reads the files. Canonical context7 IDs for the read-path frameworks: `/withastro/docs` (default pairing), `/gohugoio/hugo`, `/11ty/eleventy`. **Freshness-check requirement:** the agent invokes context7 against the chosen framework at phases 12 / 17 / 18 / 22 to confirm current Content Collections / data-cascade / archetype surfaces. Framework APIs evolve; training data is stale.
 >
-> **Source design doc:** `Workstreams/website-builder/cms/DESIGN-cms-none.md`. Captain-I authored against the 12-section schema in `cms-adapters/README.md`.
+> **Source design doc:** `Workstreams/website-builder/cms/DESIGN-cms-none.md`. Captain I authored against the 12-section schema in `cms-adapters/README.md`.
 
 ## Mental model
 
@@ -335,7 +335,7 @@ Phase 12 cross-CMS × stack pairings from `cms-none`'s perspective. Verdicts use
 | **WordPress** | **N/A** | WordPress IS the CMS; the `wordpress-core` `project.yaml.cms` value is the default for the WordPress stack. File-based content is a category error against WordPress. |
 | **Astro** | **Native** (default) | First-class — Astro Content Collections + Zod is the gold standard for file-based content. **This is the default recommendation when the user picks `none` and hasn't already committed to a stack.** Cached context7 snapshot at `.website-builder/library/docs/cms-none-astro.md`. |
 | **Hugo** | **Native** | First-class — Hugo's `content/` directory is exactly this pattern. Built-in i18n via `i18n/{lang}.toml`. Fastest build times of any static-site framework (50k pages in seconds). Cached context7 snapshot at `.website-builder/library/docs/cms-none-hugo.md`. |
-| **SvelteKit (static)** | **Possible** | Works via `mdsvex` for markdown-in-Svelte. Per Phase 3 stack-pairing symmetry — SvelteKit is not in the v1 stack adapter set (Phase 3 ships framer / nextjs / wordpress); flagged for future Phase 10+ expansion. |
+| **SvelteKit** | **Possible** | Works via `mdsvex` for markdown-in-Svelte (adapter-static mode). Per Phase 3 stack-pairing symmetry — SvelteKit is not in the v1 stack adapter set (Phase 3 ships framer / nextjs / wordpress); flagged for future Phase 10+ expansion. |
 | **Webflow** | **N/A** | Webflow has its own first-party CMS (Webflow CMS); pages are visual-builder documents, not file-based routes. Same category-error as Framer / WordPress pairings. |
 | **Plain static HTML** | **Possible** | A build script (Pandoc / custom Node / Python markdown library) renders markdown to HTML. Niche; the agent prefers Astro for muggle-friendliness. |
 | **11ty (Eleventy)** | **Native** (supplementary — not in cross-CMS anchor's 8-stack row, but `DESIGN-cms-none.md` line 299 documents 11ty Native) | First-class — Eleventy's data cascade reads markdown + frontmatter natively. Cached context7 snapshot at `.website-builder/library/docs/cms-none-11ty.md`. Per Phase 3 stack-pairing symmetry — 11ty is not in the v1 stack adapter set; flagged for future Phase 10+ expansion. |
@@ -701,9 +701,9 @@ Per Lock-3 freshness pattern. The agent re-validates the chosen static-site fram
 - Cache rotation: re-fetch when stale (>30 days since file mtime) OR when phase entry signals "verify current API".
 - Cache format: free-form markdown extracted from context7 response, with header noting `Cached YYYY-MM-DD by {callsign}`.
 
-### MCP availability audit (per round-3 MCP audit doctrine)
+### MCP availability audit (per Round-3 doctrine)
 
-The agent checks for relevant MCP servers at phase entry. Findings as of **2026-05-20** (Captain-I audit):
+The agent checks for relevant MCP servers at phase entry. Findings as of **2026-05-20** (Captain I audit):
 
 | MCP | Status | Source | Use case |
 |---|---|---|---|
@@ -736,7 +736,7 @@ Cross-adapter references (Phase 3 + Phase 4 substrate):
 
 - `cms-adapters/README.md` — the 12-section schema this adapter conforms to + cross-CMS × stack compatibility anchor (verdict words for `## Stack pairings` table)
 - `adapters/README.md` — Phase 3 stack-adapter contract; `## Content layer mapping` row labels MUST match this adapter's table
-- `adapters/stack-framer.md`, `adapters/stack-nextjs.md`, `adapters/stack-wordpress.md` — Phase 3 stack adapters; `## CMS pairing` sections cross-reference `cms-none` for their own pairing verdicts (Framer N/A, Next.js Possible, WordPress N/A)
+- `adapters/stack-framer.md`, `adapters/stack-nextjs.md`, `adapters/stack-wordpress.md` — Phase 3 stack adapters. See `adapters/stack-framer.md` `## CMS pairing` for Framer-with-headless-CMS patterns (Framer CMS is Framer's default; `cms-none` is N/A for Framer per the anchor table). `adapters/stack-nextjs.md` `## CMS pairing` documents the Next.js Possible verdict via static export. `adapters/stack-wordpress.md` `## CMS pairing` documents the WordPress N/A verdict (WordPress IS the CMS)
 - `commerce-adapters/README.md` — Phase 4 sibling Captain 0 schema for commerce + booking adapters
 - `commerce-adapters/payment-config-schema.md` — canonical `payment-config.yaml` schema for commerce pairings (TWINT-via-Stripe-on-CHF)
 - `tests/cms-adapters/README.md` — per-CMS-adapter test fixture convention; `tests/cms-adapters/none/` is the matching fixture set

@@ -1101,9 +1101,9 @@ The agent invokes context7 at these phases when Payload is the chosen CMS. Cache
 
 **Secondary mirror:** `/llmstxt/payloadcms_llms-full_txt` (6552 snippets, full-text mirror, benchmark 42.12). Useful when the primary context7 corpus returns too narrowly — the llmstxt mirror has broader-but-less-precise coverage.
 
-### MCP audit — comprehensive enumeration (verified 2026-05-20)
+### MCP availability audit (per Round-3 doctrine)
 
-Each MCP investigated below for the Payload-specific surface. Negative findings documented per Round-3 audit doctrine; the agent does NOT keep searching at runtime for non-existent MCPs.
+Comprehensive enumeration verified 2026-05-20. Each MCP investigated below for the Payload-specific surface. Negative findings documented per Round-3 audit doctrine; the agent does NOT keep searching at runtime for non-existent MCPs.
 
 #### Payload-specific MCPs
 
