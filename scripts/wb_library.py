@@ -80,15 +80,19 @@ from urllib.parse import urlparse
 
 try:
     import yaml  # type: ignore
-
-    HAS_PYYAML = True
 except ImportError:  # pragma: no cover — exercised only outside the test harness
-    HAS_PYYAML = False
+    # Explicit no-yaml fallback: bind `yaml = None` so the name is always defined
+    # and the `yaml is not None` guard below narrows correctly for the type checker
+    # (a bare HAS_PYYAML bool does not narrow `yaml`). The minimal hand-rolled
+    # parser/emitter then handles the flat shapes we read/write.
+    yaml = None  # type: ignore[assignment]
+
+HAS_PYYAML = yaml is not None
 
 
 def _parse_yaml(text: str) -> dict[str, Any]:
     """Parse YAML to a dict. PyYAML when present; minimal flat-scalar fallback."""
-    if HAS_PYYAML:
+    if yaml is not None:
         result = yaml.safe_load(text)
         return result if isinstance(result, dict) else {}
     # Fallback: handle flat top-level `key: value` scalar lines only. Sufficient
@@ -110,7 +114,7 @@ def _parse_yaml(text: str) -> dict[str, Any]:
 
 def _emit_yaml(data: dict[str, Any]) -> str:
     """Emit a dict as YAML. PyYAML when present; minimal fallback otherwise."""
-    if HAS_PYYAML:
+    if yaml is not None:
         return yaml.safe_dump(
             data,
             sort_keys=False,
@@ -677,7 +681,7 @@ def autoclone_for_state(
             )
             continue
 
-        source_url, rtype, default_sub = _resolve_resource(resource)
+        source_url, _rtype, default_sub = _resolve_resource(resource)
         target = str(entry.get("as") or default_sub)
 
         if target in existing or resource in existing:
@@ -835,7 +839,7 @@ def _build_parser() -> argparse.ArgumentParser:
 # ---- verb handlers --------------------------------------------------------
 
 
-def _cmd_list(args: argparse.Namespace, project_root: Path) -> int:
+def _cmd_list(_args: argparse.Namespace, project_root: Path) -> int:
     entries = _read_registry(project_root)
     if not entries:
         print(f"[{MODULE_NAME}] library is empty. Add one with `wb library add <url>`.")
@@ -855,7 +859,7 @@ def _entry_subdir(entry: LibraryEntry) -> str:
 
 def _cmd_add(args: argparse.Namespace, project_root: Path) -> int:
     resource = args.url
-    source_url, rtype, default_sub = _resolve_resource(resource)
+    source_url, rtype, _default_sub = _resolve_resource(resource)
     subdir = args.as_subdir or _default_subdir_for_type(rtype)
     name = _slug_from_resource(resource, source_url, rtype)
 
@@ -921,7 +925,7 @@ def _cmd_refresh(args: argparse.Namespace, project_root: Path) -> int:
     return 0
 
 
-def _cmd_refresh_all(args: argparse.Namespace, project_root: Path) -> int:
+def _cmd_refresh_all(_args: argparse.Namespace, project_root: Path) -> int:
     entries = _read_registry(project_root)
     if not entries:
         print(f"[{MODULE_NAME}] library is empty; nothing to refresh.")
@@ -944,7 +948,7 @@ def _cmd_refresh_all(args: argparse.Namespace, project_root: Path) -> int:
     return 0
 
 
-def _cmd_prune(args: argparse.Namespace, project_root: Path) -> int:
+def _cmd_prune(_args: argparse.Namespace, project_root: Path) -> int:
     entries = _read_registry(project_root)
     if not entries:
         print(f"[{MODULE_NAME}] library is empty; nothing to prune.")
