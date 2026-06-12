@@ -83,15 +83,62 @@ class _Recorder:
         return self.return_code
 
 
+_SENTINEL = object()  # distinguished "was absent" marker
+
+# Stash for pre-stub/pre-block originals, keyed by module name.  Both
+# _inject_stub and _block_module save the current sys.modules entry here before
+# replacing it; _remove_stub restores it so cross-file tests (e.g. the library
+# reload tests) can still use importlib.reload() on the real module object
+# after any cli test that injected stubs.
+_saved_originals: dict[str, object] = {}
+
+
+def _remove_stub(module_name: str) -> None:
+    """Remove a stub or None-sentinel from sys.modules, restoring saved originals.
+
+    If _inject_stub or _block_module previously saved the original for this
+    name, restore it.  If not (nothing was saved, i.e. nobody injected a stub
+    for this name this test), leave whatever is in sys.modules untouched — this
+    prevents the autouse setup phase from evicting the real wb_library that was
+    imported at collection time by test_wb_library.py (F3 root cause).
+    """
+    saved = _saved_originals.pop(module_name, _SENTINEL)
+    if saved is _SENTINEL:
+        # Nobody saved an original for this name in this test — nothing to restore.
+        # Leave sys.modules as-is (protects the real module from eviction).
+        return
+
+    # We have a saved original: evict whatever is there now and restore.
+    sys.modules.pop(module_name, None)
+    if saved is not None:
+        sys.modules[module_name] = saved  # type: ignore[assignment]
+    # If saved is None it means the module was absent before injection; leave absent.
+
+
 def _inject_stub(module_name: str, recorder: _Recorder) -> None:
-    """Insert a fake wb_library / wb_keys module exposing recorder.run."""
+    """Insert a fake wb_library / wb_keys module exposing recorder.run.
+
+    Saves the current sys.modules entry so _remove_stub can restore it.
+    """
+    if module_name not in _saved_originals:
+        _saved_originals[module_name] = sys.modules.get(module_name, _SENTINEL)
     mod = types.ModuleType(module_name)
     mod.run = recorder.run  # type: ignore[attr-defined]
     sys.modules[module_name] = mod
 
 
-def _remove_stub(module_name: str) -> None:
-    sys.modules.pop(module_name, None)
+def _block_module(module_name: str) -> None:
+    """Set a None sentinel so `import <module_name>` raises ModuleNotFoundError.
+
+    Python treats sys.modules[name] = None as a cached "does not exist" entry,
+    which makes wb.py's lazy `import wb_library` raise ModuleNotFoundError
+    deterministically regardless of whether the real .py exists on sys.path.
+    Saves the current entry so _remove_stub restores the real module in teardown,
+    keeping cross-file reload() calls working.
+    """
+    if module_name not in _saved_originals:
+        _saved_originals[module_name] = sys.modules.get(module_name, _SENTINEL)
+    sys.modules[module_name] = None  # type: ignore[assignment]
 
 
 @pytest.fixture
@@ -106,7 +153,13 @@ def project_dir():
 
 @pytest.fixture(autouse=True)
 def _clean_stubs():
-    """Ensure no stub leaks between tests."""
+    """Ensure no stub or None-sentinel leaks between tests.
+
+    Setup (pre-yield): only removes stubs/sentinels — leaves real modules intact
+    so tests in other files (e.g. test_wb_library.py) can still reload them.
+    Teardown (post-yield): same safe removal, which also cleans up any
+    None-sentinels placed by _block_module inside a test.
+    """
     _remove_stub("wb_library")
     _remove_stub("wb_keys")
     yield
@@ -160,8 +213,13 @@ class TestWbDispatch:
         assert rec.calls[0]["argv"] == ["list"]
 
     def test_library_missing_module_returns_4(self, project_dir):
-        """No wb_library present (the parallel-build reality) → clean exit 4."""
-        _remove_stub("wb_library")
+        """No wb_library present (the parallel-build reality) → clean exit 4.
+
+        Uses _block_module (sys.modules[name] = None sentinel) instead of a
+        mere pop so that the real scripts/wb_library.py on sys.path cannot be
+        imported — the test must pass whether or not the real module file exists.
+        """
+        _block_module("wb_library")
         wb = _fresh_wb()
         rc = wb.main(["--project-dir", str(project_dir), "library", "list"])
         assert rc == 4
@@ -186,7 +244,12 @@ class TestWbDispatch:
         assert rc == 3
 
     def test_keys_missing_module_returns_4(self, project_dir):
-        _remove_stub("wb_keys")
+        """No wb_keys present (the parallel-build reality) → clean exit 4.
+
+        Uses _block_module so the test is repo-state-independent: passes whether
+        or not scripts/wb_keys.py exists on sys.path.
+        """
+        _block_module("wb_keys")
         wb = _fresh_wb()
         rc = wb.main(["--project-dir", str(project_dir), "keys", "migrate-to-env"])
         assert rc == 4
