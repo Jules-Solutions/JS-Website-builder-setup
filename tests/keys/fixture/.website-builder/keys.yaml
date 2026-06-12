@@ -1,0 +1,42 @@
+# keys.yaml — TEST FIXTURE for tests/keys/test_wb_keys.py
+# Committed, references-only registry (per DESIGN-secrets-and-keys.md Layer 1).
+# NO REAL SECRETS — placeholder values only (per .claude/rules/secrets-conventions.md
+# + tests/README.md Phase 5 "placeholder values ONLY" rule). The resolver tests
+# assert the MECHANISM (which source, which env var, fix-path on missing), never
+# real key values.
+version: 1
+
+# source: env — resolved from .env (or process env). The muggle default.
+image_gen:
+  provider: gemini
+  api_key:
+    source: env
+    env_var: WB_TEST_GEMINI_API_KEY
+
+# A second env-source key, also a publishable (non-secret) key — still resolved.
+commerce:
+  stripe:
+    secret_key:
+      source: onepassword
+      ref: "op://TestVault/Stripe/secret_key"
+      env_var: WB_TEST_STRIPE_SECRET_KEY
+    publishable_key:
+      source: env
+      env_var: WB_TEST_STRIPE_PUBLISHABLE_KEY
+
+# source: onepassword — resolved via the `op` CLI (mocked in tests; never hits a
+# real 1Password account).
+hosting:
+  vercel:
+    deploy_token:
+      source: onepassword
+      ref: "op://TestVault/Vercel/api_token"
+      env_var: WB_TEST_VERCEL_TOKEN
+
+# An optional key (required: false) — absence must NOT trigger an unresolved error.
+analytics:
+  plausible:
+    api_key:
+      source: env
+      env_var: WB_TEST_PLAUSIBLE_KEY
+      required: false
