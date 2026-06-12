@@ -17,6 +17,20 @@ relates_to:
   - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
   - Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md
   - Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md
+# library_clones_at_entry — auto-clone triggers read by wb_library.autoclone_for_state(trigger="phase-entry", phase=17).
+# Schema: scripts/README.md § library_clones_at_entry. This is the Phase-5 WORKING EXAMPLE (per the contract,
+# Captain P adds the field to phase 17 ONLY; the other 37 contracts are back-filled by a future follow-up INST).
+# Triggers per DESIGN-resource-curation.md lines 234-242 + this contract's § Reference materials / § Output artifacts:
+#   - the awesome-design-md exemplar corpus subset (always, at phase-17 entry, per decision 42)
+#   - the chosen component-library reference (only when the user picked shadcn — load-bearing for the phase-18 build)
+library_clones_at_entry:
+  - resource: awesome-design-md
+    as: awesome-design-md
+    note: "10-20 most-relevant DESIGN.md exemplars for the chosen aesthetic (decision 42; § Output artifacts)"
+  - resource: shadcn-components
+    when: component_library == "shadcn"
+    as: docs
+    note: "shadcn/ui component reference for the phase-18 build (clone-into-project when shadcn picked)"
 ---
 
 # Phase 17 — Design system creation
