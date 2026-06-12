@@ -1,0 +1,25 @@
+# project.yaml — synthetic fixture for tests/library/test_wb_library.py.
+# Minimal-but-valid .website-builder/ state. Drives the auto-clone runtime's
+# session-start candidate derivation + the phase-17 `when:` predicate evaluation.
+# NOT a real project — values chosen so both gated clones in 17-design-system.md fire.
+version: 1
+plugin_version: "0.1.0"
+name: "fixture-site"
+slug: "fixture-site"
+entry_mode: "greenfield"
+current_phase: 17
+phase_locked: false
+secrets_backend: "env"
+design_skill_flavor: "ui-ux-pro-max"
+design_skill_flavor_preferred: null
+design_skill_complementary: []
+stack: "astro"
+cms: "decap"
+transactional: true
+payment_provider: "stripe"
+languages: ["en"]
+default_language: "en"
+component_library: "shadcn"
+component_library_composition:
+  primary: "shadcn"
+  complementary: []
