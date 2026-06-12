@@ -1,3 +1,7 @@
+# CC session-local state (agent memory, session dirs) — NOT plugin content.
+# NOTE: .claude-plugin/ (the plugin manifest) is tracked; only .claude/ is local.
+.claude/
+
 # OS / editor cruft
 .DS_Store
 Thumbs.db
