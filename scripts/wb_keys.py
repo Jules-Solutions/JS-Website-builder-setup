@@ -163,14 +163,16 @@ def log_err(msg: str) -> None:
 
 try:
     import yaml  # type: ignore
-    HAS_PYYAML = True
 except ImportError:  # pragma: no cover — exercised only outside the test harness
-    HAS_PYYAML = False
+    yaml = None  # name is always bound (None when unavailable) so type-checkers
+                 # narrow `yaml is not None` correctly without a possibly-unbound warning.
+
+HAS_PYYAML = yaml is not None
 
 
 def parse_yaml(text: str) -> dict[str, Any]:
     """Parse YAML to a dict. PyYAML when available; minimal nested fallback else."""
-    if HAS_PYYAML:
+    if yaml is not None:
         result = yaml.safe_load(text)
         return result if isinstance(result, dict) else {}
     return _hand_parse_yaml(text)
@@ -228,7 +230,7 @@ def _coerce_scalar(raw: str) -> Any:
 
 def emit_yaml(data: dict[str, Any]) -> str:
     """Emit YAML. PyYAML when available; minimal nested fallback else."""
-    if HAS_PYYAML:
+    if yaml is not None:
         return yaml.safe_dump(  # type: ignore[no-any-return]
             data, sort_keys=False, default_flow_style=False, allow_unicode=True
         )
@@ -860,11 +862,27 @@ def _write_text(path: Path, content: str) -> None:
 
 def _verify_after_migration(project_root: Path, *, expect_sources: set[str]) -> None:
     """
-    Best-effort post-migration verification: re-resolve and report. Does NOT raise
-    on failure (the migration already happened + persisted); it surfaces a warning
-    so the user knows to investigate. Never logs values.
+    Best-effort post-migration verification: re-read keys.yaml + re-resolve, then
+    report. Does NOT raise on failure (the migration already happened + persisted);
+    it surfaces a warning so the user knows to investigate. Never logs values.
+
+    expect_sources: the source(s) the migrated entries should now carry in
+    keys.yaml (e.g. {"onepassword"} after migrate-to-1password, {"env"} after
+    migrate-to-env). Any entry whose source is OUTSIDE this set is flagged as a
+    keys.yaml-write invariant violation (the migration didn't fully flip it).
     """
     try:
+        doc = _load_keys_doc(project_root)
+        entries = collect_key_entries(doc)
+        stray = sorted(
+            e.env_var for e in entries if e.source not in expect_sources
+        )
+        if stray:
+            log_warn(
+                "Post-migration check: these keys.yaml entries are NOT in the "
+                f"expected source set {sorted(expect_sources)} — {', '.join(stray)}. "
+                "If they should have migrated, re-run the migration for them."
+            )
         resolved = resolve_keys(project_root)
         log_ok(f"Verified: {len(resolved)} key(s) resolve after migration.")
     except KeyResolutionError as exc:

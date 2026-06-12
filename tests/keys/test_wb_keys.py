@@ -63,10 +63,12 @@ def project_root(tmp_path: Path) -> Path:
 
 
 @pytest.fixture(autouse=True)
-def _clean_env(monkeypatch: pytest.MonkeyPatch):
+def _clean_env(monkeypatch: pytest.MonkeyPatch):  # noqa: PT004  (autouse fixture; invoked by pytest, not referenced by name)
     """
     Ensure the fixture's env-var names aren't already set in the real process env
     (so the .env file — not a stray ambient var — is what the resolver reads).
+    Autouse so every test gets a clean env without explicitly requesting it; the
+    static-analysis "unused" flag is a false positive — pytest injects it.
     """
     for name in (
         "WB_TEST_GEMINI_API_KEY",
@@ -105,7 +107,7 @@ def _install_op_mock(monkeypatch: pytest.MonkeyPatch, *, available: bool = True,
             self.stdout = stdout
             self.stderr = stderr
 
-    def fake_run_op(args, *, input_text=None):
+    def fake_run_op(args, **_kwargs):
         # args is the op argv WITHOUT the binary name.
         if not args:
             return _FakeProc(2, stderr="no args")
@@ -148,7 +150,7 @@ class TestWbKeysImportSafety:
         # touching the module's constants/helpers needs no op binary.
         called = {"n": 0}
         monkeypatch.setattr(wb_keys, "_run_op",
-                            lambda *a, **k: called.__setitem__("n", called["n"] + 1))
+                            lambda *_a, **_k: called.__setitem__("n", called["n"] + 1))
         # Reading constants + parsing YAML must not call op.
         _ = wb_keys.OP_BIN
         _ = wb_keys.collect_key_entries({"version": 1})
@@ -207,7 +209,7 @@ class TestResolveKeysOnePasswordSource:
             def __init__(self, rc, out="", err=""):
                 self.returncode, self.stdout, self.stderr = rc, out, err
 
-        def fake_run_op(args, *, input_text=None):
+        def fake_run_op(args, **_kwargs):
             seen_args.append(args)
             if args[0] == "whoami":
                 return _FakeProc(0, "acct")
@@ -295,7 +297,7 @@ class TestMigrateTo1Password:
             def __init__(self, rc, out="", err=""):
                 self.returncode, self.stdout, self.stderr = rc, out, err
 
-        def fake_run_op(args, *, input_text=None):
+        def fake_run_op(args, **_kwargs):
             seen.append(args)
             if args[0] == "whoami":
                 return _FakeProc(0, "acct")
