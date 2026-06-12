@@ -63,14 +63,41 @@ tests/.fixtures-state/
 tests/coverage/
 
 # Plugin runtime state (user-side artifacts that shouldn't ship in plugin repo)
+# Covers .website-builder/keys-resolved.tmp, .website-builder/skills-installed.yaml,
+# .website-builder/library/ clones, and the user's real .website-builder/.env.op
+# (op:// references) — all are per-user runtime, never committed in the plugin repo.
 .website-builder/
-# Exception: test fixtures DO ship — they ARE the per-adapter test contract
+# Exception: test fixtures DO ship — they ARE the per-adapter / per-module test contract.
+# Phase 3/4 adapter fixtures (tests/<type>/<name>/fixture/.website-builder/):
 !tests/adapters/*/fixture/.website-builder/
 !tests/adapters/*/fixture/.website-builder/**
 !tests/cms-adapters/*/fixture/.website-builder/
 !tests/cms-adapters/*/fixture/.website-builder/**
 !tests/commerce-adapters/*/fixture/.website-builder/
 !tests/commerce-adapters/*/fixture/.website-builder/**
+# Phase 5 per-Captain code-test fixtures. Two layouts:
+#   one-deep   tests/<captain>/fixture/.website-builder/       (cli, library, keys)
+#   two-deep   tests/<type>/<name>/fixture/.website-builder/   (skills-bundle/ui-ux-pro-max, extraction/stitch)
+# These fixture .website-builder/ dirs hold synthetic project.yaml / keys.yaml /
+# .env (PLACEHOLDER values only — never real secrets) / library/ scaffolds + a
+# sample skills-installed.yaml; they MUST ship so Phase 5 module tests can run.
+!tests/cli/*/fixture/.website-builder/
+!tests/cli/*/fixture/.website-builder/**
+!tests/cli/fixture/.website-builder/
+!tests/cli/fixture/.website-builder/**
+!tests/library/fixture/.website-builder/
+!tests/library/fixture/.website-builder/**
+!tests/keys/fixture/.website-builder/
+!tests/keys/fixture/.website-builder/**
+!tests/skills-bundle/*/fixture/.website-builder/
+!tests/skills-bundle/*/fixture/.website-builder/**
+!tests/extraction/*/fixture/.website-builder/
+!tests/extraction/*/fixture/.website-builder/**
+
+# Note on .env.op: it holds op:// REFERENCES (pointers), not secret values
+# (DESIGN-secrets-and-keys.md line 164). A user's real .env.op lives at
+# .website-builder/.env.op (already ignored above). Do NOT add a blanket `.env.op`
+# ignore — a fixture may ship a sample reference file under a tests/ fixture dir.
 
 # Logs
 *.log
