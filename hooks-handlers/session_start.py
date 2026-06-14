@@ -293,11 +293,149 @@ def read_project_state(root: Path) -> dict | None:
     return read_state_yaml(project_yaml)
 
 
-def render_context(*, root: Path, state_present: bool, entry: dict, project: dict | None) -> str:
+# ---------------------------------------------------------------------------
+# Phase-5 runtime interlocks (wired here at Phase 6 per RPT-phase-5-stage-
+# completion.md follow-up #1 + RPT-phase-5-captain-q.md follow-up #1).
+#
+# Two Phase-5 modules ship callable-but-unwired: scripts/wb_library.py's
+# `autoclone_for_state` (project.yaml-derived resource auto-clone, Captain P) and
+# scripts/wb_keys.py's `resolve_keys` (secrets resolution, Captain Q). This hook
+# is where they become live. Both run ONLY on the mid-project path (a
+# `.website-builder/` state dir exists) — a fresh project has no project.yaml /
+# keys.yaml for them to read.
+#
+# DEFENSIVE CONTRACT (this file runs on EVERY website-builder CC session — a
+# crash here breaks every user session):
+#   - imports are guarded (the modules live in scripts/, may be absent in a
+#     partially-installed plugin) — matching the `try: import yaml` idiom the
+#     sibling modules already use;
+#   - every call is wrapped so no exception escapes into main();
+#   - resolve_keys NEVER has its resolved VALUES logged — only counts + names +
+#     the (value-free) fix-path message on KeyResolutionError (per
+#     .claude/rules/secrets-conventions.md + the hook-development skill's
+#     "DON'T log sensitive information" rule);
+#   - autoclone_for_state records clone INTENT at session-start (the module
+#     defers the actual network fetch — DESIGN-resource-curation line 138), so
+#     this stays fast + offline-safe inside the 30s SessionStart timeout.
+# ---------------------------------------------------------------------------
+
+
+def _scripts_dir() -> Path:
+    """The plugin's scripts/ dir (sibling of hooks-handlers/), where the Phase-5
+    runtime modules live. Resolved relative to this file so it works regardless
+    of cwd (cwd at session-start is the USER's project, not the plugin)."""
+    return Path(__file__).resolve().parent.parent / "scripts"
+
+
+def run_autoclone(root: Path) -> dict | None:
+    """Invoke scripts/wb_library.autoclone_for_state for the session-start trigger.
+
+    Import-safe + non-fatal: a missing module, an unreadable project.yaml, or any
+    runtime error yields a structured note (never an exception). Returns a dict
+    summary for the context block, or None if the module is unavailable.
+    """
+    scripts = _scripts_dir()
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    try:
+        import wb_library  # type: ignore
+    except Exception as exc:  # noqa: BLE001 — defensive: a broken/absent module must not break the hook
+        return {"available": False, "error": f"wb_library import failed: {exc}"}
+
+    log_lines: list[str] = []
+    try:
+        results = wb_library.autoclone_for_state(
+            root, trigger="session-start", log=log_lines.append
+        )
+    except Exception as exc:  # noqa: BLE001 — defensive: autoclone must never crash session-start
+        return {"available": True, "error": f"autoclone_for_state raised: {exc}"}
+
+    # CloneResult is a dataclass; summarize without assuming attribute presence.
+    summary: list[dict] = []
+    for r in results:
+        summary.append(
+            {
+                "resource": getattr(r, "resource", "?"),
+                "status": getattr(r, "status", "?"),
+                "target": getattr(r, "target", None),
+                "reason": getattr(r, "reason", ""),
+            }
+        )
+    return {
+        "available": True,
+        "count": len(summary),
+        "results": summary,
+        "log": log_lines,
+    }
+
+
+def run_resolve_keys(root: Path) -> dict | None:
+    """Invoke scripts/wb_keys.resolve_keys for the project.
+
+    Import-safe + non-fatal + SECRET-SAFE: never returns or logs a resolved
+    value. Surfaces only:
+      - the count of resolved keys + their env-var NAMES (not values), OR
+      - the value-free fix-path message when required keys can't be resolved
+        (KeyResolutionError), OR
+      - a "no keys.yaml yet" note (KeysError — the project hasn't run bootstrap's
+        secrets step), OR
+      - a generic defensive note on any other error.
+    Returns a dict summary for the context block, or None if the module is
+    unavailable.
+    """
+    scripts = _scripts_dir()
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    try:
+        import wb_keys  # type: ignore
+    except Exception as exc:  # noqa: BLE001 — defensive: a broken/absent module must not break the hook
+        return {"available": False, "error": f"wb_keys import failed: {exc}"}
+
+    try:
+        resolved = wb_keys.resolve_keys(root)
+    except wb_keys.KeyResolutionError as exc:
+        # The fix-path message is value-free by contract (names keys + sources +
+        # fix paths, never secret values). Safe to surface verbatim.
+        return {
+            "available": True,
+            "status": "unresolved",
+            "unresolved_count": len(getattr(exc, "unresolved", []) or []),
+            "fix_message": str(exc),
+        }
+    except wb_keys.KeysError as exc:
+        # No keys.yaml yet (or another typed keys error) — the secrets registry
+        # hasn't been initialized. Not an error condition for the hook.
+        return {"available": True, "status": "no-registry", "note": str(exc)}
+    except Exception as exc:  # noqa: BLE001 — defensive: resolve_keys must never crash session-start
+        return {"available": True, "status": "error", "error": f"resolve_keys raised: {exc}"}
+
+    # SECRET-SAFE: surface only the NAMES of resolved keys, never the values.
+    return {
+        "available": True,
+        "status": "resolved",
+        "count": len(resolved),
+        "env_vars": sorted(resolved.keys()),
+    }
+
+
+def render_context(
+    *,
+    root: Path,
+    state_present: bool,
+    entry: dict,
+    project: dict | None,
+    autoclone: dict | None = None,
+    keys: dict | None = None,
+) -> str:
     """Render the context block injected into the session.
 
     The agent reads this at session start. Format is markdown for readability;
     structured JSON is appended for any downstream programmatic consumer.
+
+    `autoclone` / `keys` are the (optional) Phase-5 runtime-interlock summaries
+    from run_autoclone() / run_resolve_keys() — present on the mid-project path,
+    None otherwise. Both are already secret-safe (run_resolve_keys never returns
+    a resolved value).
     """
     lines: list[str] = []
     lines.append("# website-builder — session context")
@@ -335,6 +473,8 @@ def render_context(*, root: Path, state_present: bool, entry: dict, project: dic
                 "reconcile state."
             )
         lines.append("")
+        _render_autoclone_section(lines, autoclone)
+        _render_keys_section(lines, keys)
     else:
         lines.append("## Fresh project (no `.website-builder/` state yet)")
         lines.append("")
@@ -378,12 +518,129 @@ def render_context(*, root: Path, state_present: bool, entry: dict, project: dic
         "entry_mode": entry["mode"] if not state_present else None,
         "entry_signals": {k: v for k, v in entry.items() if k != "mode"} if not state_present else None,
         "project_state": project,
+        # Phase-5 runtime interlocks (mid-project path only; None on fresh
+        # projects). `keys` is secret-safe — it carries env-var NAMES + counts +
+        # value-free fix messages, never resolved secret values.
+        "autoclone": autoclone,
+        "keys": keys,
     }
     lines.append(json.dumps(payload, indent=2, default=str))
     lines.append("```")
     lines.append("")
 
     return "\n".join(lines)
+
+
+def _render_autoclone_section(lines: list[str], autoclone: dict | None) -> None:
+    """Append the resource auto-clone summary (from run_autoclone) to `lines`."""
+    if not autoclone:
+        return
+    lines.append("## Resource library (auto-clone)")
+    lines.append("")
+    if not autoclone.get("available"):
+        lines.append(
+            f"- Resource auto-clone unavailable: {autoclone.get('error', 'unknown')}"
+        )
+        lines.append("")
+        return
+    if "error" in autoclone:
+        lines.append(f"- Resource auto-clone error (non-fatal): {autoclone['error']}")
+        lines.append("")
+        return
+    results = autoclone.get("results", [])
+    if not results:
+        lines.append(
+            "- No resource auto-clones for the current project state "
+            "(nothing picked yet, or all referenced resources already present)."
+        )
+        lines.append("")
+        return
+    lines.append(
+        f"- {autoclone.get('count', len(results))} resource(s) considered for "
+        "the project-local library (`.website-builder/library/`):"
+    )
+    for r in results:
+        target = r.get("target")
+        target_str = f" -> library/{target}" if target else ""
+        reason = r.get("reason", "")
+        reason_str = f" ({reason})" if reason else ""
+        lines.append(f"  - `{r.get('resource')}` [{r.get('status')}]{target_str}{reason_str}")
+    lines.append("")
+    lines.append(
+        "Network fetches are deferred — the agent (or `wb library add`/`refresh`) "
+        "performs the actual clone on demand. Session-start records intent only."
+    )
+    lines.append("")
+
+
+def _render_keys_section(lines: list[str], keys: dict | None) -> None:
+    """Append the secrets-resolution summary (from run_resolve_keys) to `lines`.
+
+    SECRET-SAFE: only counts, env-var names, and value-free fix messages are
+    rendered — never a resolved secret value.
+    """
+    if not keys:
+        return
+    lines.append("## Secrets / keys")
+    lines.append("")
+    if not keys.get("available"):
+        lines.append(f"- Secrets resolution unavailable: {keys.get('error', 'unknown')}")
+        lines.append("")
+        return
+    status = keys.get("status")
+    if status == "resolved":
+        count = keys.get("count", 0)
+        env_vars = keys.get("env_vars", [])
+        lines.append(f"- {count} key(s) resolved for this project (env vars set for child processes):")
+        if env_vars:
+            lines.append(f"  - {', '.join(env_vars)}")
+        lines.append("")
+    elif status == "no-registry":
+        lines.append(
+            "- No `keys.yaml` secrets registry yet — the project hasn't run the "
+            "bootstrap secrets step. (Run `wb-bootstrap` / `wb maintain reconfig` "
+            "if this project needs API keys.)"
+        )
+        lines.append("")
+    elif status == "unresolved":
+        lines.append(
+            f"- {keys.get('unresolved_count', 0)} required key(s) could not be "
+            "resolved. Fix path (no secret values shown):"
+        )
+        for fixline in str(keys.get("fix_message", "")).splitlines():
+            lines.append(f"  > {fixline}" if fixline.strip() else "  >")
+        lines.append("")
+    else:  # "error" or unexpected
+        lines.append(f"- Secrets resolution error (non-fatal): {keys.get('error', 'unknown')}")
+        lines.append("")
+
+
+def _emit(text: str) -> None:
+    """Write the context block to stdout, never crashing on console encoding.
+
+    SessionStart hooks run under whatever console encoding the user's terminal
+    has. On Windows that's often cp1252 / cp437, which can't encode every
+    character (e.g. an arrow or em-dash). A bare print() raising
+    UnicodeEncodeError would non-zero-exit the hook on every such session — a
+    high-blast-radius failure for a hook that runs on EVERY website-builder
+    session. We write to the underlying buffer as UTF-8 when we can, and fall
+    back to an ASCII-safe replacement encoding otherwise. Either way the hook
+    keeps exit 0 + emits readable context.
+    """
+    out = sys.stdout
+    buffer = getattr(out, "buffer", None)
+    if buffer is not None:
+        try:
+            buffer.write((text + "\n").encode("utf-8"))
+            buffer.flush()
+            return
+        except Exception:  # noqa: BLE001 — defensive: fall through to the str path below
+            pass
+    try:
+        print(text, flush=True)
+    except UnicodeEncodeError:
+        enc = getattr(out, "encoding", None) or "ascii"
+        print(text.encode(enc, errors="replace").decode(enc), flush=True)
 
 
 def main() -> int:
@@ -402,12 +659,11 @@ def main() -> int:
             if root.resolve() == Path(plugin_root_env).resolve():
                 # Developer is in the plugin repo itself, not a user project.
                 # Emit a brief diagnostic and return.
-                print(
+                _emit(
                     "# website-builder — session context\n\n"
                     f"cwd is the plugin install dir (`{root}`); skipping entry-mode "
                     "detection. Open a user-project directory to activate the plugin's "
-                    "session-start logic.",
-                    flush=True,
+                    "session-start logic."
                 )
                 return 0
         except (OSError, ValueError):
@@ -415,14 +671,37 @@ def main() -> int:
             pass
 
     state_present = has_state_dir(root)
+    autoclone: dict | None = None
+    keys: dict | None = None
     if state_present:
         entry: dict = {"mode": "mid-project", "signal": "`.website-builder/` exists"}
         project = read_project_state(root)
+        # Phase-5 runtime interlocks — only meaningful once the project has state
+        # (autoclone reads project.yaml; resolve_keys reads keys.yaml). Both are
+        # internally defensive (they never raise out), but main() must stay
+        # crash-proof regardless, so belt-and-suspenders try/except here too.
+        try:
+            autoclone = run_autoclone(root)
+        except Exception as exc:  # noqa: BLE001 — last-resort guard: session-start must never crash
+            autoclone = {"available": True, "error": f"run_autoclone wrapper raised: {exc}"}
+        try:
+            keys = run_resolve_keys(root)
+        except Exception as exc:  # noqa: BLE001 — last-resort guard: session-start must never crash
+            keys = {"available": True, "status": "error", "error": f"run_resolve_keys wrapper raised: {exc}"}
     else:
         entry = detect_entry_mode(root)
         project = None
 
-    print(render_context(root=root, state_present=state_present, entry=entry, project=project), flush=True)
+    _emit(
+        render_context(
+            root=root,
+            state_present=state_present,
+            entry=entry,
+            project=project,
+            autoclone=autoclone,
+            keys=keys,
+        )
+    )
     return 0
 
 
