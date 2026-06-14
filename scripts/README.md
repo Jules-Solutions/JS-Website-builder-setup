@@ -133,10 +133,11 @@ def run(argv: list[str], *, project_root: Path) -> int:
 Plus the **auto-clone runtime** (called by the SessionStart hook + phase-entry logic, NOT via the `wb` CLI). Public entry point:
 
 ```python
-def autoclone_for_state(project_root: Path, *, trigger: str, phase: int | None = None) -> list[CloneResult]:
+def autoclone_for_state(project_root: Path, *, trigger: str, phase: int | None = None, log: Callable[[str], None] | None = None) -> list[CloneResult]:
     """Run auto-clones for the project's current state.
     trigger: "session-start" | "phase-entry".
     phase: the phase number when trigger == "phase-entry"; None for session-start.
+    log: optional callback(str) for progress lines (e.g. session_start.py passes log_lines.append).
     Reads project.yaml (stack/cms/component_library/commerce/flavors) + the phase contract's
     `library_clones_at_entry` field (see § library_clones_at_entry schema). Idempotent:
     skips resources already present unless freshness is in question.
