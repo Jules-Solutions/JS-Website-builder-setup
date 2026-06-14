@@ -1,0 +1,76 @@
+{
+  "$schema": "spec/component-request-v1.json",
+  "$version": "v1",
+  "type": "component-request",
+  "id": "stat-callout-2026-06-14T19-20-00Z",
+  "created": "2026-06-14T19:20:00Z",
+  "iteration": 0,
+  "subject": {
+    "kind": "component",
+    "name": "StatCallout",
+    "purpose": "A single big-number stat with a label and optional sublabel; used in a metrics strip."
+  },
+  "brand_context": {
+    "voice": {
+      "descriptors": ["confident", "precise"],
+      "exemplars_say": ["12,000 hours saved. Measured, not guessed."],
+      "exemplars_avoid": ["Infinitely scalable impact"]
+    },
+    "color_palette": {
+      "primary": "oklch(64% 0.18 30)",
+      "neutral_50": "oklch(98% 0 0)",
+      "neutral_900": "oklch(15% 0 0)"
+    },
+    "typography": {
+      "display": "Fraunces, serif",
+      "body": "Inter, sans-serif",
+      "scale": {
+        "stat": { "size": "56px", "lh": "1.0", "weight": 700 },
+        "body": { "size": "16px", "lh": "1.5", "weight": 400 }
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": [0, 4, 8, 12, 16, 24, 32]
+    },
+    "motion": {
+      "duration_med": "300ms",
+      "easing_default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "preference": "subtle"
+    },
+    "dark_mode": "auto"
+  },
+  "request": {
+    "props": {
+      "value": { "type": "string", "max_chars": 16, "required": true },
+      "label": { "type": "string", "max_chars": 40, "required": true },
+      "sublabel": { "type": "string", "max_chars": 60, "required": false }
+    },
+    "behavior": [
+      "Big display-serif number; label below; optional muted sublabel",
+      "Presentational only"
+    ],
+    "responsive": {
+      "mobile_360": { "stat_size": "40px" },
+      "desktop_1280": { "stat_size": "56px" }
+    },
+    "accessibility": {
+      "heading_hierarchy": "no heading; value + label are paragraphs",
+      "contrast_ratio": "4.5:1 for label + sublabel",
+      "keyboard_nav": "no interactive elements"
+    },
+    "states": {
+      "default": "static"
+    }
+  },
+  "output_format": {
+    "framework": "react",
+    "library": "none",
+    "style_system": "tailwind",
+    "language": "tsx",
+    "file_path_hint": "components/StatCallout.tsx",
+    "file_count_hint": 1
+  },
+  "iteration_history": [],
+  "instructions_for_external_tool": "Generate ONLY the single component below as one file. Do NOT scaffold a full app or backend. Component name: StatCallout. Purpose: a single presentational big-number stat. You MUST use ONLY the design tokens provided in brand_context — do not fall back to default Tailwind grays. Framework: react + tailwind (no component library). Return code only. Single file. Accessibility: value + label are paragraphs; 4.5:1 contrast."
+}

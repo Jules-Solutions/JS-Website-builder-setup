@@ -16,6 +16,8 @@ $version: v1
 
 This spec is **v1**. Breaking changes ship as `component-request-v2` with migration notes. Round-trips that emit v1 briefs are ingested by `component-output-v1` outputs.
 
+The **machine-validatable JSON Schema** lives at [`spec/component-request-v1.json`](../spec/component-request-v1.json) (JSON Schema Draft 2020-12). This markdown doc is the human-readable block-by-block SSOT; the JSON Schema is the concrete realisation of it, and the two are kept in lock-step. A brief's `$schema: "spec/component-request-v1.json"` field points VS Code's JSON validation at the schema when the plugin is installed; the plugin's session-start hook validates briefs in `.website-builder/briefs/` against it. Round-trip + validity tests at `tests/handoff-protocol/`.
+
 ## Top-level shape
 
 ```json
@@ -301,14 +303,17 @@ Lint failures surface to the user with diagnostic + suggested fix.
 
 ## Adapter fixtures (per external tool)
 
-Per-tool example briefs + tool-specific quirks live in `handoff-spec/adapter-fixtures/`. Each fixture documents:
+Per-tool example briefs + tool-specific quirks live in [`handoff-spec/adapter-fixtures/`](adapter-fixtures/). Each fixture documents:
 
 - How to paste the brief into that tool's interface
-- Tool-specific quirks (ChatGPT truncation handling, v0 React+shadcn defaults, Cursor file-comment, Lovable scope-down)
+- Tool-specific quirks (ChatGPT output-cap truncation + fence-stripping, Claude.ai Artifacts panel, v0 React+shadcn defaults, Cursor file-comment, Lovable / Bolt.new whole-app scope-down)
 - Expected output format
-- Common gotchas
+- How to capture the output for paste-back
+- Known issues
+- A sample brief + sample output pair
 
-Initial fixtures cover ChatGPT / Claude.ai / v0 / Cursor / Lovable / human-freelancer. (Authoring of these fixtures is **Phase 4+ scope** per the BUILD strategy — this v1 spec ships without them.)
+The **7 shipped fixtures** cover ChatGPT / Claude.ai / v0 / Cursor / Lovable / Bolt.new (the 6 AI tools) + human-freelancer:
+[`chatgpt.md`](adapter-fixtures/chatgpt.md) · [`claude-ai.md`](adapter-fixtures/claude-ai.md) · [`v0.md`](adapter-fixtures/v0.md) · [`cursor.md`](adapter-fixtures/cursor.md) · [`lovable.md`](adapter-fixtures/lovable.md) · [`bolt-new.md`](adapter-fixtures/bolt-new.md) · [`human-freelancer.md`](adapter-fixtures/human-freelancer.md). Each fixture's sample brief validates against `spec/component-request-v1.json`; the AI-tool fixtures' sample output pairs drive the round-trip ingestion tests at `tests/handoff-protocol/`.
 
 ## See also
 

@@ -1,0 +1,78 @@
+{
+  "$schema": "spec/component-request-v1.json",
+  "$version": "v1",
+  "type": "component-request",
+  "id": "testimonial-quote-2026-06-14T19-02-00Z",
+  "created": "2026-06-14T19:02:00Z",
+  "iteration": 0,
+  "subject": {
+    "kind": "component",
+    "name": "TestimonialQuote",
+    "purpose": "A single pull-quote testimonial with author attribution; used in a testimonial section."
+  },
+  "brand_context": {
+    "voice": {
+      "descriptors": ["warm", "credible"],
+      "exemplars_say": ["It just works, and it stays out of my way."],
+      "exemplars_avoid": ["Game-changing paradigm shift"]
+    },
+    "color_palette": {
+      "primary": "oklch(64% 0.18 30)",
+      "neutral_50": "oklch(98% 0 0)",
+      "neutral_900": "oklch(15% 0 0)"
+    },
+    "typography": {
+      "display": "Fraunces, serif",
+      "body": "Inter, sans-serif",
+      "scale": {
+        "quote": { "size": "28px", "lh": "1.3", "weight": 500 },
+        "body": { "size": "16px", "lh": "1.5", "weight": 400 }
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": [0, 4, 8, 12, 16, 24, 32, 48]
+    },
+    "motion": {
+      "duration_med": "300ms",
+      "easing_default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "preference": "subtle"
+    },
+    "dark_mode": "auto"
+  },
+  "request": {
+    "props": {
+      "quote": { "type": "string", "max_chars": 240, "required": true },
+      "author_name": { "type": "string", "max_chars": 48, "required": true },
+      "author_role": { "type": "string", "max_chars": 48, "required": false },
+      "avatar": { "type": "image", "required": false }
+    },
+    "behavior": [
+      "Large serif pull-quote; author block below with optional avatar",
+      "Presentational only — no data fetching, no backend"
+    ],
+    "responsive": {
+      "mobile_360": { "layout": "stacked" },
+      "desktop_1280": { "layout": "centered", "max_width": "640px" }
+    },
+    "accessibility": {
+      "heading_hierarchy": "no heading; quote is a blockquote with cite",
+      "alt_text_required": ["avatar"],
+      "contrast_ratio": "4.5:1 for quote + author",
+      "keyboard_nav": "no interactive elements"
+    },
+    "states": {
+      "default": "static"
+    }
+  },
+  "output_format": {
+    "framework": "react",
+    "library": "shadcn",
+    "style_system": "tailwind",
+    "language": "tsx",
+    "file_path_hint": "components/TestimonialQuote.tsx",
+    "file_count_hint": 1
+  },
+  "iteration_history": [],
+  "instructions_for_external_tool": "Generate ONLY the single component below as one file. Do NOT scaffold an app, backend, auth, or database. Component name: TestimonialQuote. Purpose: a single presentational pull-quote testimonial. You MUST use ONLY the design tokens provided in brand_context. Framework: react + shadcn + tailwind. Return code only. Single file. Accessibility: use a blockquote with cite; avatar requires alt text; 4.5:1 contrast. This is presentational — no Supabase, no data fetching."
+}

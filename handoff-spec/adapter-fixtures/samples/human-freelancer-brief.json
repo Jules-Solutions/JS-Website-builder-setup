@@ -1,0 +1,93 @@
+{
+  "$schema": "spec/component-request-v1.json",
+  "$version": "v1",
+  "type": "component-request",
+  "id": "contact-form-2026-06-14T19-45-00Z",
+  "created": "2026-06-14T19:45:00Z",
+  "iteration": 1,
+  "subject": {
+    "kind": "component",
+    "name": "ContactForm",
+    "purpose": "Contact page form: name, email, message, submit; confirms inline. Hired out to a freelancer."
+  },
+  "brand_context": {
+    "voice": {
+      "descriptors": ["warm", "direct"],
+      "exemplars_say": ["Tell us what you need. We read everything."],
+      "exemplars_avoid": ["Reach out to learn more about our solutions"]
+    },
+    "color_palette": {
+      "primary": "oklch(64% 0.18 30)",
+      "neutral_50": "oklch(98% 0 0)",
+      "neutral_900": "oklch(15% 0 0)",
+      "semantic_success": "oklch(70% 0.15 145)",
+      "semantic_error": "oklch(60% 0.20 25)"
+    },
+    "typography": {
+      "display": "Fraunces, serif",
+      "body": "Inter, sans-serif",
+      "scale": {
+        "h2": { "size": "40px", "lh": "1.1", "weight": 600 },
+        "body": { "size": "16px", "lh": "1.5", "weight": 400 }
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": [0, 4, 8, 12, 16, 24, 32, 48]
+    },
+    "motion": {
+      "duration_med": "300ms",
+      "easing_default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "preference": "subtle"
+    },
+    "dark_mode": "auto"
+  },
+  "request": {
+    "props": {
+      "heading": { "type": "string", "max_chars": 48, "required": true },
+      "on_submit": { "type": "object", "required": true }
+    },
+    "behavior": [
+      "Fields: name (text), email (email), message (textarea); submit button",
+      "Validate email format client-side; show inline errors",
+      "On success, replace the form with a thank-you message"
+    ],
+    "responsive": {
+      "mobile_360": { "layout": "single-column", "padding_inline": "16px" },
+      "desktop_1280": { "layout": "single-column", "max_width": "560px" }
+    },
+    "accessibility": {
+      "heading_hierarchy": "heading = h2",
+      "contrast_ratio": "4.5:1 for labels + inputs + button",
+      "keyboard_nav": "logical tab order name->email->message->submit; visible focus ring; errors announced"
+    },
+    "states": {
+      "default": "form visible",
+      "loading": "submit disabled with spinner",
+      "success": "thank-you message using semantic_success",
+      "error": "field-level errors using semantic_error"
+    }
+  },
+  "output_format": {
+    "framework": "react",
+    "library": "shadcn",
+    "style_system": "tailwind",
+    "language": "tsx",
+    "file_path_hint": "components/ContactForm.tsx",
+    "file_count_hint": 1
+  },
+  "iteration_history": [
+    {
+      "iteration": 0,
+      "tool_used": "human-freelancer-sam",
+      "timestamp": "2026-06-10T11:00:00Z",
+      "output_ingested_at": ".website-builder/outputs/contact-form-2026-06-10T11-00-00Z.tsx",
+      "issues_found": [
+        "Used hardcoded #e11d48 for the error color instead of semantic_error token",
+        "Email input was type=text, not type=email",
+        "No visible focus ring on the submit button"
+      ]
+    }
+  ],
+  "instructions_for_external_tool": "You are generating a component named ContactForm. Purpose: contact page form with inline confirmation. You MUST use ONLY the design tokens provided in brand_context — do not invent colors, fonts, or spacing values. Framework: react + shadcn + tailwind. Return code only. Single file. This is iteration 1 — the previous attempt had these issues to fix: (1) use the semantic_error token, not a hardcoded hex, for the error color; (2) the email input must be type=email; (3) the submit button needs a visible focus ring. Accessibility: heading is an h2; 4.5:1 contrast; tab order name->email->message->submit; errors announced to screen readers."
+}
