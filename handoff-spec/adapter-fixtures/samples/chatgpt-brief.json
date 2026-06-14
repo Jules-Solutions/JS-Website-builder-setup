@@ -1,0 +1,84 @@
+{
+  "$schema": "spec/component-request-v1.json",
+  "$version": "v1",
+  "type": "component-request",
+  "id": "hero-block-2026-06-14T16-32-00Z",
+  "created": "2026-06-14T16:32:00Z",
+  "iteration": 0,
+  "subject": {
+    "kind": "component",
+    "name": "HeroBlock",
+    "purpose": "Top of home page; introduces the project and drives the subscribe CTA."
+  },
+  "brand_context": {
+    "voice": {
+      "descriptors": ["warm", "direct", "contrarian"],
+      "exemplars_say": ["You're not broken; the world is heavy."],
+      "exemplars_avoid": ["Optimize your wellness journey"]
+    },
+    "color_palette": {
+      "primary": "oklch(64% 0.18 30)",
+      "secondary": "oklch(72% 0.05 200)",
+      "neutral_50": "oklch(98% 0 0)",
+      "neutral_900": "oklch(15% 0 0)",
+      "semantic_success": "oklch(70% 0.15 145)",
+      "semantic_error": "oklch(60% 0.20 25)"
+    },
+    "typography": {
+      "display": "Fraunces, serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace",
+      "scale": {
+        "h1": { "size": "64px", "lh": "1.0", "weight": 700 },
+        "body": { "size": "18px", "lh": "1.5", "weight": 400 }
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": [0, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128]
+    },
+    "motion": {
+      "duration_med": "300ms",
+      "easing_default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "preference": "subtle"
+    },
+    "dark_mode": "auto"
+  },
+  "request": {
+    "props": {
+      "headline": { "type": "string", "max_chars": 60, "required": true },
+      "sub": { "type": "string", "max_chars": 120, "required": true },
+      "cta_text": { "type": "string", "max_chars": 24, "required": true },
+      "background_image": { "type": "image", "required": false }
+    },
+    "behavior": [
+      "Headline + sub stack vertically; CTA below",
+      "Background image (if present) covers full bleed; dark overlay for readability"
+    ],
+    "responsive": {
+      "mobile_360": { "headline_size": "32px", "layout": "stacked", "padding_inline": "16px" },
+      "tablet_768": { "headline_size": "48px", "padding_inline": "32px" },
+      "desktop_1280": { "headline_size": "64px", "padding_inline": "64px" }
+    },
+    "accessibility": {
+      "heading_hierarchy": "headline = h1 (only on home), h2 elsewhere",
+      "alt_text_required": ["background_image"],
+      "contrast_ratio": "4.5:1 against headline color",
+      "keyboard_nav": "CTA tabbable; focus ring visible"
+    },
+    "states": {
+      "default": "as described",
+      "loading": "skeleton outline for headline + sub"
+    }
+  },
+  "output_format": {
+    "framework": "react",
+    "library": "shadcn",
+    "style_system": "tailwind",
+    "language": "tsx",
+    "file_path_hint": "components/HeroBlock.tsx",
+    "file_count_hint": 1
+  },
+  "iteration_history": [],
+  "instructions_for_external_tool": "You are generating a component named HeroBlock. Purpose: top of home page; introduces the project and drives the subscribe CTA. You MUST use ONLY the design tokens provided in brand_context — do not invent colors, fonts, or spacing values. The brand voice is warm, direct, contrarian. Framework: react + shadcn + tailwind. Return code only — no prose, no markdown fences, no explanations. Single file. Accessibility: headline is an h1 on the home page; background_image requires alt text; 4.5:1 contrast against the headline color; the CTA must be keyboard-focusable with a visible focus ring."
+}

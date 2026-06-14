@@ -1,0 +1,79 @@
+{
+  "$schema": "spec/component-request-v1.json",
+  "$version": "v1",
+  "type": "component-request",
+  "id": "feature-card-2026-06-14T18-12-00Z",
+  "created": "2026-06-14T18:12:00Z",
+  "iteration": 0,
+  "subject": {
+    "kind": "component",
+    "name": "FeatureCard",
+    "purpose": "A single feature in a 3-up feature grid; icon + title + body + optional link."
+  },
+  "brand_context": {
+    "voice": {
+      "descriptors": ["confident", "plainspoken"],
+      "exemplars_say": ["It does the boring part so you don't."],
+      "exemplars_avoid": ["Unlock next-generation synergy"]
+    },
+    "color_palette": {
+      "primary": "oklch(64% 0.18 30)",
+      "neutral_50": "oklch(98% 0 0)",
+      "neutral_200": "oklch(92% 0 0)",
+      "neutral_900": "oklch(15% 0 0)"
+    },
+    "typography": {
+      "display": "Fraunces, serif",
+      "body": "Inter, sans-serif",
+      "scale": {
+        "h3": { "size": "24px", "lh": "1.2", "weight": 600 },
+        "body": { "size": "16px", "lh": "1.5", "weight": 400 }
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": [0, 4, 8, 12, 16, 24, 32]
+    },
+    "motion": {
+      "duration_fast": "150ms",
+      "easing_default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "preference": "subtle"
+    },
+    "dark_mode": "auto"
+  },
+  "request": {
+    "props": {
+      "icon": { "type": "string", "required": true },
+      "title": { "type": "string", "max_chars": 40, "required": true },
+      "body": { "type": "string", "max_chars": 160, "required": true },
+      "href": { "type": "string", "required": false }
+    },
+    "behavior": [
+      "Icon top, title below, body below that; optional 'Learn more' link at the bottom",
+      "On hover, the card gains a subtle elevation"
+    ],
+    "responsive": {
+      "mobile_360": { "layout": "full-width" },
+      "desktop_1280": { "layout": "one-third" }
+    },
+    "accessibility": {
+      "heading_hierarchy": "title = h3",
+      "contrast_ratio": "4.5:1 for body text",
+      "keyboard_nav": "if href present, whole card is a single focusable link with visible focus ring"
+    },
+    "states": {
+      "default": "resting",
+      "hover": "subtle elevation"
+    }
+  },
+  "output_format": {
+    "framework": "react",
+    "library": "shadcn",
+    "style_system": "tailwind",
+    "language": "tsx",
+    "file_path_hint": "components/FeatureCard.tsx",
+    "file_count_hint": 1
+  },
+  "iteration_history": [],
+  "instructions_for_external_tool": "You are generating a component named FeatureCard. Purpose: a single feature in a 3-up grid. You MUST use ONLY the design tokens provided in brand_context — do not invent colors, fonts, or spacing values; prefer the project's shadcn CSS-variable theme tokens (bg-card, text-foreground, text-primary) which map to the brand OKLCH palette. Framework: react + shadcn + tailwind. Return code only. Single file. Accessibility: title is an h3; 4.5:1 body contrast; if href present make the whole card one focusable link with a visible focus ring."
+}

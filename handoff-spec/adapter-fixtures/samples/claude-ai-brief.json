@@ -1,0 +1,83 @@
+{
+  "$schema": "spec/component-request-v1.json",
+  "$version": "v1",
+  "type": "component-request",
+  "id": "subscribe-card-2026-06-14T17-05-00Z",
+  "created": "2026-06-14T17:05:00Z",
+  "iteration": 0,
+  "subject": {
+    "kind": "component",
+    "name": "SubscribeCard",
+    "purpose": "Inline newsletter subscribe card placed mid-page; collects an email and confirms inline."
+  },
+  "brand_context": {
+    "voice": {
+      "descriptors": ["warm", "direct"],
+      "exemplars_say": ["One email a week. No noise."],
+      "exemplars_avoid": ["Join our community of high-performers"]
+    },
+    "color_palette": {
+      "primary": "oklch(64% 0.18 30)",
+      "neutral_50": "oklch(98% 0 0)",
+      "neutral_900": "oklch(15% 0 0)",
+      "semantic_success": "oklch(70% 0.15 145)",
+      "semantic_error": "oklch(60% 0.20 25)"
+    },
+    "typography": {
+      "display": "Fraunces, serif",
+      "body": "Inter, sans-serif",
+      "scale": {
+        "h2": { "size": "40px", "lh": "1.1", "weight": 600 },
+        "body": { "size": "18px", "lh": "1.5", "weight": 400 }
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": [0, 4, 8, 12, 16, 24, 32, 48]
+    },
+    "motion": {
+      "duration_med": "300ms",
+      "easing_default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "preference": "subtle"
+    },
+    "dark_mode": "auto"
+  },
+  "request": {
+    "props": {
+      "heading": { "type": "string", "max_chars": 48, "required": true },
+      "blurb": { "type": "string", "max_chars": 120, "required": true },
+      "cta_text": { "type": "string", "max_chars": 24, "required": true },
+      "on_submit": { "type": "object", "required": true }
+    },
+    "behavior": [
+      "Email input + submit button on one row at desktop; stacked on mobile",
+      "On success, swap the form for an inline success message",
+      "On error, show the error string under the input"
+    ],
+    "responsive": {
+      "mobile_360": { "layout": "stacked", "padding_inline": "16px" },
+      "desktop_1280": { "layout": "row", "padding_inline": "32px" }
+    },
+    "accessibility": {
+      "heading_hierarchy": "heading = h2",
+      "contrast_ratio": "4.5:1 for body + button label",
+      "keyboard_nav": "input -> submit tab order; submit triggers on Enter; visible focus ring"
+    },
+    "states": {
+      "default": "form visible",
+      "loading": "submit button shows spinner; input disabled",
+      "success": "form replaced by success message using semantic_success",
+      "error": "error string under input using semantic_error"
+    }
+  },
+  "output_format": {
+    "framework": "react",
+    "library": "shadcn",
+    "style_system": "tailwind",
+    "language": "tsx",
+    "file_path_hint": "components/SubscribeCard.tsx",
+    "file_count_hint": 1
+  },
+  "iteration_history": [],
+  "instructions_for_external_tool": "You are generating a component named SubscribeCard. Purpose: inline newsletter subscribe card; collects an email and confirms inline. You MUST use ONLY the design tokens provided in brand_context — do not invent colors, fonts, or spacing values. Framework: react + shadcn + tailwind. Return code only. Single file. Prepend a component-output-v1 metadata header (a JSON block in a leading /* */ comment with $schema, $version, type, brief_id, tool_used, timestamp). brief_id must be subscribe-card-2026-06-14T17-05-00Z. Accessibility: heading is an h2; 4.5:1 contrast; input -> submit tab order with visible focus ring; submit on Enter."
+}

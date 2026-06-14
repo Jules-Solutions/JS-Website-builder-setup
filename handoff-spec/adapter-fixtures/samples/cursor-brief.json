@@ -1,0 +1,76 @@
+{
+  "$schema": "spec/component-request-v1.json",
+  "$version": "v1",
+  "type": "component-request",
+  "id": "pricing-table-2026-06-14T18-40-00Z",
+  "created": "2026-06-14T18:40:00Z",
+  "iteration": 0,
+  "subject": {
+    "kind": "component",
+    "name": "PricingTable",
+    "purpose": "Three-tier pricing table on the pricing page; highlights the middle tier."
+  },
+  "brand_context": {
+    "voice": {
+      "descriptors": ["confident", "transparent"],
+      "exemplars_say": ["No hidden fees. Cancel anytime."],
+      "exemplars_avoid": ["Enterprise-grade value propositions"]
+    },
+    "color_palette": {
+      "primary": "oklch(64% 0.18 30)",
+      "neutral_50": "oklch(98% 0 0)",
+      "neutral_200": "oklch(92% 0 0)",
+      "neutral_900": "oklch(15% 0 0)"
+    },
+    "typography": {
+      "display": "Fraunces, serif",
+      "body": "Inter, sans-serif",
+      "scale": {
+        "h3": { "size": "24px", "lh": "1.2", "weight": 600 },
+        "body": { "size": "16px", "lh": "1.5", "weight": 400 }
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": [0, 4, 8, 12, 16, 24, 32, 48]
+    },
+    "motion": {
+      "duration_med": "300ms",
+      "easing_default": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "preference": "subtle"
+    },
+    "dark_mode": "auto"
+  },
+  "request": {
+    "props": {
+      "tiers": { "type": "array", "required": true },
+      "highlight_index": { "type": "number", "required": false, "default": 1 }
+    },
+    "behavior": [
+      "Three tier columns; the highlighted tier gets a primary border + a badge",
+      "Each tier: name, price, feature list, CTA button"
+    ],
+    "responsive": {
+      "mobile_360": { "layout": "stacked" },
+      "desktop_1280": { "layout": "three-column" }
+    },
+    "accessibility": {
+      "heading_hierarchy": "tier name = h3",
+      "contrast_ratio": "4.5:1 for prices + features",
+      "keyboard_nav": "each CTA tabbable in column order; visible focus ring"
+    },
+    "states": {
+      "default": "resting"
+    }
+  },
+  "output_format": {
+    "framework": "react",
+    "library": "shadcn",
+    "style_system": "tailwind",
+    "language": "tsx",
+    "file_path_hint": "components/PricingTable.tsx",
+    "file_count_hint": 1
+  },
+  "iteration_history": [],
+  "instructions_for_external_tool": "You are generating a component named PricingTable. Purpose: three-tier pricing table; highlights the middle tier. You MUST use ONLY the design tokens provided in brand_context. Framework: react + shadcn + tailwind. Return code only. Single file at components/PricingTable.tsx. Accessibility: tier names are h3; 4.5:1 contrast; each CTA tabbable in column order with a visible focus ring."
+}

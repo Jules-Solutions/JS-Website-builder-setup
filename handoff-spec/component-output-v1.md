@@ -15,7 +15,9 @@ $schema: spec/component-output-v1.json
 $version: v1
 ```
 
-Outputs are paired 1:1 with `component-request-v1` briefs by the round-trip `id`. v2 of the output spec ships when v2 of the request spec ships.
+Outputs are paired 1:1 with [`component-request-v1`](component-request-v1.md) briefs by the round-trip `id`. v2 of the output spec ships when v2 of the request spec ships.
+
+> **No output JSON Schema by design.** The `spec/component-output-v1.json` identifier above is the string an output's *optional* Form-2 metadata header declares (so a tool that respects the protocol can self-label) — it is **not** a file that exists. The output side stays a single **permissive markdown contract** (this doc): the AI-output parser is deliberately tolerant because external tools rarely follow a strict shape (most emit Form 1 — pure code). The *request* side is the machine-validatable half — its JSON Schema is at [`../spec/component-request-v1.json`](../spec/component-request-v1.json). The round-trip is asserted by feeding sample outputs (the three forms below) through the ingestion contract in `tests/handoff-protocol/`.
 
 ## What the output is
 
