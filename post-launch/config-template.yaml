@@ -1,0 +1,94 @@
+# config-template.yaml — the post-launch maintainer config TEMPLATE.
+#
+# Plugin source. At phase 29 (deploy), the wb-deploy skill runs the 7-section
+# customization wizard and writes a resolved copy of this file to
+# .website-builder/post-launch/config.yaml — placeholders ({...}) filled from
+# the project's state + the user's wizard answers.
+#
+# Schema source: Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md
+#   § Wizard config output. Provider option lists ground the wizard's choices;
+#   they were re-verified 2026-06-14 (decision 75) — pricing/free-tiers drift,
+#   so the wizard re-confirms current options at deploy time, never assumes.
+#
+# DO NOT hand-edit the materialized config.yaml carelessly — re-run the wizard
+# (the materializer / `wb maintain reconfig` once the CLI verb ships) instead.
+
+version: 1
+
+# --- Identity (resolved from project.yaml at deploy) ---
+project: "{project_name}"            # e.g. still-humans
+stack: "{chosen_stack}"              # e.g. astro | nextjs | hugo | sveltekit | framer | wordpress | webflow | static-html
+deploy_provider: "{chosen_provider}" # e.g. vercel | cloudflare-pages | netlify | framer | wordpress-host
+languages: "{languages}"             # e.g. [en, de]; single-language sites = [en]
+
+# --- Wizard section 1: Analytics ---
+# Options (re-verify at deploy): plausible (privacy; ~$9/mo @10k pv) | ga4 (free;
+# ITP under-counts Safari; needs consent banner) | cloudflare-web-analytics
+# (free; cookie-free; basic only) | fathom (privacy; ~$15/mo; 3yr retention) |
+# none | custom. Privacy-friendly tools need no cookie banner.
+analytics:
+  provider: "{analytics_provider}"   # plausible | ga4 | cloudflare-web-analytics | fathom | none | custom
+  config_url: "{analytics_config_url}"   # e.g. https://plausible.io/{project}.example ; null if none
+  api_key_env: "{analytics_api_key_env}" # env var name (resolved via secrets backend); null if none/cookieless
+
+# --- Wizard section 2: Uptime monitoring ---
+# Options (re-verify at deploy): uptimerobot (free tier — historically 50 monitors
+# @5-min, IN FLUX 2026 with reports of 50->10; re-check at setup) | better-stack
+# (free tier 10 monitors + incident mgmt) | cloudflare-health-checks (with
+# Cloudflare paid; integrates with the site's DNS) | pingdom (paid) | none.
+uptime:
+  provider: "{uptime_provider}"      # uptimerobot | better-stack | cloudflare-health-checks | pingdom | none
+  monitor_id: "{uptime_monitor_id}"  # provider monitor id; null until created
+  alert_channel: "{uptime_alert_channel}"  # the channel the user actually watches (verified at phase 34)
+
+# --- Wizard section 3: Error tracking ---
+# Options (re-verify at deploy): sentry (free ~5-7.5k events/mo; widely used) |
+# logrocket (session replay) | raygun | none (default for static no-JS sites).
+# For static no-JS brochure sites, "none" is a considered decline, not an omission.
+error_tracking:
+  provider: "{error_tracking_provider}"  # sentry | logrocket | raygun | none
+  dsn_env: "{error_tracking_dsn_env}"    # env var name (resolved via secrets backend); null if none
+  declined_reason: "{error_tracking_declined_reason}"  # set only when provider=none on a JS site, recording why
+
+# --- Wizard section 4: CMS notification (only if the project has a CMS) ---
+cms:
+  provider: "{cms_provider}"          # file-based | sanity | payload | wordpress | framer-cms | webflow-cms | none
+  notification_cadence: "{cms_notification_cadence}"  # weekly | monthly | quarterly | off
+  stale_content_months: "{cms_stale_months}"  # warn when content unchanged this long; null if off
+
+# --- Wizard section 5: Backup strategy ---
+# Per-component, stack-specific. Records what git covers and — critically — what
+# it does NOT (a WP database + uploads, a Payload Postgres DB are not in the repo).
+backup:
+  code: "{backup_code}"               # e.g. git (origin/main) + host deploy history
+  content_layer_4: "{backup_content}" # e.g. git (Layer-4 markdown)
+  cms: "{backup_cms}"                 # CMS-specific path; "n/a (file-based)" for static
+  media: "{backup_media}"             # e.g. git | git LFS | object storage
+  database: "{backup_database}"       # DB-specific path; "n/a" if no DB
+
+# --- Wizard section 6: Iteration cadence ---
+# Choice locks a notification cadence + a checklist template.
+iteration_cadence:
+  frequency: "{iteration_frequency}"  # weekly | monthly | quarterly | adhoc
+  next_review: "{iteration_next_review}"  # ISO date of the next scheduled review
+
+# --- Wizard section 7: Maintenance language preference (decision 40) ---
+# 1 = auto-translate inline (default) | 2 = always emit a translation brief |
+# 3 = ask each time. Default 1 per locked decision 40.
+translation_preference: "{translation_preference}"   # 1 | 2 | 3
+
+# --- Skill subset materialized at deploy (chosen via wizard) ---
+# The wizard installs the subset the user wants; all 8 is the default full set.
+maintainer_skills_installed:
+  - wb-maintain-content
+  - wb-maintain-monitoring
+  - wb-maintain-deps
+  - wb-maintain-content-add
+  - wb-maintain-section-add
+  - wb-maintain-page-add
+  - wb-maintain-iterate
+  - wb-maintain-escalate
+
+# --- Provenance ---
+materialized_at: "{materialized_at}"  # ISO 8601 timestamp the wizard wrote config.yaml
+plugin_version: "{plugin_version}"    # matches .claude-plugin/plugin.json

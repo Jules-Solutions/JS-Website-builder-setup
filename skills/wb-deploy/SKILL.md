@@ -62,10 +62,43 @@ Entry gate: phase 28 complete, `audit/DOMAIN-REPORT.md` confirms the real domain
 3. **Push production secrets correctly + run the parity check.** For every `keys.yaml` secret, set it in the *host's production env* with the production value (`sk_live_*`, not `sk_test_*`). Surface each secret's state loudly and explicitly via `AskUserQuestion` — live-key cutover is **always** an explicit, user-confirmed step, never silent (per `DESIGN-secrets-and-keys.md`). Then run the explicit local↔production parity pass: for every integration/commerce/analytics path, confirm the same behavior local and live. Any divergence is fixed *before* deploy is declared done — see `references/deploy-provider-matrix.md` § Secret parity per host for the per-host env-var push commands.
 4. **Confirm build + migrations.** The production build must complete; for build-time data steps (e.g., a Payload-CMS Next.js site: `payload migrate && next build`), the migration runs as part of deploy so the schema is not drifted.
 5. **Walk every page live.** Via `Playwright` MCP at the real `https://` domain: every page in `sitemap.yaml` returns 200 (no 4xx/5xx), every section renders (no silently-failed component), HTTPS works, the phase-25 consent banner gates cookies *in production*, the phase-24 integrations fire against production config, the phase-26 structured data is in the live server HTML. "Deployed" = verified-rendering, not build-succeeded.
-6. **Materialize the post-launch maintainer.** Run the deploy wizard per `DESIGN-post-launch-template.md` (analytics / uptime / error-tracking / CMS-notification / backup / iteration-cadence / translation questions), write `.website-builder/post-launch/config.yaml`, copy the chosen maintainer skills + customized `website-maintainer.md` + per-project runbooks into `.website-builder/post-launch/`. Do not skip the wizard.
+6. **Materialize the post-launch maintainer.** Run the 7-section deploy wizard, then materialize the template. This is non-overridable — see `## The post-launch maintainer wizard (phase 29)` below for the full procedure. In short: ask the 7 wizard questions via `AskUserQuestion`, then invoke the materializer `scripts/wb_postlaunch.py` (the non-interactive sibling of the wizard) with the answers — it writes `.website-builder/post-launch/config.yaml` and copies the chosen maintainer skills + the customized `website-maintainer.md` + the per-project runbooks into `.website-builder/post-launch/`. Do not skip the wizard.
 7. **Write `.website-builder/audit/DEPLOY-REPORT.md`** per the contract schema (deploy URL, host + decision-50 rationale, build result, per-page live grid, production-secret-parity table, migration result, post-launch materialization confirmation). Update `project.yaml.current_phase` to `30`.
 
 Gating (refuse to call deployed): any page 4xx/5xx or non-rendering section (non-overridable); local↔production parity failure (non-overridable); production secret missing or wrong class; build failed or migration skipped; off-ranking host without the explicit decision doc (only this is overridable); post-launch template not materialized.
+
+#### The post-launch maintainer wizard (phase 29)
+
+> The "killer template" install. Per locked decisions 28 / 37 / 45 / 49 + `DESIGN-post-launch-template.md`. Run this as part of phase 29 step 6 — declaring deploy done without it is a non-overridable gate violation ("post-launch template not materialized"). The wizard customizes the maintainer to *this* site; the materializer copies it into `.website-builder/post-launch/`.
+
+**Read first:** `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` § Wizard-driven customization + § Wizard config output. The provider option lists below are grounded but **drift** — re-verify current free-tiers/pricing via WebSearch at deploy time (decision 75) before surfacing them; never present stale pricing as fact.
+
+**Step A — run the 7-section wizard via `AskUserQuestion`** (one section at a time; surface options, let the user pick or skip):
+
+1. **Analytics** — `plausible` (privacy-friendly; flat-rate) / `ga4` (free; rich; needs consent banner + under-counts Safari via ITP) / `cloudflare-web-analytics` (free; cookie-free; basic only) / `fathom` (privacy-friendly; flat-rate) / `none` / `custom`. Captures provider + config URL + the API-key env-var name.
+2. **Uptime monitoring** — `uptimerobot` (most generous free tier historically — *re-verify, the free monitor count has been in flux in 2026*) / `better-stack` (free tier + incident mgmt) / `cloudflare-health-checks` (with Cloudflare paid; integrates with the site's DNS) / `pingdom` (paid) / `none`. Captures provider + monitor id + the alert channel the user actually watches.
+3. **Error tracking** — `sentry` (free tier ~5-7.5k events/mo; widely used) / `logrocket` (session replay) / `raygun` / `none` (the default for static no-JS sites; record it as a *considered decline with reason*, never a silent omission). Captures provider + DSN env-var name.
+4. **CMS notification** (only if the site has a CMS) — watch for stale content, track CMS health, optionally pull CMS changes into git for backup. Captures cadence + stale-content threshold.
+5. **Backup strategy** — per-component, stack-specific. Record what git covers (code, Layer-4 content) and — critically — what it does NOT (a WordPress database + uploads, a Payload Postgres DB are not in the repo). Captures code / content / cms / media / database backup paths.
+6. **Iteration cadence** — `weekly` / `monthly` / `quarterly` / `adhoc`. Locks the maintainer's review cadence + next-review date.
+7. **Maintenance language preference** (multi-language sites) — `1` auto-translate inline (default per decision 40) / `2` always emit a translation brief / `3` ask each time.
+
+Also confirm the **skill subset** to install (default: all 8 — `wb-maintain-{content,monitoring,deps,content-add,section-add,page-add,iterate,escalate}`).
+
+**Step B — materialize via the runner.** Collect the wizard answers into a JSON object (keys per `scripts/wb_postlaunch.py` `default_answers()` — `analytics_provider`, `uptime_provider`, `error_tracking_provider`, `cms_provider`, `backup_*`, `iteration_frequency`, `translation_preference`, `maintainer_skills_installed`, etc.), write it to a temp file, and invoke:
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/wb_postlaunch.py" --answers <answers.json>
+# cwd = the user's project dir; reads .website-builder/project.yaml for identity
+```
+
+The runner reads project identity (project / stack / deploy_provider / languages) from `project.yaml`, writes `.website-builder/post-launch/config.yaml` (placeholders resolved), and materializes the customized `website-maintainer.md` + the chosen skill subset + the runbooks + README into `.website-builder/post-launch/`. It is idempotent (re-runnable) and never touches user `content/` or `media/`.
+
+**Step C — confirm + surface.** Verify `.website-builder/post-launch/config.yaml` + `.website-builder/post-launch/agents/website-maintainer.md` exist (no unresolved `{...}` placeholders). Surface the handoff to the user:
+
+> *Your site is live, and I've installed your post-launch maintainer at `.website-builder/post-launch/`. When you want a small change — update content, add an essay, review analytics, check the site's health — invoke `/wb-maintain` (or run `wb maintain`). It knows your stack, brand, and integrations, and escalates back to me for anything bigger than maintenance.*
+
+**Re-running the wizard later:** the user can re-run `scripts/wb_postlaunch.py` directly to re-materialize (e.g. after changing a provider). A future `wb maintain postlaunch` CLI verb would wrap this — currently the runner is invoked directly (the `wb` verb surface is locked; see the plugin's `scripts/README.md`).
 
 ### Phase 30 — Analytics + search-engine submission
 
