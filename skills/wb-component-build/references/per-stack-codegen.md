@@ -19,7 +19,7 @@ Verify the **current** install command, theming-integration shape, primitive-com
 | WordPress | `/wordpress/wp-rest-api` | `/wordpress/block-editor-handbook`, `/woocommerce/woocommerce` (if commerce) |
 | Webflow | `/webflow/webflow-api` | — |
 
-Cross-stack: `/stripe/stripe-docs`, `/calcom/cal.com`, `/dequelabs/axe-core`, `/GoogleChrome/lighthouse`.
+Cross-stack: `/websites/stripe_js`, `/calcom/cal.com`, `/dequelabs/axe-core`, `/GoogleChrome/lighthouse`.
 
 ### Verified-current library notes (2026-05-18 — freshness date of phase contract 18)
 

@@ -102,7 +102,7 @@ Write `brand.yaml` `tokens:` + `brand.yaml.tokens.css` (worked shapes in `refere
 When the user reaches phase 17, recommend invoking via the `Skill` tool, for the stated purpose only:
 
 - **`document-skills:frontend-design`** (Anthropic) — for the *aesthetic-direction* conversation: its anti-"AI-slop" heuristics (distinctive display+refined body type pairing; dominant color with sharp accents over timid even palettes; high-impact orchestrated motion over scattered micro-interactions; bold intentional direction). Recommend at Step 3 when the user wants a stronger point of view than the flavor defaults. *"For a bolder aesthetic stance, also pull in `document-skills:frontend-design` — it's tuned to avoid generic AI defaults."*
-- **`ui-ux-pro-max:ui-ux-pro-max`** — the upstream of the MVP primary flavor itself; recommend invoking directly when the user wants to browse its full palette/style/font surface rather than the agent's narrowed 3–5.
+- **`ui-ux-pro-max@ui-ux-pro-max-skill`** — the upstream of the MVP primary flavor itself; recommend invoking directly when the user wants to browse its full palette/style/font surface rather than the agent's narrowed 3–5.
 - **`document-skills:canvas-design`** — when the user wants a visual *mood/specimen board* (a rendered swatch+type specimen artifact) to react to alongside the in-chat options.
 - **`document-skills:brand-guidelines`** — when the brand already has guidelines (colors/type) the system must conform to rather than generate from scratch; recommend at Step 1 to seed the option round from the existing brand.
 

@@ -933,7 +933,7 @@ Per Lock-3 freshness pattern. The agent invokes context7 at the following phases
 
 ### Phase 24a (commerce)
 
-- `/stripe/stripe-docs` — current Checkout Session API + webhook signature verification + TWINT enable pattern
+- `/websites/stripe_js` — current Checkout Session API + webhook signature verification + TWINT enable pattern
 - (When booking) `/calcom/cal.com` — `@calcom/embed-react` current install + props
 
 ### Phases 28-30 (deploy)

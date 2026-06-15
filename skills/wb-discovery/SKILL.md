@@ -33,7 +33,7 @@ Capture one paragraph (3-6 sentences) in the user's own words answering: what th
 
 Capture 3-5 reference URLs + one sentence per URL on *what* is admired + 1-2 sentences on the imagined feel + an extracted 3-6 adjective set. Output: `project.yaml.vision`.
 
-**This skill's discipline:** convert empty descriptors ("clean", "modern", "professional") into concrete observations grounded in specific examples. Use `WebFetch` to load each reference and *discuss* it (not just list it). When the user has no references, walk them through reference-sourcing per `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (Awwwards, Land-book, One Page Love, Mobbin, SaaS Pages) and the plugin corpus at `${CLAUDE_PLUGIN_ROOT}/reference/awesome-design-md-corpus/`. Do not pick references on the user's behalf — surface a shortlist to react to, never decree taste.
+**This skill's discipline:** convert empty descriptors ("clean", "modern", "professional") into concrete observations grounded in specific examples. Use `WebFetch` to load each reference and *discuss* it (not just list it). When the user has no references, walk them through reference-sourcing per `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (Awwwards, Land-book, One Page Love, Mobbin, SaaS Pages) and the runtime corpus at `.website-builder/library/awesome-design-md/` (the Decision-42 auto-clone of 60+ DESIGN.md exemplars; read it if cloned, else fetch via `wb library`). Do not pick references on the user's behalf — surface a shortlist to react to, never decree taste.
 
 ### Phase 3 — Requirements → read `phase-contracts/03-requirements.md`
 
@@ -51,7 +51,7 @@ Capture the real entity: name (+ legal name if different), one-sentence what-the
 
 Capture five artifacts: a 1-2 sentence voice description, 3-5 voice attributes, a Nielsen Norman 4-dimensional tone profile (humor / formality / respectfulness / enthusiasm, each 3-point), say / never-say example lists, and 1-2 voice exemplars. Output: `brand.yaml.voice` (the FIRST write to `brand.yaml`).
 
-**This skill's discipline:** the never-say list is more diagnostic than the say list — a brand defines itself by what it refuses. The NN4D framework is the empirical scaffold; ground attributes in it. The voice MUST compose with phase 3 positioning — refuse a voice that contradicts it. Surface voice-archetype frameworks (see `references/voice-archetype-frameworks.md`) when the user struggles to find words. Load the plugin voice corpus at `${CLAUDE_PLUGIN_ROOT}/reference/voice-archetypes/`; use `WebFetch` to pull named exemplars' public voice guides fresh (Slack, Mailchimp, Patagonia, Stripe).
+**This skill's discipline:** the never-say list is more diagnostic than the say list — a brand defines itself by what it refuses. The NN4D framework is the empirical scaffold; ground attributes in it. The voice MUST compose with phase 3 positioning — refuse a voice that contradicts it. Surface voice-archetype frameworks (see `references/voice-archetype-frameworks.md`) when the user struggles to find words. No bundled voice corpus ships in v1 — ground the voice work in the NN4D + Aaker + Jung scaffolds in `references/voice-archetype-frameworks.md` and use `WebFetch` to pull named exemplars' public voice guides fresh (Slack, Mailchimp, Patagonia, Stripe). (A curated voice-exemplar corpus is tracked content-authoring follow-up.)
 
 ## Cross-phase discipline (the glue)
 
@@ -113,8 +113,8 @@ If a `.website-builder/brand.yaml` already exists (re-entry / ingestion), read i
 - STATE doc decisions ledger: `Workstreams/website-builder/website-builder.md` (decisions 2, 4)
 - Agent profile: `${CLAUDE_PLUGIN_ROOT}/agents/website-builder.md` § Anti-skip enforcement + § Voice characteristics + § Anti-pattern cheat sheet
 
-### Plugin corpus (loaded when the user wants to react to options rather than start cold)
+### Runtime corpus (cloned into the project — loaded when the user wants to react to options rather than start cold)
 
-- `${CLAUDE_PLUGIN_ROOT}/reference/awesome-design-md-corpus/` — 60+ DESIGN.md exemplars (phase 2 adjective grounding)
-- `${CLAUDE_PLUGIN_ROOT}/reference/brand-examples/` — complete brand systems (phase 2/5 "what a full vision/voice looks like")
-- `${CLAUDE_PLUGIN_ROOT}/reference/voice-archetypes/` — catalogued brand voice exemplars with NN4D profiles + say/never-say excerpts (phase 5 core corpus)
+- `.website-builder/library/awesome-design-md/` — 60+ DESIGN.md exemplars (phase 2 adjective grounding). This is the Decision-42 auto-clone runtime path (the `awesome-design-md` catalogue key in `scripts/wb_library.py` clones the VoltAgent corpus here at phase-17 entry / session-start). Same SSOT `wb-design-system` cites (`references/oklch-token-system.md`) — read the cloned corpus if present; the agent fetches it via `wb library` if not.
+
+> **No bundled `brand-examples` / `voice-archetypes` corpus ships in v1.** There is neither a bundled copy nor a catalogue clone-key for these. For the phase-2 vision/brand-systems grounding and the phase-5 voice corpus, use the inline phase-2/5 discipline this skill already carries (see § The five phases — phases 2 + 5 — and the cross-phase glue): ground adjectives in the user's specific references via `WebFetch`; build voice via the NN4D + Aaker + Jung scaffolds in `references/voice-archetype-frameworks.md`; pull named exemplars' public voice guides fresh via `WebFetch` (Slack, Mailchimp, Patagonia, Stripe). A curated brand/voice exemplar corpus is tracked content-authoring follow-up, not a v1 dependency.

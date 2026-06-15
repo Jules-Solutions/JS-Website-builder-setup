@@ -113,7 +113,7 @@ When the user reaches phase 18, recommend (via the `Skill` tool) where the purpo
 
 - **`document-skills:frontend-design`** — when the user wants distinctive, production-grade visual polish on a component beyond the chosen library's defaults. Recommend before building hero / showcase / landing components.
 - **`accessibility-compliance:wcag-audit-patterns`** — when a component carries non-trivial a11y obligations (interactive widgets, forms, modals). Recommend running it against the built component before the phase-18 self-review sweep, so the formal phase-21 audit finds less.
-- **`ui-ux-pro-max:ui-ux-pro-max`** — the loaded design-skill flavor's component element library (button/modal/navbar/card/table/form/chart with style-aware variants) as a secondary consistency reference against the phase-17 aesthetic.
+- **`ui-ux-pro-max@ui-ux-pro-max-skill`** — the loaded design-skill flavor's component element library (button/modal/navbar/card/table/form/chart with style-aware variants) as a secondary consistency reference against the phase-17 aesthetic.
 - **`document-skills:web-artifacts-builder`** — when the user wants a multi-component interactive artifact (React + Tailwind + shadcn/ui) prototyped quickly before committing it into the project tree.
 
 Recommend; let the user invoke. The skill points, it does not pull.

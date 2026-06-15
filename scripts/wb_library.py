@@ -284,7 +284,7 @@ CATALOGUE_CLONE_KEYS: dict[str, tuple[str, str, str]] = {
     ),
     "shadcn-components": ("/shadcn/ui", "docs", "docs"),
     "astro-content-collections": ("/withastro/docs", "docs", "docs"),
-    "stripe-checkout": ("/stripe/stripe-docs", "docs", "docs"),
+    "stripe-checkout": ("/websites/stripe_js", "docs", "docs"),
     "payload-docs": ("/payloadcms/payload", "docs", "docs"),
     "decap-cms": ("/decaporg/decap-cms", "docs", "docs"),
     "cal-com": ("/calcom/cal.com", "docs", "docs"),
