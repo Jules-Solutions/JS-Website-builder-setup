@@ -83,7 +83,7 @@ This installs the skill into the user-level CC skills directory so it is shared 
 | macOS | `$HOME/.claude/skills/ui-ux-pro-max` |
 | Linux | `$HOME/.claude/skills/ui-ux-pro-max` |
 
-`scripts/install-skills.sh` is the plugin's automation around this: invoked by `wb-bootstrap` (Step 5) as `bash "${CLAUDE_PLUGIN_ROOT}/scripts/install-skills.sh" --primary ui-ux-pro-max`, it detects the OS, resolves the target path above, and records the install in `.website-builder/skills-installed.yaml`. The script's `KNOWN_SKILLS` registry row for this flavor carries upstream method `registry` (the script's spelling of this manifest's `install_method: skill-registry`) and ref `ui-ux-pro-max:ui-ux-pro-max`; this manifest's `upstream_id` (`ui-ux-pro-max@ui-ux-pro-max-skill`) is the marketplace install id verified at the canonical upstream on 2026-06-12. See `## Upstream attribution` for the registry-id reconciliation note.
+`scripts/install-skills.sh` is the plugin's automation around this: invoked by `wb-bootstrap` (Step 5) as `bash "${CLAUDE_PLUGIN_ROOT}/scripts/install-skills.sh" --primary ui-ux-pro-max`, it detects the OS, resolves the target path above, and records the install in `.website-builder/skills-installed.yaml`. The script's `KNOWN_SKILLS` registry row for this flavor carries upstream method `registry` (the script's spelling of this manifest's `install_method: skill-registry`), the install ref `ui-ux-pro-max@ui-ux-pro-max-skill` (matching this manifest's `upstream_id`), and the marketplace source `nextlevelbuilder/ui-ux-pro-max-skill` — so the stub it writes emits the correct `/plugin marketplace add` + `/plugin install` pair (reconciled 2026-06-16, Decision 90). The `@` form is the **install** id; the `Skill`-tool **invoke** id is the `plugin:skill` form `ui-ux-pro-max:ui-ux-pro-max`.
 
 > **Windows prerequisite.** `scripts/install-skills.sh` runs under bash. On Windows it needs Git Bash (ships with [Git for Windows](https://git-scm.com/download/win)) or WSL — there is no native PowerShell/cmd path in v0.1 (per the cross-platform precedent in `wb-bootstrap` Step 5). The two `/plugin` commands above run inside a Claude Code session and are OS-agnostic.
 
@@ -125,16 +125,18 @@ This skill is authored by **nextlevelbuilder**. Source: <https://github.com/next
 
 The website-builder plugin **orchestrates; nextlevelbuilder authors.** Per locked decision 32 (hybrid distribution), the plugin ships this composition manifest — the wiring layer describing how the skill composes with the website-builder pipeline — and never a vendored copy of the skill content. The user installs the real upstream skill from nextlevelbuilder's own distribution (the CC plugin marketplace), which preserves the author's attribution, gives the user the latest version, and avoids any redistribution-licensing concern. Please support the upstream project.
 
-<!-- BUILD-TIME NOTE (not end-user-facing) — registry-id reconciliation / install-skills.sh consistency interlock.
-The canonical schema authority (DESIGN-skill-distribution.md) and the Phase-1 scripts/install-skills.sh KNOWN_SKILLS
-row both record the upstream ref as `ui-ux-pro-max:ui-ux-pro-max` (a colon-delimited form). The marketplace install
-id verified at the canonical upstream on 2026-06-12 is `ui-ux-pro-max@ui-ux-pro-max-skill` (skill `@` marketplace),
-preceded by `/plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill`. This manifest records the verified `@`
-form in `upstream_id` per the freshness discipline (decision 75: record verified-at-author-time state). The
-install-skills.sh KNOWN_SKILLS row still carries the older `:` form — reconciling the script's registry ref with the
-verified marketplace id is a behavioral interlock for the General to sequence (the script is READ-ONLY substrate for
-Phase 5 Captains; not edited here). The script's *install mechanism* still works regardless of the ref string — for
-`skill-registry` v0.1 it reserves the install slot and the user completes the fetch via the `/plugin` commands above;
-the ref string only matters once install-skills.sh grows a manifest-read fetch path (script lines 17-19, a future
-Phase-5+ step). -->
+<!-- BUILD-TIME NOTE (not end-user-facing) — registry-id reconciliation: RESOLVED 2026-06-16 (Decision 90).
+Ground truth re-verified against the upstream repo manifests + the canonical CC plugin docs (code.claude.com):
+  - marketplace.json `name`/`id` = `ui-ux-pro-max-skill`; plugin.json `name` = `ui-ux-pro-max`, declared skill dir
+    `./.claude/skills/ui-ux-pro-max` (skill name `ui-ux-pro-max`).
+  - INSTALL id (for `/plugin install`) = `<plugin>@<marketplace>` = `ui-ux-pro-max@ui-ux-pro-max-skill`,
+    preceded by `/plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill`.
+  - INVOKE id (for the `Skill` tool) = `<plugin>:<skill>` = `ui-ux-pro-max:ui-ux-pro-max`.
+These are two DIFFERENT ids by design; an earlier pass (the build-audit F2 + decision 80) treated the `:` form as a
+stale duplicate of the `@` form — they are not duplicates. Reconciled both surfaces:
+  - install-skills.sh KNOWN_SKILLS now carries the `@` INSTALL id + a `marketplace_source` field
+    (`nextlevelbuilder/ui-ux-pro-max-skill`) and emits the correct `/plugin marketplace add` + `/plugin install` pair.
+  - the user-facing `Skill`-tool recommendation lines (wb-component-build, wb-design-system) use the `:` INVOKE id.
+Remaining: DESIGN-skill-distribution.md still references the older `:` form in an install context — back-propagate
+under INST-B (design-doc sync); non-gating. -->
 

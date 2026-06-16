@@ -27,17 +27,29 @@ SCRIPT_NAME="install-skills.sh"
 SCRIPT_VERSION="0.1.0"
 
 # v0.1 known skills. Format per entry:
-#   ID|name|upstream_method|upstream_ref|status|notes
-# upstream_method: "registry" (Claude Code skill registry) | "git" (git clone) | "deferred" (not in v0.1)
+#   ID|name|upstream_method|upstream_ref|marketplace_source|status|notes
+# upstream_method: "registry" (Claude Code plugin marketplace) | "git" (git clone) | "deferred" (not in v0.1)
+# upstream_ref:
+#   - registry  → the `/plugin install` id in <plugin>@<marketplace> form
+#                 (e.g. ui-ux-pro-max@ui-ux-pro-max-skill). NOTE: this is the INSTALL id,
+#                 distinct from the Skill-tool INVOKE id which is <plugin>:<skill>
+#                 (e.g. ui-ux-pro-max:ui-ux-pro-max). See DESIGN-skill-distribution.md.
+#   - git       → the clone URL.
+#   - deferred  → a placeholder URL (no real install in v0.1).
+# marketplace_source: registry → the `/plugin marketplace add` argument (owner/repo or URL);
+#                     empty for git/deferred rows.
+# Forms verified 2026-06-16 against the upstream repo manifests (marketplace.json name
+# `ui-ux-pro-max-skill`, plugin.json name `ui-ux-pro-max`) + the canonical CC plugin docs
+# (code.claude.com: `/plugin install plugin@marketplace`; invoke via `/plugin:skill`). Decision 90.
 # For v0.1, UI/UX Pro Max is the only active entry; the others are tracked as deferred so
 # the script can surface a clear "ships in expansion phase 10" message if requested.
 KNOWN_SKILLS=(
-  "ui-ux-pro-max|UI/UX Pro Max|registry|ui-ux-pro-max:ui-ux-pro-max|active|v0.1 default per decision 55"
-  "impeccable|Impeccable|deferred|https://impeccable.style|deferred|expansion phase 10"
-  "emil-kowalski|Emil Kowalski|deferred|https://emilkowal.ski/skill|deferred|expansion phase 10"
-  "taste|Taste|deferred|https://tasteskill.dev|deferred|expansion phase 10"
-  "framer-motion|Framer Motion|deferred|https://github.com/C-Jeril/framer-motion-skills|deferred|expansion phase 10"
-  "twenty-first-dev|21st.dev Magic|deferred|https://21st.dev|deferred|expansion phase 10"
+  "ui-ux-pro-max|UI/UX Pro Max|registry|ui-ux-pro-max@ui-ux-pro-max-skill|nextlevelbuilder/ui-ux-pro-max-skill|active|v0.1 default per decision 55"
+  "impeccable|Impeccable|deferred|https://impeccable.style||deferred|expansion phase 10"
+  "emil-kowalski|Emil Kowalski|deferred|https://emilkowal.ski/skill||deferred|expansion phase 10"
+  "taste|Taste|deferred|https://tasteskill.dev||deferred|expansion phase 10"
+  "framer-motion|Framer Motion|deferred|https://github.com/C-Jeril/framer-motion-skills||deferred|expansion phase 10"
+  "twenty-first-dev|21st.dev Magic|deferred|https://21st.dev||deferred|expansion phase 10"
 )
 
 # ---------- OS detection + paths ----------
@@ -101,7 +113,7 @@ lookup_skill() {
 # Parse a row into individual variables (returns via global SKILL_ID etc.). Bash 3.2 safe.
 parse_skill_row() {
   local row="$1"
-  IFS='|' read -r SKILL_ID SKILL_NAME SKILL_METHOD SKILL_REF SKILL_STATUS SKILL_NOTES <<< "$row"
+  IFS='|' read -r SKILL_ID SKILL_NAME SKILL_METHOD SKILL_REF SKILL_MARKETPLACE SKILL_STATUS SKILL_NOTES <<< "$row"
 }
 
 # ---------- Install state tracking ----------
@@ -180,7 +192,19 @@ EOF
 # clear "registry fetch goes here" pointer so a future Phase 5 Captain can plug in the
 # actual registry call without rewriting the script.
 install_via_registry() {
-  local id="$1" name="$2" upstream_ref="$3" target_dir="$4"
+  local id="$1" name="$2" upstream_ref="$3" target_dir="$4" marketplace_source="${5:-}"
+
+  # Build the user-facing install command block. CC plugin install is two steps:
+  #   /plugin marketplace add <source>   (registers the marketplace)
+  #   /plugin install <plugin>@<marketplace>   (installs the plugin from it)
+  # (verified against code.claude.com plugin docs — see Decision 90 / KNOWN_SKILLS note).
+  local install_cmds
+  if [[ -n "$marketplace_source" ]]; then
+    install_cmds="/plugin marketplace add ${marketplace_source}
+/plugin install ${upstream_ref}"
+  else
+    install_cmds="/plugin install ${upstream_ref}"
+  fi
 
   # Detect whether the skill is already in the user's CC skills dir. CC's skill discovery
   # is location-based: anything under ~/.claude/skills/{slug}/SKILL.md is auto-loaded.
@@ -221,7 +245,7 @@ install_via_registry() {
   cat > "${target_dir}/SKILL.md" <<EOF
 ---
 name: ${name} (install pending)
-description: Stub placeholder — the actual ${name} skill needs to be fetched from the Claude Code skill registry. Run \`/plugin install\` for ${upstream_ref} (full mechanism lands in Phase 5 of the website-builder build).
+description: Stub placeholder — the actual ${name} skill installs from the Claude Code plugin marketplace. See "To complete the install manually" below (full mechanism lands in Phase 5 of the website-builder build).
 version: 0.0.0-pending
 ---
 
@@ -236,14 +260,16 @@ per \`BUILD-strategy.md\`). For now, the slot at \`${target_dir}\` is reserved.
 
 ## To complete the install manually
 
-Until Phase 5 ships, you can install the upstream skill via Claude Code's
-standard \`/plugin install\` flow:
+Until Phase 5 ships, install the upstream skill via Claude Code's plugin
+marketplace (run these inside a Claude Code session):
 
 \`\`\`
-/plugin install ${upstream_ref}
+${install_cmds}
 \`\`\`
 
-(Or whichever upstream-blessed install command applies for \`${upstream_ref}\`.)
+Then invoke it with the \`Skill\` tool using the namespaced \`<plugin>:<skill>\`
+form — for this skill: \`${id}:${id}\`. (The \`@\` form above is the *install*
+id; the \`:\` form is the *invoke* id — they are different by design.)
 
 After install, this stub file is replaced by the upstream's real \`SKILL.md\`.
 You can also re-run \`scripts/install-skills.sh\` after the Phase 5 mechanism
@@ -338,7 +364,7 @@ install_skill() {
 
   case "$SKILL_METHOD" in
     registry)
-      install_via_registry "$SKILL_ID" "$SKILL_NAME" "$SKILL_REF" "$target_dir" || return 1
+      install_via_registry "$SKILL_ID" "$SKILL_NAME" "$SKILL_REF" "$target_dir" "$SKILL_MARKETPLACE" || return 1
       ;;
     git)
       install_via_git "$SKILL_ID" "$SKILL_NAME" "$SKILL_REF" "$target_dir" || return 1

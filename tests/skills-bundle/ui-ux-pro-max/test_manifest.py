@@ -232,7 +232,8 @@ class TestUiuxManifest:
     def test_skill_name_is_a_known_skill_id(
         self, frontmatter: dict, install_script_text: str
     ):
-        # The script's KNOWN_SKILLS rows are pipe-delimited: ID|name|method|ref|status|notes.
+        # The script's KNOWN_SKILLS rows are pipe-delimited:
+        #   ID|name|method|ref|marketplace_source|status|notes  (marketplace_source added Decision 90).
         # The manifest's skill_name must appear as a KNOWN_SKILLS row id (first field).
         name = frontmatter["skill_name"]
         ids = re.findall(r'^\s*"([a-z0-9-]+)\|', install_script_text, flags=re.MULTILINE)
@@ -256,7 +257,7 @@ class TestUiuxManifest:
         )
         assert row_match, f"no KNOWN_SKILLS row for '{name}'"
         row_fields = row_match.group(1).split("|")
-        script_method = row_fields[2]  # ID|name|method|ref|status|notes
+        script_method = row_fields[2]  # ID|name|method|ref|marketplace_source|status|notes
         expected = method_map.get(frontmatter["install_method"])
         assert expected is not None, (
             f"install_method '{frontmatter['install_method']}' has no script-token "
