@@ -8,16 +8,19 @@ routes each verb-family to its implementation:
 
     wb library <verb> ...   → Captain P's module (scripts/wb_library.py)
     wb keys <verb> ...      → Captain Q's module (scripts/wb_keys.py)
+    wb fanout <verb> ...    → the fan-out helper (scripts/wb_fanout.py)
     wb skills <verb> ...    → scripts/install-skills.sh (subprocess)
     wb maintain <verb> ...  → scripts/wb-bootstrap.{sh,py} / install-skills.sh
 
 Module boundary (locked per Decision 78 — see scripts/README.md § Module boundary):
-  - `library` + `keys` are IMPORTABLE Python modules under scripts/ that this
-    dispatcher imports and calls through a stable function contract
+  - `library` + `keys` + `fanout` are IMPORTABLE Python modules under scripts/ that
+    this dispatcher imports and calls through a stable function contract
     (`run(argv, *, project_root) -> int`). The imports are LAZY (inside the
     route functions) so this dispatcher is import-safe and unit-testable
-    WITHOUT P's/Q's modules present (they are built in parallel worktrees and
-    land at merge time — O merges last).
+    WITHOUT those modules present (they are built in parallel worktrees and
+    land at merge time — O merges last). `fanout` is the Wave-3b parallel-research
+    fan-out substrate (DESIGN-orchestration-spine.md § 8); it follows the same
+    delegate-verb contract as library/keys.
   - `skills` + `maintain` delegate to the existing Phase-1 bash/python scripts
     via subprocess. This dispatcher does NOT reimplement install-skills.sh or
     wb-bootstrap.* — it wires the dispatch.
@@ -73,6 +76,7 @@ SCRIPTS_DIR = PLUGIN_ROOT / "scripts"
 # change requiring General review (NOT a Captain-level edit).
 LIBRARY_VERBS = ("list", "add", "remove", "refresh", "refresh-all", "prune", "inspect")
 KEYS_VERBS = ("migrate-to-1password", "migrate-to-env")
+FANOUT_VERBS = ("decompose", "aggregate", "status")
 SKILLS_VERBS = ("update", "sync")
 MAINTAIN_VERBS = ("reconfig", "install-skills")
 
@@ -170,6 +174,27 @@ def route_keys(argv: list[str], *, project_root: Path) -> int:
     except ModuleNotFoundError as exc:
         return _module_missing("keys", "wb_keys.py", exc)
     return wb_keys.run(argv, project_root=project_root)
+
+
+# ---------- Route: fanout (parallel-research substrate — scripts/wb_fanout.py) ----------
+
+def route_fanout(argv: list[str], *, project_root: Path) -> int:
+    """
+    Route `fanout` sub-verbs to the parallel-research fan-out helper.
+
+    Lazy import for the same import-safety reason as library/keys. The fan-out
+    module is the Wave-3b substrate (DESIGN-orchestration-spine.md § 8) — it
+    decomposes a research brief into N sub-agent specs + a spawn-recipe, maintains
+    the .website-builder/tasks.yaml fan-out ledger, and aggregates the structured
+    sub-agent results back into a synthesis. It follows the same
+    `run(argv, *, project_root) -> int` contract as library/keys.
+    Verbs handled: decompose | aggregate | status.
+    """
+    try:
+        import wb_fanout  # type: ignore  # scripts/wb_fanout.py
+    except ModuleNotFoundError as exc:
+        return _module_missing("fanout", "wb_fanout.py", exc)
+    return wb_fanout.run(argv, project_root=project_root)
 
 
 # ---------- Subprocess delegation helper ----------
@@ -440,6 +465,25 @@ def build_parser() -> argparse.ArgumentParser:
         help="keys sub-verb + its arguments (e.g. `migrate-to-1password`).",
     )
 
+    # --- fanout (routes to the parallel-research substrate, scripts/wb_fanout.py) ---
+    fanout = sub.add_parser(
+        "fanout",
+        help="Decompose / aggregate parallel-research fan-out at opt-in phases.",
+        description=(
+            "Parallel-research fan-out substrate (DESIGN-orchestration-spine.md § 8). "
+            "Verbs: " + " | ".join(FANOUT_VERBS) + ". `decompose` turns a research brief "
+            "into N sub-agent specs + a spawn-recipe the agent executes; `aggregate` "
+            "merges the structured results into a synthesis; `status` shows the ledger. "
+            "Fan-out is an opt-in at phases 2/3/5/8 — in-person is the default."
+        ),
+    )
+    # Opaque tail: the sub-verb + its args go straight to wb_fanout.run().
+    fanout.add_argument(
+        "args",
+        nargs=argparse.REMAINDER,
+        help="fanout sub-verb + its arguments (e.g. `decompose --brief brief.yaml`).",
+    )
+
     # --- skills (O's own; delegates to install-skills.sh) ---
     skills = sub.add_parser(
         "skills",
@@ -534,6 +578,12 @@ def main(argv: list[str] | None = None) -> int:
         if keys_argv and keys_argv[0] == "--":
             keys_argv = keys_argv[1:]
         return route_keys(keys_argv, project_root=project_root)
+
+    if args.command == "fanout":
+        fanout_argv = list(args.args)
+        if fanout_argv and fanout_argv[0] == "--":
+            fanout_argv = fanout_argv[1:]
+        return route_fanout(fanout_argv, project_root=project_root)
 
     if args.command == "skills":
         return route_skills(args, project_root=project_root)
