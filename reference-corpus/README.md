@@ -38,4 +38,4 @@ All six shipped reference dirs are populated (corpus track): `design-systems/`, 
 
 ## See also
 
-- `../reference/` — exemplar inspiration data shipped with the plugin (brand examples, design system exemplars, component patterns, etc.).
+- `.website-builder/library/` — runtime destination for corpora after `autoclone_for_state` copies them in at phase entry.

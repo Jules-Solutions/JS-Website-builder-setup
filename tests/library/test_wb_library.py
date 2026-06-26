@@ -351,3 +351,171 @@ class TestWhenPredicate:
     def test_bool_value_coercion(self):
         assert wl._evaluate_when("transactional == true", self.PROJECT) is True
         assert wl._evaluate_when("transactional == false", self.PROJECT) is False
+
+
+# --- bundled resolver (Wave 4) ---------------------------------------------
+
+
+class TestBundledResolver:
+    """Tests for the 'bundled' resolver type added in Wave 4.
+
+    Bundled resources are plugin-shipped corpus dirs under reference-corpus/.
+    _fetch_resource does shutil.copytree (no network); autoclone_for_state
+    clones them inline (no 'fetch-deferred' status).
+    """
+
+    # ---- catalogue key resolution ----
+
+    def test_voice_archetypes_resolves_to_bundled(self):
+        source, rtype, subdir = wl._resolve_resource("voice-archetypes")
+        assert rtype == "bundled"
+        assert source == "reference-corpus/voice-archetypes"
+        assert subdir == "voice-archetypes"
+
+    def test_component_patterns_resolves_to_bundled(self):
+        _, rtype, _ = wl._resolve_resource("component-patterns")
+        assert rtype == "bundled"
+
+    def test_seo_checklists_resolves_to_bundled(self):
+        _, rtype, _ = wl._resolve_resource("seo-checklists")
+        assert rtype == "bundled"
+
+    def test_design_systems_corpus_resolves_to_bundled(self):
+        source, rtype, subdir = wl._resolve_resource("design-systems-corpus")
+        assert rtype == "bundled"
+        assert source == "reference-corpus/design-systems"
+        assert subdir == "design-systems"
+
+    def test_brand_examples_corpus_resolves_to_bundled(self):
+        source, rtype, subdir = wl._resolve_resource("brand-examples-corpus")
+        assert rtype == "bundled"
+        assert source == "reference-corpus/brand-examples"
+        assert subdir == "brand-examples"
+
+    def test_awesome_design_md_corpus_is_now_bundled(self):
+        """Option A: awesome-design-md-corpus repoints from github to bundled."""
+        _, rtype, _ = wl._resolve_resource("awesome-design-md-corpus")
+        assert rtype == "bundled"
+
+    def test_awesome_design_md_bare_key_stays_github(self):
+        """Option A: bare awesome-design-md key stays on upstream github."""
+        source, rtype, _ = wl._resolve_resource("awesome-design-md")
+        assert rtype == "github-repo"
+        assert "github.com" in source
+
+    def test_detect_url_type_recognizes_bundled_prefix(self):
+        assert wl._detect_url_type("reference-corpus/voice-archetypes") == "bundled"
+        assert wl._detect_url_type("bundled:some/path") == "bundled"
+
+    def test_default_subdir_for_bundled(self):
+        assert wl._default_subdir_for_type("bundled") == "."
+
+    # ---- _bundled_copy helper ----
+
+    def test_bundled_copy_populates_target(self, tmp_path: Path):
+        """_bundled_copy with a real source dir places files in target."""
+        src_key = "reference-corpus/voice-archetypes"
+        src = PLUGIN_ROOT / src_key
+        if not src.is_dir():
+            pytest.skip(f"{src_key} not present in plugin root")
+        target = tmp_path / "voice-archetypes"
+        result = wl._bundled_copy(src_key, target)
+        assert result is True
+        assert target.is_dir()
+        assert any(target.iterdir())
+
+    def test_bundled_copy_idempotent_no_clobber(self, tmp_path: Path):
+        """Second call with existing target returns True without overwriting files."""
+        src_key = "reference-corpus/voice-archetypes"
+        src = PLUGIN_ROOT / src_key
+        if not src.is_dir():
+            pytest.skip(f"{src_key} not present in plugin root")
+        target = tmp_path / "voice-archetypes"
+        wl._bundled_copy(src_key, target)
+        sentinel = target / "_sentinel.txt"
+        sentinel.write_text("preserve-me", encoding="utf-8")
+        result = wl._bundled_copy(src_key, target)
+        assert result is True
+        assert sentinel.exists(), "idempotent: existing files must not be removed"
+
+    def test_bundled_copy_missing_source_returns_false(self, tmp_path: Path):
+        result = wl._bundled_copy("reference-corpus/nonexistent-xyzzy-9999",
+                                   tmp_path / "target")
+        assert result is False
+
+    def test_bundled_copy_refresh_replaces_target(self, tmp_path: Path):
+        """refresh=True removes and re-copies the target."""
+        src_key = "reference-corpus/voice-archetypes"
+        if not (PLUGIN_ROOT / src_key).is_dir():
+            pytest.skip(f"{src_key} not present in plugin root")
+        target = tmp_path / "voice-archetypes"
+        wl._bundled_copy(src_key, target)
+        stale = target / "_stale.txt"
+        stale.write_text("will-be-removed", encoding="utf-8")
+        wl._bundled_copy(src_key, target, refresh=True)
+        assert not stale.exists(), "refresh must replace the target dir"
+        assert target.is_dir() and any(target.iterdir())
+
+    # ---- autoclone_for_state integration ----
+
+    def _make_project(self, tmp_path: Path, phase_yaml: str) -> Path:
+        """Create a throwaway project with a synthetic phase-99 contract."""
+        state = tmp_path / ".website-builder"
+        state.mkdir()
+        (state / "project.yaml").write_text("stack: nextjs\ncms: none\n", encoding="utf-8")
+        contracts = state / "phase-contracts"
+        contracts.mkdir()
+        (contracts / "99-test-bundled.md").write_text(phase_yaml, encoding="utf-8")
+        return tmp_path
+
+    def test_autoclone_bundled_resource_yields_cloned(self, tmp_path: Path):
+        """autoclone_for_state returns 'cloned' for a bundled resource."""
+        if not (PLUGIN_ROOT / "reference-corpus" / "voice-archetypes").is_dir():
+            pytest.skip("reference-corpus/voice-archetypes not present")
+        project_root = self._make_project(
+            tmp_path,
+            "---\nphase: 99\nlibrary_clones_at_entry:\n"
+            "  - resource: voice-archetypes\n    as: voice-archetypes\n"
+            "    note: 'test'\n---\nbody\n",
+        )
+        results = wl.autoclone_for_state(project_root, trigger="phase-entry", phase=99)
+        assert len(results) == 1
+        assert results[0].status == "cloned"
+        assert (project_root / ".website-builder" / "library" / "voice-archetypes").is_dir()
+
+    def test_autoclone_bundled_idempotent_second_call_skipped(self, tmp_path: Path):
+        """Second autoclone_for_state call with target already on disk → 'skipped'."""
+        if not (PLUGIN_ROOT / "reference-corpus" / "voice-archetypes").is_dir():
+            pytest.skip("reference-corpus/voice-archetypes not present")
+        project_root = self._make_project(
+            tmp_path,
+            "---\nphase: 99\nlibrary_clones_at_entry:\n"
+            "  - resource: voice-archetypes\n    as: voice-archetypes\n---\nbody\n",
+        )
+        r1 = wl.autoclone_for_state(project_root, trigger="phase-entry", phase=99)
+        assert r1[0].status == "cloned"
+        r2 = wl.autoclone_for_state(project_root, trigger="phase-entry", phase=99)
+        assert r2[0].status == "skipped"
+
+    def test_autoclone_bundled_missing_source_yields_error(self, tmp_path: Path):
+        """autoclone_for_state for a missing bundled source yields 'error', not crash."""
+        project_root = self._make_project(
+            tmp_path,
+            "---\nphase: 99\nlibrary_clones_at_entry:\n"
+            "  - resource: component-patterns\n    as: component-patterns\n---\nbody\n",
+        )
+        # Temporarily test with a key that resolves to a non-existent source path.
+        # We monkeypatch CATALOGUE_CLONE_KEYS to point at a missing dir.
+        orig = wl.CATALOGUE_CLONE_KEYS.get("component-patterns")
+        wl.CATALOGUE_CLONE_KEYS["component-patterns"] = (
+            "reference-corpus/NONEXISTENT-xyzzy-test", "bundled", "component-patterns"
+        )
+        try:
+            results = wl.autoclone_for_state(project_root, trigger="phase-entry", phase=99)
+            assert len(results) == 1
+            assert results[0].status == "error"
+        finally:
+            if orig is not None:
+                wl.CATALOGUE_CLONE_KEYS["component-patterns"] = orig
+            else:
+                del wl.CATALOGUE_CLONE_KEYS["component-patterns"]

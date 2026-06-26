@@ -20,6 +20,11 @@ relates_to:
   - Workstreams/website-builder/stacks/DESIGN-stack-sveltekit.md
   - Workstreams/website-builder/stacks/DESIGN-stack-webflow.md
   - Workstreams/website-builder/stacks/DESIGN-stack-static-html.md
+library_clones_at_entry:
+  - resource: astro-content-collections
+    when: stack == "astro"
+    as: docs
+    note: "Astro Content Collections reference docs (clone when Astro chosen at phase 11)"
 ---
 
 # Phase 11 — Stack decision *(plus sibling — transactional decision)*

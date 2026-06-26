@@ -12,6 +12,13 @@ relates_to:
   - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
   - Workstreams/website-builder/foundation/DESIGN-architecture.md
   - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md
+library_clones_at_entry:
+  - resource: brand-examples-corpus
+    as: brand-examples
+    note: "complete brand systems showing voice + tokens + component patterns; surfaces when user wants to see what a full vision looks like"
+  - resource: design-systems-corpus
+    as: design-systems
+    note: "Material 3 / Apple HIG / IBM Carbon excerpts for reading how mature systems articulate themselves"
 ---
 
 # Phase 2 — Vision
@@ -83,7 +90,7 @@ The override path applies — the user can explicitly confirm advancement with a
 - **`WebSearch`** — used sparingly, when the user describes a site by recall but cannot name it (*"there was this minimalist site about journals, I think — it had a serif headline?"*) and the agent helps locate it.
 - **`Read`** — to read `.website-builder/project.yaml.idea` (phase 1 output) at phase entry.
 - **`Write` / `Edit`** — to update `.website-builder/project.yaml` with the captured vision.
-- **Reference-data load** — the agent reads catalogued exemplar libraries from `${CLAUDE_PLUGIN_ROOT}/reference/brand-examples/` and `${CLAUDE_PLUGIN_ROOT}/reference/awesome-design-md-corpus/` (per `DESIGN-ecosystem-catalog.md`) when the user wants the agent to surface candidate references rather than coming with their own.
+- **Reference-data load** — the agent reads catalogued exemplar libraries from `.website-builder/library/brand-examples/` and `.website-builder/library/awesome-design-md/` (per `DESIGN-ecosystem-catalog.md`) when the user wants the agent to surface candidate references rather than coming with their own.
 
 No `context7` lookups (no library docs needed at this phase). No Playwright (phase 6.5 owns live-site walking; phase 2 stays at the surface-level WebFetch for reference-loading).
 
@@ -115,7 +122,7 @@ The agent updates `.website-builder/project.yaml.current_phase` to `3` upon user
 
 **The user pasted a single one-shot AI-tool screenshot and says "make it look like that".** The screenshot is one reference; phase 2 wants 3-5. The agent acknowledges: *"This screenshot is a useful anchor. Treat it as one of the references — what specifically is admirable about it? Pull out the part that's actually you. Then let's add 2-3 more references so phase 17 has range to compose from, not just one source."*
 
-**The user wants the agent to "just generate a vision".** *"I don't have time for this — pick five sites you like for me."* The agent refuses politely: *"This is one of the load-bearing decisions. If I pick references on your behalf, phases 5 and 17 inherit my taste, not yours, and the site ends up reading as 'an agent's idea of what your site should be.' I can offer you a curated shortlist from the corpus we have — design exemplars and category libraries — and we narrow from there. Want me to surface 10 candidates for you to react to?"* This route loads from `${CLAUDE_PLUGIN_ROOT}/reference/brand-examples/` + `awesome-design-md-corpus/` + the catalogued external libraries (Awwwards, Land-book, etc. per `DESIGN-ecosystem-catalog.md`).
+**The user wants the agent to "just generate a vision".** *"I don't have time for this — pick five sites you like for me."* The agent refuses politely: *"This is one of the load-bearing decisions. If I pick references on your behalf, phases 5 and 17 inherit my taste, not yours, and the site ends up reading as 'an agent's idea of what your site should be.' I can offer you a curated shortlist from the corpus we have — design exemplars and category libraries — and we narrow from there. Want me to surface 10 candidates for you to react to?"* This route loads from `.website-builder/library/brand-examples/` + `.website-builder/library/awesome-design-md/` + the catalogued external libraries (Awwwards, Land-book, etc. per `DESIGN-ecosystem-catalog.md`).
 
 **The references the user names cannot be loaded by WebFetch (Cloudflare gate, login-walled, dead URL).** The agent surfaces the load failure: *"That URL didn't load — looks like the site requires login or has changed. Want to point at a different reference, or describe what you remembered about it so we can capture the intent without the artifact?"* Memory-based references are valid; they just live with `seen_via: user-described-from-memory` in the schema.
 
@@ -125,8 +132,8 @@ The agent updates `.website-builder/project.yaml.current_phase` to `3` upon user
 - **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
 - **Design doc — reference catalogue:** `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (the external inspiration sources the agent surfaces when the user has no references: Awwwards, Dribbble, Behance, Land-book, One Page Love, Mobbin, SaaS Pages)
 - **Design doc — adjective output target:** `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 1 — Design tokens (the adjective set seeds phase-17 token generation)
-- **Plugin corpus — design exemplars:** `${CLAUDE_PLUGIN_ROOT}/reference/awesome-design-md-corpus/` — cloned from VoltAgent/awesome-design-md; 60+ DESIGN.md exemplars from Claude / Shopify / Stripe / Figma / Notion / IBM etc.; agent greps for patterns when surfacing candidate adjective sets
-- **Plugin corpus — brand examples:** `${CLAUDE_PLUGIN_ROOT}/reference/brand-examples/` — 5-8 complete brand systems showing voice + tokens + component patterns; useful when the user wants to see "what a complete vision looks like" before committing
+- **Plugin corpus — design exemplars:** `.website-builder/library/awesome-design-md/` — cloned from VoltAgent/awesome-design-md; 60+ DESIGN.md exemplars from Claude / Shopify / Stripe / Figma / Notion / IBM etc.; agent greps for patterns when surfacing candidate adjective sets
+- **Plugin corpus — brand examples:** `.website-builder/library/brand-examples/` — 5-8 complete brand systems showing voice + tokens + component patterns; useful when the user wants to see "what a complete vision looks like" before committing
 - **External libraries** (fetch-on-demand per catalog):
   - Awwwards — https://www.awwwards.com (award-winning sites by style + tech stack)
   - Land-book — https://land-book.com (landing-page gallery)

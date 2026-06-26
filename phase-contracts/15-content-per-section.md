@@ -13,6 +13,10 @@ relates_to:
   - Workstreams/website-builder/foundation/DESIGN-architecture.md
   - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
   - Workstreams/website-builder/foundation/DESIGN-content-layers.md
+library_clones_at_entry:
+  - resource: component-patterns
+    as: component-patterns
+    note: "canonical specs for the ~20 most common component types (hero, feature-grid, testimonial, pricing-table, faq, etc.); agent draws first-draft component specs from these"
 ---
 
 # Phase 15 — Content per section
@@ -62,10 +66,10 @@ There is one soft check the agent performs but does not hard-gate:
 
 ## Tools and skills used
 
-- **AskUserQuestion** — the primary tool. For each section type the agent asks: *what component holds this? what fields does it need? what data does it pull? what does the prose in each slot need to accomplish?* For sections the user can't spec from scratch, the agent proposes a spec drawn from `reference/component-patterns/` and asks the user to confirm or adjust.
+- **AskUserQuestion** — the primary tool. For each section type the agent asks: *what component holds this? what fields does it need? what data does it pull? what does the prose in each slot need to accomplish?* For sections the user can't spec from scratch, the agent proposes a spec drawn from `.website-builder/library/component-patterns/` and asks the user to confirm or adjust.
 - **Write / Edit** — the agent writes `.website-builder/components.yaml` (component specs, Layer 2), updates `.website-builder/content/sections.yaml` (section→component mapping), adds content placeholders to each `content/pages/{slug}.md` section body (Layer 4 placeholder), and declares string keys in `.website-builder/content/strings/${default_language}.json` (Layer 3).
 - **Read** — agent reads phase-13 briefs, phase-14 wireframes, `.website-builder/inbox/INVENTORY.md` (phase 6 content sources), `.website-builder/brand.yaml.voice` (phase 5 voice constraints for placeholders).
-- **Reference-data load** — `reference/component-patterns/` for canonical component specs (the 20 most common component types — hero, feature-grid, testimonial, pricing, faq, etc.); the agent draws first-draft component specs from these and adjusts to the project.
+- **Reference-data load** — `.website-builder/library/component-patterns/` for canonical component specs (the 20 most common component types — hero, feature-grid, testimonial, pricing, faq, etc.); the agent draws first-draft component specs from these and adjusts to the project.
 - **WebFetch / WebSearch** — sparingly. The agent may search current component-spec conventions for a novel section type, or fetch a reference site's component to study its field shape (per `DESIGN-templates-catalog.md`: studied, never imported).
 
 The `wb-content` phase-group skill (loaded since phase 13) carries the cross-phase discipline: every section specced here gets prose at phase 16 and code at phase 18 from the same `components.yaml` + page-body files.
@@ -171,7 +175,7 @@ sections:
 
 **"Just put the headline text in the component."** The most common separation failure. The user wants to write `headline: "Still Humans — essays on staying a person in 2026"` directly into the component spec. The agent moves it: the component spec gets `headline: { type: string, max_chars: 60 }`; the literal sentence becomes a phase-16 content placeholder in the page body. The agent explains once per occurrence: *"the component is the shape; the words are content. They live in different places so you can change the words at phase 16 without touching the component, and so the German version reuses the same component with different words."* The pattern usually sticks after 2-3 corrections.
 
-**"This section needs a custom one-off component."** Sometimes true, often premature. The agent checks `reference/component-patterns/` and `components.yaml` for an existing component the section can reuse with different content before creating a new type. A genuinely novel component is fine; a near-duplicate of an existing one (a "HeroBlockV2" that differs from `HeroBlock` only in content) is not — the agent merges. The healthy component count for a typical 5-15 page marketing site is 10-20 distinct types; if component types approach section count, the agent forces de-duplication.
+**"This section needs a custom one-off component."** Sometimes true, often premature. The agent checks `.website-builder/library/component-patterns/` and `components.yaml` for an existing component the section can reuse with different content before creating a new type. A genuinely novel component is fine; a near-duplicate of an existing one (a "HeroBlockV2" that differs from `HeroBlock` only in content) is not — the agent merges. The healthy component count for a typical 5-15 page marketing site is 10-20 distinct types; if component types approach section count, the agent forces de-duplication.
 
 **"I'll write the actual copy here."** Phase 15 is content *spec*, not copy. The agent confirms — *yes, the placeholder is the spec; phase 16 writes the words* — and pushes back if the user starts writing finished prose into placeholders (it's not wrong to draft, but the agent flags that phase-16 voice-consistency pass will re-touch it, so heavy investment now may be redone). Conversely, the agent pushes back on vague placeholders — *"good copy here"* is not a spec; *"≤60 chars, warm-direct voice, communicates what-this-is in one line, sourced from phase-1 idea"* is.
 
@@ -198,8 +202,8 @@ Content Design JSON methodology (string-key declaration):
 
 Component-pattern corpus:
 
-- `reference/component-patterns/` — canonical specs for the ~20 most common component types (hero, feature-grid, testimonial, pricing-table, faq-accordion, cta-band, logo-cloud, team-grid, blog-card, contact-form, etc.). The agent draws first-draft component specs from these and adjusts to the project. Reduces the chance of inventing a near-duplicate of a well-understood pattern.
-- `reference/brand-examples/` — complete brand systems showing how mature brands shape component field sets and reuse components across pages.
+- `.website-builder/library/component-patterns/` — canonical specs for the ~20 most common component types (hero, feature-grid, testimonial, pricing-table, faq-accordion, cta-band, logo-cloud, team-grid, blog-card, contact-form, etc.). The agent draws first-draft component specs from these and adjusts to the project. Reduces the chance of inventing a near-duplicate of a well-understood pattern.
+- `.website-builder/library/brand-examples/` — complete brand systems showing how mature brands shape component field sets and reuse components across pages.
 
 Per-CMS structural mappings (relevant because `components.yaml` from this phase consumes CMS shape at phase 18):
 
