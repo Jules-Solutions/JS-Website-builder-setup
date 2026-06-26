@@ -1,0 +1,18 @@
+{
+  "include": [
+    "scripts",
+    "hooks-handlers"
+  ],
+  "extraPaths": [
+    "scripts",
+    "hooks-handlers",
+    "tests"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/.pytest_cache"
+  ],
+  "pythonVersion": "3.11",
+  "typeCheckingMode": "basic",
+  "reportMissingModuleSource": false
+}

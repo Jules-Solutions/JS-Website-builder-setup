@@ -157,11 +157,13 @@ class TestPhase17DoD:
         assert "## Content layer mapping" in block
         assert "## Component library pairing" in block
 
-    def test_no_validation_or_imagegen_in_wave1(self, proj17: Path):
-        # Wave-2 modules absent → actions 4 + 5 are no-ops at phase 17.
+    def test_no_validation_or_imagegen_at_phase17(self, proj17: Path):
+        # Post-Wave-2 the modules are present, but at phase 17 with a project that
+        # has no content-layer files yet, validate_content_layers returns [] (skip-
+        # on-absent), and phase 17 is not an IMAGEGEN_PHASES phase → imagegen None.
         result = wo.orchestrate_phase_entry(proj17, 17)
         assert result.validation_errors == []
-        assert result.imagegen is None  # phase 17 isn't an imagegen phase anyway
+        assert result.imagegen is None
 
 
 # --- Marker + fire decision (§ 3.2 / § 3.3) ---------------------------------
@@ -309,8 +311,9 @@ class TestDefensive:
 
 class TestImportGuards:
     def test_wave2_modules_guarded(self):
-        # Wave 1 ships before Wave 2 — these are None until Wave 2 drops them in.
-        # (If a later wave adds them, they become callable; either is acceptable.)
+        # Post-Wave-2 these resolve to callables; the guard tolerates absence too
+        # (None when a module is missing/broken). Either is acceptable — the guard
+        # is retained as defensive decoupling.
         assert wo.validate_content_layers is None or callable(wo.validate_content_layers)
         assert wo.resolve_imagegen_path is None or callable(wo.resolve_imagegen_path)
 

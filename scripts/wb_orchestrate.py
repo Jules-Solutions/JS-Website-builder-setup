@@ -47,9 +47,11 @@ Interface rules (mirrors the locked wb_keys.py / wb_library.py module contract,
     inside its logic (testability; mirrors wb_keys / wb_library).
   - Does NOT import session_start (would be circular — § 4.2). The handlers import
     THIS module, not the reverse.
-  - Wave-2 modules (wb_validate_layers, wb_imagegen) are SOFT-imported + guarded so
-    Wave 1 lands + is tested before Wave 2 exists; actions 4 + 5 degrade to no-ops
-    until those modules drop in (§ 4.3 import-guard pattern).
+  - The consumer/validation modules (wb_validate_layers, wb_imagegen — shipped in
+    Wave 2) are SOFT-imported + guarded. The guard is RETAINED as defensive
+    decoupling (Wave-2 INST locked decision): a present-but-broken module must never
+    break the spine import, and an absent module degrades its action to a no-op
+    (§ 4.3 import-guard pattern). Actions 4 + 5 fire whenever the modules resolve.
 
 Crash-discipline: every one of the 5 actions is individually wrapped so a single
 broken action never breaks the orchestrator; the handlers add their own outer
@@ -90,21 +92,22 @@ import wb_markdown  # noqa: E402  (sys.path nudge must precede)
 import wb_library  # noqa: E402
 
 
-# ---------- Wave-2 soft-imports (import-guarded — § 4.3) ----------
+# ---------- Consumer/validation soft-imports (import-guarded — § 4.3) ----------
 #
-# These land in Wave 2. Guarding the import lets Wave 1 ship + be tested in
-# isolation; Wave 2 drops the modules in with no Wave-1 edit required. `except
-# Exception` (not just ImportError) is deliberate: a present-but-broken Wave-2
-# module must not break the Wave-1 spine import.
+# wb_validate_layers + wb_imagegen ship in Wave 2 (now present). The guard is
+# RETAINED as defensive decoupling (Wave-2 INST locked decision — overrides the
+# design's "remove the guards once present" note): `except Exception` (not just
+# ImportError) is deliberate — a present-but-broken module must never break the
+# spine import; an absent module degrades its action to a no-op.
 
 try:
     from wb_validate_layers import validate_content_layers  # type: ignore
-except Exception:  # noqa: BLE001 — absent/broken Wave-2 module degrades action 4 to a no-op
+except Exception:  # noqa: BLE001 — absent/broken module degrades action 4 to a no-op
     validate_content_layers = None  # type: ignore[assignment]
 
 try:
     from wb_imagegen import resolve_imagegen_path  # type: ignore
-except Exception:  # noqa: BLE001 — absent/broken Wave-2 module degrades action 5 to a no-op
+except Exception:  # noqa: BLE001 — absent/broken module degrades action 5 to a no-op
     resolve_imagegen_path = None  # type: ignore[assignment]
 
 
@@ -664,8 +667,8 @@ def _action_skill_directives(
 def _action_validate_layers(
     project_root: Path, emit: Callable[[str], None]
 ) -> list[str]:
-    """Action 4 — run content-layer validation (Wave 2, import-guarded). No-op when
-    the module is absent."""
+    """Action 4 — run content-layer validation (wb_validate_layers, import-guarded).
+    Fires when the module resolves; no-op when it is absent/broken."""
     if validate_content_layers is None:
         return []
     try:
@@ -680,7 +683,8 @@ def _action_imagegen(
     project_root: Path, phase: int, emit: Callable[[str], None]
 ) -> ImagegenStatus | None:
     """Action 5 — surface the resolved image-gen path at phases that need generated
-    visual assets (Wave 2, import-guarded + phase-gated). No-op otherwise."""
+    visual assets (wb_imagegen, import-guarded + phase-gated to IMAGEGEN_PHASES).
+    Fires when the module resolves + the phase needs it; no-op otherwise."""
     if phase not in IMAGEGEN_PHASES or resolve_imagegen_path is None:
         return None
     try:
