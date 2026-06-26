@@ -79,11 +79,7 @@ Restart Claude Code in your project directory; the new plugin version is picked 
 ls -la ~/website-builder/.claude-plugin/plugin.json
 ```
 
-**"hook scripts not executing"** — check that the scripts in `hooks-handlers/` are executable:
-
-```bash
-chmod +x ~/website-builder/hooks-handlers/*.sh
-```
+**"hook scripts not executing"** — the plugin's hooks are **Python** (`hooks-handlers/session_start.py` + `pre_tool_use.py`), wired via `hooks/hooks.json` and run through your Python interpreter. There are no shell scripts to mark executable (`chmod` is not needed). If a hook isn't firing, confirm Python is on your PATH (`python --version`) and that the plugin loaded (`/plugin list` shows `website-builder`).
 
 **Anything else** — open an issue on the repo or contact Jules.Solutions directly. (During invite-only Phase, support is via direct contact rather than public issue tracker.)
 
