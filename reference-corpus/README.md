@@ -9,8 +9,11 @@
 - `design-systems/` — 5 reference docs on mature design systems (Material 3, Apple HIG, IBM Carbon, Tailwind, Radix/shadcn): token systems + principles + when-to-use. (`DESIGN-architecture.md` §329)
 - `brand-examples/` — 7 complete, original brand systems (voice + OKLCH tokens + component patterns) across distinct archetypes. (`DESIGN-architecture.md` §328)
 - `awesome-design-md-corpus/` — a curated 14-exemplar subset of `DESIGN.md`-style brand design specs, format adopted from the MIT-licensed `VoltAgent/awesome-design-md`. (`DESIGN-architecture.md` §333)
+- `voice-archetypes/` — 8 reference voices spanning the verbal-identity spectrum, each grounded in NN4D + Aaker + Jung with attributes, say/never-say, and sample copy. (`DESIGN-architecture.md` §330)
+- `component-patterns/` — canonical specs for the 20 most common component types (purpose + anatomy + content slots + a11y + variants). (`DESIGN-architecture.md` §331)
+- `seo-checklists/` — Lighthouse-mapped performance (phase 22) + SEO (phase 26) checklists, each item → audit id → fix path. (`DESIGN-architecture.md` §332)
 
-Each of those three has its own `README.md` index with provenance + which phases consume it. Primary consumer: **phase 17 (design system)**, with phases 2/5/18 sampling them.
+Each of these six dirs has its own `README.md` index with provenance + which phases consume it. The design trio (`design-systems/`, `brand-examples/`, `awesome-design-md-corpus/`) is consumed primarily at **phase 17 (design system)**, with phases 2/5/18 sampling them. The remaining three serve **phase 5 (voice)** for `voice-archetypes/`, **phase 18 (component build)** for `component-patterns/` (with 9/17 sampling), and **phases 22/26 (performance + SEO)** for `seo-checklists/`.
 
 **Runtime / seeds infrastructure (Phase 5 — Captain P):**
 
@@ -28,7 +31,7 @@ Both modes coexist; per-resource policy lives in `seeds/` manifests (Phase 5 wor
 
 ## Status
 
-The three shipped reference dirs (`design-systems/`, `brand-examples/`, `awesome-design-md-corpus/`) are populated (corpus track — `RPT-corpus-1.md`). The `seeds/` manifests + runtime curation logic remain Captain P (Phase 5) work, authored per:
+All six shipped reference dirs are populated (corpus track): `design-systems/`, `brand-examples/`, `awesome-design-md-corpus/` (`RPT-corpus-1.md`) plus `voice-archetypes/`, `component-patterns/`, `seo-checklists/` (`RPT-corpus-2.md`). The `seeds/` manifests + runtime curation logic remain Captain P (Phase 5) work, authored per:
 
 - `Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md`
 - `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md`
