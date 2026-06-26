@@ -27,8 +27,6 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-import pytest
-
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent.parent
 SCRIPTS_DIR = PLUGIN_ROOT / "scripts"
 HANDLERS_DIR = PLUGIN_ROOT / "hooks-handlers"
@@ -47,7 +45,7 @@ GREENFIELD = {
 
 
 def _write_project(root: Path, phase: int, **overrides) -> Path:
-    fields = dict(GREENFIELD)
+    fields: dict[str, object] = dict(GREENFIELD)
     fields.update(overrides)
     fields["current_phase"] = phase
     sd = root / ".website-builder"

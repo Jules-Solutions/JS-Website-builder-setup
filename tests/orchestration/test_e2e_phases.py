@@ -72,7 +72,7 @@ EXPECTED_SKILL = {
 
 def _write_project(root: Path, phase: int, **overrides) -> None:
     """(Re)write .website-builder/project.yaml at `phase` with the greenfield stack."""
-    fields = dict(GREENFIELD)
+    fields: dict[str, object] = dict(GREENFIELD)
     fields.update(overrides)
     fields["current_phase"] = phase
     sd = root / ".website-builder"
@@ -139,6 +139,7 @@ class TestE2EPhaseWalk:
         root = tmp_path
         for phase in range(1, 19):
             result = _advance(root, phase)
+            assert result is not None, f"phase {phase} advance did not fire"
             payload = _as_posttooluse_payload(result.render())
             hso = payload["hookSpecificOutput"]
             assert hso["hookEventName"] == "PostToolUse"
@@ -159,7 +160,7 @@ class TestE2EPhaseWalk:
 
 class TestPhase02Vision:
     def test_autoclones_brand_and_design_corpora(self, walk):
-        root, results = walk
+        _root, results = walk
         resources = _autoclone_resources(results[2])
         assert "brand-examples-corpus" in resources
         assert "design-systems-corpus" in resources

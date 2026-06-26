@@ -56,7 +56,7 @@ FU2_SLUGS = ("design-systems", "awesome-design-md", "component-patterns",
 
 
 def _write_project(root: Path, phase: int, **overrides) -> Path:
-    fields = dict(GREENFIELD)
+    fields: dict[str, object] = dict(GREENFIELD)
     fields.update(overrides)
     fields["current_phase"] = phase
     sd = root / ".website-builder"
