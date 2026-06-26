@@ -500,3 +500,51 @@ class TestMaterializerUnit:
         assert config["analytics"]["provider"] == "none"
         assert config["maintainer_skills_installed"] == list(m.ALL_MAINTAINER_SKILLS)
         assert str(config["translation_preference"]) == "1"
+
+
+# --- Tier 1 — wb-deploy SKILL.md ↔ wb_postlaunch wiring (gap #6) -------------
+
+
+class TestDeploySkillWiring:
+    """Wave 3a (Captain wiring-1): the phase-29 deploy skill must actually invoke the
+    post-launch materializer (gap #6 — DESIGN-orchestration-spine.md §7 row #6). A
+    structural/contract test over the SKILL.md is the right granularity — the SKILL.md
+    is the prose spine the agent follows; this asserts the invocation is present, robust
+    (the python3||python||py interpreter fallback the hooks use), and at the phase-29
+    post-deploy-verify step."""
+
+    def _skill_text(self) -> str:
+        path = PLUGIN_ROOT / "skills" / "wb-deploy" / "SKILL.md"
+        assert path.is_file(), f"wb-deploy SKILL.md missing at {path}"
+        return path.read_text(encoding="utf-8")
+
+    def test_skill_invokes_wb_postlaunch_runner(self):
+        text = self._skill_text()
+        assert "${CLAUDE_PLUGIN_ROOT}/scripts/wb_postlaunch.py" in text, \
+            "wb-deploy SKILL.md must invoke scripts/wb_postlaunch.py via ${CLAUDE_PLUGIN_ROOT}"
+
+    def test_skill_uses_interpreter_fallback(self):
+        """The invocation must carry the python3 || python || py fallback the plugin's
+        hooks use (hooks/hooks.json) — each interpreter invoking the runner."""
+        text = self._skill_text()
+        for interp in ("python3", "python", "py"):
+            invocation = f'{interp} "${{CLAUDE_PLUGIN_ROOT}}/scripts/wb_postlaunch.py"'
+            assert invocation in text, \
+                f"wb-deploy SKILL.md must carry the `{interp} ...wb_postlaunch.py` fallback form"
+        # The three forms must be chained with the `||` short-circuit (robust path).
+        assert "||" in text, "wb-deploy SKILL.md must chain the interpreters with `||`"
+
+    def test_invocation_in_phase_29_section(self):
+        """The materializer invocation lives in the phase-29 wizard section (the
+        post-deploy-verify step), not stranded elsewhere."""
+        text = self._skill_text()
+        anchor = "## The post-launch maintainer wizard (phase 29)"
+        assert anchor in text, "phase-29 wizard section header missing"
+        section = text.split(anchor, 1)[1]
+        assert "wb_postlaunch.py" in section, \
+            "wb_postlaunch.py invocation must be in the phase-29 wizard section"
+
+    def test_runner_actually_exists(self):
+        """The wired script must be a real file (the wiring points at something real)."""
+        assert (SCRIPTS_DIR / "wb_postlaunch.py").is_file(), \
+            "scripts/wb_postlaunch.py (the wired runner) must exist"

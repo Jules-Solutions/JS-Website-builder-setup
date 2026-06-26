@@ -58,6 +58,13 @@ PLUGIN_ROOT = Path(PLUGIN_ROOT_ENV).resolve() if PLUGIN_ROOT_ENV else SCRIPT_PAT
 sys.path.insert(0, str(PLUGIN_ROOT / "tests"))
 from detector import detect  # noqa: E402  (sys.path mutation must precede)
 
+# Make the plugin's scripts/ dir importable so the project-root CLAUDE.md helper
+# (gap #2 — DESIGN-orchestration-spine.md §9, Commander CONFIRMED) resolves
+# regardless of how this runner is invoked. wb_claudemd is a leaf module (no in-repo
+# deps); importing it is side-effect-free.
+sys.path.insert(0, str(PLUGIN_ROOT / "scripts"))
+import wb_claudemd  # noqa: E402  (sys.path mutation must precede)
+
 
 # ---------- Constants ----------
 
@@ -672,6 +679,15 @@ def bootstrap(
     # ----- Step 7 — extend .gitignore -----
     gi_result = extend_gitignore(project_root)
     log_info(f".gitignore: {gi_result}")
+
+    # ----- Step 7.5 — write the project-root CLAUDE.md orientation surface -----
+    # gap #2 — DESIGN-orchestration-spine.md §7 row #2 + §9 (Commander CONFIRMED).
+    # A STANDING orientation surface (project / phase / stack / cms / how-to-resume)
+    # that survives even when the plugin isn't loaded; the orchestration spine keeps
+    # its phase line fresh on phase entry. Idempotent via a delimited managed block —
+    # never clobbers a user-authored CLAUDE.md (their content lives outside the markers).
+    claudemd_result = wb_claudemd.write_project_claudemd(project_root, proj)
+    log_info(f"project-root CLAUDE.md: {claudemd_result}")
 
     # ----- Step 8 — write README.md inside .website-builder/ -----
     readme = build_readme(entry_mode=chosen_mode, secrets_backend=secrets_backend)
