@@ -4,6 +4,16 @@
 
 ## What this directory holds
 
+**Shipped reference content (committed; selectively cloneable into the user's project):**
+
+- `design-systems/` — 5 reference docs on mature design systems (Material 3, Apple HIG, IBM Carbon, Tailwind, Radix/shadcn): token systems + principles + when-to-use. (`DESIGN-architecture.md` §329)
+- `brand-examples/` — 7 complete, original brand systems (voice + OKLCH tokens + component patterns) across distinct archetypes. (`DESIGN-architecture.md` §328)
+- `awesome-design-md-corpus/` — a curated 14-exemplar subset of `DESIGN.md`-style brand design specs, format adopted from the MIT-licensed `VoltAgent/awesome-design-md`. (`DESIGN-architecture.md` §333)
+
+Each of those three has its own `README.md` index with provenance + which phases consume it. Primary consumer: **phase 17 (design system)**, with phases 2/5/18 sampling them.
+
+**Runtime / seeds infrastructure (Phase 5 — Captain P):**
+
 - `seeds/` — per-stack seed reference manifests describing which upstream docs to fetch on demand.
 - Cloned upstream reference material (added at runtime by the bootstrap skill or by `wb library add <url>`, NOT committed at scaffold time).
 
@@ -16,9 +26,9 @@ The plugin's resource-curation pattern has two surfacing modes per resource:
 
 Both modes coexist; per-resource policy lives in `seeds/` manifests (Phase 5 work).
 
-## Status as of Phase 1 scaffold
+## Status
 
-Stub. Captain P (Phase 5) authors the `seeds/` manifests and the runtime curation logic per:
+The three shipped reference dirs (`design-systems/`, `brand-examples/`, `awesome-design-md-corpus/`) are populated (corpus track — `RPT-corpus-1.md`). The `seeds/` manifests + runtime curation logic remain Captain P (Phase 5) work, authored per:
 
 - `Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md`
 - `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md`
