@@ -418,6 +418,36 @@ def run_resolve_keys(root: Path) -> dict | None:
     }
 
 
+def run_orchestrate_session_start(root: Path) -> str | None:
+    """Invoke scripts/wb_orchestrate.run_session_start and return its rendered
+    phase-entry block (markdown) to append to the session context, or None.
+
+    Import-safe + non-fatal: a missing module, an unresolvable current_phase, or any
+    runtime error yields None (never an exception). This re-injects the current
+    phase's resources/skill/adapter on every resume — the orchestration spine's
+    "fresh session and mid-session advance run the same path" guarantee
+    (DESIGN-orchestration-spine.md § 3.4). It reconciles the orchestrator marker as
+    a side effect (run_session_start writes last_phase = current_phase).
+    """
+    scripts = _scripts_dir()
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    try:
+        import wb_orchestrate  # type: ignore
+    except Exception:  # noqa: BLE001 — defensive: a broken/absent module must not break the hook
+        return None
+    try:
+        result = wb_orchestrate.run_session_start(root)
+    except Exception:  # noqa: BLE001 — defensive: orchestrate must never crash session-start
+        return None
+    if result is None or result.is_empty():
+        return None
+    try:
+        return result.render()
+    except Exception:  # noqa: BLE001 — defensive: a render bug must not break the hook
+        return None
+
+
 def render_context(
     *,
     root: Path,
@@ -673,6 +703,7 @@ def main() -> int:
     state_present = has_state_dir(root)
     autoclone: dict | None = None
     keys: dict | None = None
+    orchestrate_block: str | None = None
     if state_present:
         entry: dict = {"mode": "mid-project", "signal": "`.website-builder/` exists"}
         project = read_project_state(root)
@@ -688,20 +719,30 @@ def main() -> int:
             keys = run_resolve_keys(root)
         except Exception as exc:  # noqa: BLE001 — last-resort guard: session-start must never crash
             keys = {"available": True, "status": "error", "error": f"run_resolve_keys wrapper raised: {exc}"}
+        # Orchestration spine — re-inject the current phase's entry block on resume
+        # (DESIGN-orchestration-spine.md § 3.4). Internally defensive (returns None
+        # on any failure); belt-and-suspenders guard here too.
+        try:
+            orchestrate_block = run_orchestrate_session_start(root)
+        except Exception:  # noqa: BLE001 — last-resort guard: session-start must never crash
+            orchestrate_block = None
     else:
         entry = detect_entry_mode(root)
         project = None
 
-    _emit(
-        render_context(
-            root=root,
-            state_present=state_present,
-            entry=entry,
-            project=project,
-            autoclone=autoclone,
-            keys=keys,
-        )
+    context = render_context(
+        root=root,
+        state_present=state_present,
+        entry=entry,
+        project=project,
+        autoclone=autoclone,
+        keys=keys,
     )
+    # The orchestration block is appended to the existing render (plain stdout enters
+    # context for SessionStart — § 2; PostToolUse needs JSON, SessionStart does not).
+    if orchestrate_block:
+        context = context + "\n" + orchestrate_block
+    _emit(context)
     return 0
 
 

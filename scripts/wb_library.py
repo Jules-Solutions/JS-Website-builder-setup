@@ -377,6 +377,14 @@ def _load_project_yaml(project_root: Path) -> dict[str, Any]:
         return {}
 
 
+def load_project_yaml(project_root: Path) -> dict[str, Any]:
+    """Public alias over _load_project_yaml — the orchestration spine reads
+    current_phase + stack/cms/commerce through this, without reaching into a
+    private or duplicating a loader (DESIGN-orchestration-spine.md § 5.2). Same
+    defensive contract: missing/unreadable project.yaml → {} (never raises)."""
+    return _load_project_yaml(project_root)
+
+
 # ---------------------------------------------------------------------------
 # Provenance registry (library/README.md) — read / write
 #
