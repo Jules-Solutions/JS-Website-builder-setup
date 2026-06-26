@@ -17,6 +17,15 @@ relates_to:
   - Workstreams/website-builder/cms/DESIGN-cms-none.md
   - Workstreams/website-builder/cms/DESIGN-cms-decap.md
   - Workstreams/website-builder/cms/DESIGN-cms-payload.md
+library_clones_at_entry:
+  - resource: payload-docs
+    when: cms == "payload"
+    as: docs
+    note: "Payload CMS reference docs (clone when Payload chosen)"
+  - resource: decap-cms
+    when: cms == "decap"
+    as: docs
+    note: "Decap CMS reference docs (clone when Decap chosen)"
 ---
 
 # Phase 12 — CMS decision

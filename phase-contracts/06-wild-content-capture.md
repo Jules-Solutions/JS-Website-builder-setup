@@ -176,7 +176,7 @@ The agent updates `.website-builder/project.yaml.current_phase` to `7` upon user
 - **Design doc — content-layer consumption:** `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 3 (CDJSON) + § Layer 4 (page prose) — phases 13-16 lift from inbox/ into these layers
 - **Design doc — multi-language content:** `Workstreams/website-builder/foundation/DESIGN-i18n.md` § Translation workflow (when inbox items are in non-primary languages)
 - **Design doc — phase 6.5 interleave:** `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` § Phase 6.5 mechanism (when the user pastes a structured artifact during phase 6, 6.5 fires; this contract's "Common failure modes" surfaces the interleave behavior)
-- **Plugin corpus — voice exemplars** (for fresh-generation prompts): `${CLAUDE_PLUGIN_ROOT}/reference/voice-archetypes/` — agent uses representative voice-guide phrasings as model when prompting the user to freewrite or voice-note
+- **Plugin corpus — voice exemplars** (for fresh-generation prompts): `.website-builder/library/voice-archetypes/` — agent uses representative voice-guide phrasings as model when prompting the user to freewrite or voice-note
 - **External (catalogued in `DESIGN-ecosystem-catalog.md`):**
   - Audio transcription tools (Whisper / OpenAI's audio-transcription / on-device) — referenced when voice notes need transcription at phase 13 or 16
   - Content Design JSON methodology — https://uxcontent.com/content-design-json/ (load-bearing at phase 16 when CDJSON layer 3 is written from inbox material)
