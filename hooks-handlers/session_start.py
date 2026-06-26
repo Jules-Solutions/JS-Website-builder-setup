@@ -418,6 +418,96 @@ def run_resolve_keys(root: Path) -> dict | None:
     }
 
 
+def run_resolve_media(root: Path) -> dict | None:
+    """Invoke scripts/wb_imagegen.resolve_imagegen_path +
+    scripts/wb_videogen.resolve_videogen_path (Wave-2 consumer resolvers).
+
+    Import-safe + non-fatal + SECRET-SAFE: the resolvers surface only provider
+    NAMES, key env-var NAMES, and present/MISSING booleans — never a resolved
+    secret value (per .claude/rules/secrets-conventions.md + decision 56:
+    consumer-fallback, the user supplies their own provider key). Returns a dict
+    summary for the context block, or None if both modules are unavailable.
+    """
+    scripts = _scripts_dir()
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    out: dict = {"available": True}
+    try:
+        import wb_imagegen  # type: ignore
+        out["image"] = wb_imagegen.resolve_imagegen_path(root).to_summary()
+    except Exception as exc:  # noqa: BLE001 — defensive: a broken/absent module must not break the hook
+        out["image_error"] = f"image-gen resolution unavailable: {exc}"
+    try:
+        import wb_videogen  # type: ignore
+        out["video_audio"] = wb_videogen.resolve_videogen_path(root).to_summary()
+    except Exception as exc:  # noqa: BLE001 — defensive: a broken/absent module must not break the hook
+        out["video_audio_error"] = f"video/audio-gen resolution unavailable: {exc}"
+    if "image" not in out and "video_audio" not in out:
+        return {
+            "available": False,
+            "error": out.get("image_error") or out.get("video_audio_error")
+            or "media-gen resolvers unavailable",
+        }
+    return out
+
+
+def run_validate_layers(root: Path) -> dict | None:
+    """Invoke scripts/wb_validate_layers.validate_content_layers (Wave-2 module).
+
+    Import-safe + non-fatal: a missing module or any runtime error yields a
+    structured note (never an exception). The findings are value-free strings
+    (each carries a fix path; no secrets). Returns a dict summary for the context
+    block, or None if the module is unavailable.
+    """
+    scripts = _scripts_dir()
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    try:
+        import wb_validate_layers  # type: ignore
+    except Exception as exc:  # noqa: BLE001 — defensive: a broken/absent module must not break the hook
+        return {"available": False, "error": f"wb_validate_layers import failed: {exc}"}
+    try:
+        findings = wb_validate_layers.validate_content_layers(root)
+    except Exception as exc:  # noqa: BLE001 — defensive: validation must never crash session-start
+        return {"available": True, "status": "error", "error": f"validate_content_layers raised: {exc}"}
+    return {
+        "available": True,
+        "status": "ok" if not findings else "findings",
+        "count": len(findings),
+        "findings": list(findings),
+    }
+
+
+def run_orchestrate_session_start(root: Path) -> str | None:
+    """Invoke scripts/wb_orchestrate.run_session_start and return its rendered
+    phase-entry block (markdown) to append to the session context, or None.
+
+    Import-safe + non-fatal: a missing module, an unresolvable current_phase, or any
+    runtime error yields None (never an exception). This re-injects the current
+    phase's resources/skill/adapter on every resume — the orchestration spine's
+    "fresh session and mid-session advance run the same path" guarantee
+    (DESIGN-orchestration-spine.md § 3.4). It reconciles the orchestrator marker as
+    a side effect (run_session_start writes last_phase = current_phase).
+    """
+    scripts = _scripts_dir()
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    try:
+        import wb_orchestrate  # type: ignore
+    except Exception:  # noqa: BLE001 — defensive: a broken/absent module must not break the hook
+        return None
+    try:
+        result = wb_orchestrate.run_session_start(root)
+    except Exception:  # noqa: BLE001 — defensive: orchestrate must never crash session-start
+        return None
+    if result is None or result.is_empty():
+        return None
+    try:
+        return result.render()
+    except Exception:  # noqa: BLE001 — defensive: a render bug must not break the hook
+        return None
+
+
 def render_context(
     *,
     root: Path,
@@ -426,6 +516,8 @@ def render_context(
     project: dict | None,
     autoclone: dict | None = None,
     keys: dict | None = None,
+    media: dict | None = None,
+    validation: dict | None = None,
 ) -> str:
     """Render the context block injected into the session.
 
@@ -434,8 +526,10 @@ def render_context(
 
     `autoclone` / `keys` are the (optional) Phase-5 runtime-interlock summaries
     from run_autoclone() / run_resolve_keys() — present on the mid-project path,
-    None otherwise. Both are already secret-safe (run_resolve_keys never returns
-    a resolved value).
+    None otherwise. `media` / `validation` are the Wave-2 summaries from
+    run_resolve_media() / run_validate_layers() (image+video/audio gen path +
+    content-layer validation). All are already secret-safe (the media resolvers +
+    resolve_keys never return a resolved value; validation findings are value-free).
     """
     lines: list[str] = []
     lines.append("# website-builder — session context")
@@ -475,6 +569,8 @@ def render_context(
         lines.append("")
         _render_autoclone_section(lines, autoclone)
         _render_keys_section(lines, keys)
+        _render_media_section(lines, media)
+        _render_validation_section(lines, validation)
     else:
         lines.append("## Fresh project (no `.website-builder/` state yet)")
         lines.append("")
@@ -523,6 +619,11 @@ def render_context(
         # value-free fix messages, never resolved secret values.
         "autoclone": autoclone,
         "keys": keys,
+        # Wave-2 summaries (mid-project path only). Both secret-safe: `media` carries
+        # provider/env-var NAMES + presence booleans; `validation` carries value-free
+        # findings (each with a fix path).
+        "media": media,
+        "validation": validation,
     }
     lines.append(json.dumps(payload, indent=2, default=str))
     lines.append("```")
@@ -615,6 +716,63 @@ def _render_keys_section(lines: list[str], keys: dict | None) -> None:
         lines.append("")
 
 
+def _render_media_section(lines: list[str], media: dict | None) -> None:
+    """Append the image + video/audio gen path summary (from run_resolve_media).
+
+    SECRET-SAFE: only provider NAMES, key env-var NAMES, and present/MISSING
+    booleans are rendered — never a resolved secret value. Per decision 56 the
+    surfaced path is consumer-fallback (the user supplies the key).
+    """
+    if not media:
+        return
+    lines.append("## Media generation")
+    lines.append("")
+    if not media.get("available"):
+        lines.append(f"- Media-gen resolution unavailable: {media.get('error', 'unknown')}")
+        lines.append("")
+        return
+    image = media.get("image")
+    if image:
+        lines.append(f"- Image-gen: {image.get('detail', '(unresolved)')}")
+    elif media.get("image_error"):
+        lines.append(f"- Image-gen: {media['image_error']}")
+    video_audio = media.get("video_audio")
+    if video_audio:
+        lines.append(f"- Video/audio-gen: {video_audio.get('detail', '(unresolved)')}")
+    elif media.get("video_audio_error"):
+        lines.append(f"- Video/audio-gen: {media['video_audio_error']}")
+    lines.append("")
+
+
+def _render_validation_section(lines: list[str], validation: dict | None) -> None:
+    """Append the content-layer validation summary (from run_validate_layers).
+
+    Findings are value-free strings, each carrying a fix path. An empty result is
+    surfaced as an explicit OK so the agent knows validation ran.
+    """
+    if not validation:
+        return
+    lines.append("## Content-layer validation")
+    lines.append("")
+    if not validation.get("available"):
+        lines.append(f"- Content-layer validation unavailable: {validation.get('error', 'unknown')}")
+        lines.append("")
+        return
+    if validation.get("status") == "error":
+        lines.append(f"- Content-layer validation error (non-fatal): {validation.get('error', 'unknown')}")
+        lines.append("")
+        return
+    findings = validation.get("findings", [])
+    if not findings:
+        lines.append("- Content layers OK — no cross-layer inconsistencies found.")
+        lines.append("")
+        return
+    lines.append(f"- {len(findings)} content-layer finding(s) (each carries a fix path):")
+    for f in findings:
+        lines.append(f"  - {f}")
+    lines.append("")
+
+
 def _emit(text: str) -> None:
     """Write the context block to stdout, never crashing on console encoding.
 
@@ -673,6 +831,9 @@ def main() -> int:
     state_present = has_state_dir(root)
     autoclone: dict | None = None
     keys: dict | None = None
+    media: dict | None = None
+    validation: dict | None = None
+    orchestrate_block: str | None = None
     if state_present:
         entry: dict = {"mode": "mid-project", "signal": "`.website-builder/` exists"}
         project = read_project_state(root)
@@ -688,20 +849,43 @@ def main() -> int:
             keys = run_resolve_keys(root)
         except Exception as exc:  # noqa: BLE001 — last-resort guard: session-start must never crash
             keys = {"available": True, "status": "error", "error": f"run_resolve_keys wrapper raised: {exc}"}
+        # Wave-2 consumer resolvers — image + video/audio gen path (secret-safe;
+        # consumer-fallback per decision 56) + content-layer validation summary.
+        # Both internally defensive; belt-and-suspenders guard here too.
+        try:
+            media = run_resolve_media(root)
+        except Exception as exc:  # noqa: BLE001 — last-resort guard: session-start must never crash
+            media = {"available": False, "error": f"run_resolve_media wrapper raised: {exc}"}
+        try:
+            validation = run_validate_layers(root)
+        except Exception as exc:  # noqa: BLE001 — last-resort guard: session-start must never crash
+            validation = {"available": True, "status": "error", "error": f"run_validate_layers wrapper raised: {exc}"}
+        # Orchestration spine — re-inject the current phase's entry block on resume
+        # (DESIGN-orchestration-spine.md § 3.4). Internally defensive (returns None
+        # on any failure); belt-and-suspenders guard here too.
+        try:
+            orchestrate_block = run_orchestrate_session_start(root)
+        except Exception:  # noqa: BLE001 — last-resort guard: session-start must never crash
+            orchestrate_block = None
     else:
         entry = detect_entry_mode(root)
         project = None
 
-    _emit(
-        render_context(
-            root=root,
-            state_present=state_present,
-            entry=entry,
-            project=project,
-            autoclone=autoclone,
-            keys=keys,
-        )
+    context = render_context(
+        root=root,
+        state_present=state_present,
+        entry=entry,
+        project=project,
+        autoclone=autoclone,
+        keys=keys,
+        media=media,
+        validation=validation,
     )
+    # The orchestration block is appended to the existing render (plain stdout enters
+    # context for SessionStart — § 2; PostToolUse needs JSON, SessionStart does not).
+    if orchestrate_block:
+        context = context + "\n" + orchestrate_block
+    _emit(context)
     return 0
 
 

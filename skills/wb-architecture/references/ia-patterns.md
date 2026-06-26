@@ -108,8 +108,8 @@ navigation:
 - `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` — accepted IA patterns; nav-pattern subset from the inspiration corpus (Vercel Templates / Cruip / Awwwards / Astro Themes) referenced again at phase 11+ once stack is chosen.
 - `Workstreams/website-builder/foundation/DESIGN-i18n.md` — confirms multilingual sites require a utility-nav language switcher.
 - `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § sitemap.yaml — the schema this phase writes into.
-- `reference/component-patterns/navigation.md` (populated as the agent learns) — canonical nav component archetypes, referenced again at phase 18.
-- `reference/seo-checklists/ia.md` — SEO-driven IA constraints (URL depth, sitemap.xml conventions, breadcrumb schema.org markup).
+- `.website-builder/library/component-patterns/navigation.md` (populated as the agent learns) — canonical nav component archetypes, referenced again at phase 18.
+- `.website-builder/library/seo-checklists/ia.md` — SEO-driven IA constraints (URL depth, sitemap.xml conventions, breadcrumb schema.org markup).
 - Hick's Law — the soft 5-7 primary-nav ceiling rationale. WCAG 2.2 §2.4 Navigable — skip-to-content link, breadcrumb consistency, consistent navigation across pages; phase 21 (a11y audit) verifies.
 
 ## Skip authorization

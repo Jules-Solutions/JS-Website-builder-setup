@@ -12,6 +12,10 @@ relates_to:
   - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
   - Workstreams/website-builder/foundation/DESIGN-architecture.md
   - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md
+library_clones_at_entry:
+  - resource: seo-checklists
+    as: seo-checklists
+    note: "SEO checklists (schema.org corpus reference + structured-data validation patterns)"
 ---
 
 # Phase 26 — SEO + structured data + metadata
@@ -75,7 +79,7 @@ The agent refuses to advance when:
 - **Validation tooling** — Google Rich Results Test (Google-specific rich-result eligibility) and the schema.org Markup Validator (generic schema validity). The agent validates every page's JSON-LD before marking the page done; via `WebFetch`/`Bash` against the validator endpoints or the public test tools.
 - **`Playwright` MCP** — to confirm the metadata actually renders into the served HTML `<head>` (SSR/SSG correctness — a meta tag that only appears after client hydration is invisible to many crawlers; the agent checks the server-rendered source).
 - **`Read`** — `sitemap.yaml` (the page set + types — drives schema.org type per page), `project.yaml.requirements` (audience/intent — drives title/description targeting), the finalized `content/pages/*.md` (the real content the metadata + structured data must mirror), `brand.yaml.voice` (descriptions in voice).
-- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference/seo-checklists/` (per `DESIGN-phase-contracts.md` seed) and `foundation/DESIGN-ecosystem-catalog.md` for schema.org corpus reference data.
+- **Reference-data load** — `.website-builder/library/seo-checklists/` (per `DESIGN-phase-contracts.md` seed) and `foundation/DESIGN-ecosystem-catalog.md` for schema.org corpus reference data.
 
 No subagent spawn. `wb-prelaunch` phase-group skill carries phases 24-27; the structured data emitted here is re-verified rendering-correct in phase 27's cross-browser pass and submitted to Search Console/Bing in phase 30.
 

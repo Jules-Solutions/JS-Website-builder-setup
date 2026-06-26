@@ -1,5 +1,5 @@
 {
-  "description": "website-builder plugin hooks — SessionStart detects entry mode + surfaces project state; PreToolUse gates anti-skip violations against the current phase's exit criteria. Handlers in Python at ${CLAUDE_PLUGIN_ROOT}/hooks-handlers/ per decision 59 + foundation/DESIGN-architecture.md.",
+  "description": "website-builder plugin hooks — SessionStart detects entry mode + surfaces project state (and re-injects the current phase's orchestration block on resume); PreToolUse gates anti-skip violations against the current phase's exit criteria; PostToolUse (Write|Edit|MultiEdit) is the orchestration spine's phase-advance trigger — on a current_phase change it injects the phase-entry block via hookSpecificOutput.additionalContext (foundation/DESIGN-orchestration-spine.md). Handlers in Python at ${CLAUDE_PLUGIN_ROOT}/hooks-handlers/ per decision 59 + foundation/DESIGN-architecture.md.",
   "hooks": {
     "SessionStart": [
       {
@@ -20,6 +20,18 @@
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/pre_tool_use.py\" || python \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/pre_tool_use.py\" || py \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/pre_tool_use.py\"",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/post_tool_use.py\" || python \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/post_tool_use.py\" || py \"${CLAUDE_PLUGIN_ROOT}/hooks-handlers/post_tool_use.py\"",
+            "timeout": 15
           }
         ]
       }

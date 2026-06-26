@@ -13,6 +13,10 @@ relates_to:
   - Workstreams/website-builder/foundation/DESIGN-architecture.md
   - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
   - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
+library_clones_at_entry:
+  - resource: seo-checklists
+    as: seo-checklists
+    note: "Lighthouse-mapped performance + SEO checklists (the baseline phase 22 and 26 audits check against)"
 ---
 
 # Phase 22 — Performance audit
@@ -68,7 +72,7 @@ The score/CWV gates are **not individually overridable** — they are correctnes
 
 - **`Bash`** — to produce the production build (`next build && next start`, `astro build && astro preview`, `hugo`, `vite build && vite preview`) and run the audit: Lighthouse CLI (`lighthouse <url> --only-categories=performance --preset=desktop`/mobile) or Lighthouse CI (`lhci autorun` with a `categories:performance` assertion + CWV assertions). The agent audits the production build, throttled to a mobile profile.
 - **Playwright MCP** — for targeted measurement + reproduction: capturing the LCP element, observing the layout shift live, profiling an interaction's responsiveness, and confirming a fix at the same viewport phase 20 verified.
-- **`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`** — per `DESIGN-context7-integration.md`, phase 22 invokes context7 for the stack's current performance primitives (`/vercel/next.js` `next/image` + `next/font` + dynamic-import API, `/withastro/docs` asset processing + `<Image>` + island hydration strategy, `/GoogleChrome/lighthouse` current scoring + CI config) and `reference/seo-checklists/` Lighthouse-mapped checklists. Perf APIs change (the framework's image/font components evolve); the agent verifies current patterns.
+- **`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`** — per `DESIGN-context7-integration.md`, phase 22 invokes context7 for the stack's current performance primitives (`/vercel/next.js` `next/image` + `next/font` + dynamic-import API, `/withastro/docs` asset processing + `<Image>` + island hydration strategy, `/GoogleChrome/lighthouse` current scoring + CI config) and `.website-builder/library/seo-checklists/` Lighthouse-mapped checklists. Perf APIs change (the framework's image/font components evolve); the agent verifies current patterns.
 - **The image-gen consumer / image tooling** — when an image needs responsive variants + format conversion, the agent uses the phase-8 image pipeline (per `DESIGN-architecture.md` § consumers) to generate optimized sizes/formats, or the stack's build-time image optimizer (`next/image`, Astro `<Image>`, an Eleventy/Hugo image pipeline).
 - **`Edit` / `Write`** — to apply the fixes (swap to `next/image`/`<Image>`, add `font-display` + preload, dynamic-import a heavy component, add explicit image dimensions, split a bundle) and write `audit/PERF-REPORT.md`.
 - **`Read`** — `brand.yaml.tokens` (the phase-17 motion budget + fonts), `components.yaml` (which components were flagged heavy at phase 18), `media/IMAGE-PLAN.md` (image inventory + the LCP candidate).
@@ -115,7 +119,7 @@ Foundation docs:
 - `Workstreams/website-builder/foundation/DESIGN-architecture.md` § consumers (image-gen pipeline for responsive variants) / § Integration with Claude Code primitives / § context7 integration.
 - `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `audit/` conventions; `media/IMAGE-PLAN.md` (the LCP-candidate inventory).
 - `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` — phase 22 invokes context7 for stack perf primitives + Lighthouse scoring; `/GoogleChrome/lighthouse` cross-stack ID.
-- `reference/seo-checklists/` — Lighthouse-mapped performance + SEO checklists (the baseline phase 22 audits against; SEO overlaps at phase 26).
+- `.website-builder/library/seo-checklists/` — Lighthouse-mapped performance + SEO checklists (the baseline phase 22 audits against; SEO overlaps at phase 26).
 
 Core Web Vitals + Lighthouse (mandatory at this phase — current as of the freshness date):
 

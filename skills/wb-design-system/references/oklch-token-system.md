@@ -99,8 +99,8 @@ Current standards context (WebSearch "design system token schema 2026 W3C Design
 
 Per `DESIGN-resource-curation.md` + the phase-17 contract `## Reference materials`:
 
-- `reference/design-systems/` — Material 3 / Apple HIG / IBM Carbon excerpts. Read for **how a mature system maps semantic roles** (their role taxonomy), not for their specific colors.
-- `reference/awesome-design-md-corpus/` — DESIGN.md exemplars (Stripe / Shopify / Notion / Figma). A 10–20-entry aesthetic-matched subset auto-clones into `.website-builder/library/awesome-design-md/` at phase-17 entry (decision 42). Read for **how they articulate a system in prose**, not to copy.
+- `.website-builder/library/design-systems/` — Material 3 / Apple HIG / IBM Carbon excerpts. Read for **how a mature system maps semantic roles** (their role taxonomy), not for their specific colors.
+- `.website-builder/library/awesome-design-md/` — DESIGN.md exemplars (Stripe / Shopify / Notion / Figma). A 10–20-entry aesthetic-matched subset auto-clones into `.website-builder/library/awesome-design-md/` at phase-17 entry (decision 42). Read for **how they articulate a system in prose**, not to copy.
 - Template catalog (`DESIGN-templates-catalog.md`) — 3–5 stack-matched templates surfaced at phase-17 start for **aesthetic-vocabulary discussion only**. Studied, never shipped.
 
 The discipline: exemplars expand the agent's and user's shared vocabulary for *reacting to options*. They are never a source the system is assembled from. The system comes from this project's phase-2 vision + phase-5 voice + the chosen design-skill flavor.

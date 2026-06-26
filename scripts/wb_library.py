@@ -270,18 +270,50 @@ class LibraryEntry:
 # ---------------------------------------------------------------------------
 
 # key -> (source_url_or_ref, type, default_subdir)
+#
+# "bundled" type: source_url_or_ref is a plugin-root-relative path to a
+# reference-corpus/ subdirectory that ships with the plugin.  _fetch_resource
+# copies it with shutil.copytree (no network needed).  Wave-4 addition (corpus-1
+# + corpus-2 RPTs): six bundled keys + Option-A repoint of awesome-design-md-corpus.
 CATALOGUE_CLONE_KEYS: dict[str, tuple[str, str, str]] = {
+    # --- bundled corpora (plugin-shipped; Wave 4 Option-A) ---
     "awesome-design-md-corpus": (
-        "https://github.com/VoltAgent/awesome-design-md",
-        "github-repo",
+        "reference-corpus/awesome-design-md-corpus",
+        "bundled",
         "awesome-design-md",
     ),
-    # alias used in the scripts/README.md phase-17 example
+    "design-systems-corpus": (
+        "reference-corpus/design-systems",
+        "bundled",
+        "design-systems",
+    ),
+    "brand-examples-corpus": (
+        "reference-corpus/brand-examples",
+        "bundled",
+        "brand-examples",
+    ),
+    "voice-archetypes": (
+        "reference-corpus/voice-archetypes",
+        "bundled",
+        "voice-archetypes",
+    ),
+    "component-patterns": (
+        "reference-corpus/component-patterns",
+        "bundled",
+        "component-patterns",
+    ),
+    "seo-checklists": (
+        "reference-corpus/seo-checklists",
+        "bundled",
+        "seo-checklists",
+    ),
+    # --- upstream github (bare alias — stays on upstream; Option A) ---
     "awesome-design-md": (
         "https://github.com/VoltAgent/awesome-design-md",
         "github-repo",
         "awesome-design-md",
     ),
+    # --- docs (context7 / fetch-on-demand) ---
     "shadcn-components": ("/shadcn/ui", "docs", "docs"),
     "astro-content-collections": ("/withastro/docs", "docs", "docs"),
     "stripe-checkout": ("/websites/stripe_js", "docs", "docs"),
@@ -305,6 +337,9 @@ def _resolve_resource(resource: str) -> tuple[str, str, str]:
 
 def _detect_url_type(url: str) -> str:
     """Auto-detect resource type from a URL (DESIGN-resource-curation step 1)."""
+    # Plugin-bundled corpus paths: 'reference-corpus/…' or explicit 'bundled:' prefix.
+    if url.startswith("reference-corpus/") or url.startswith("bundled:"):
+        return "bundled"
     try:
         host = (urlparse(url).hostname or "").lower()
     except ValueError:
@@ -321,6 +356,7 @@ def _detect_url_type(url: str) -> str:
 
 def _default_subdir_for_type(rtype: str) -> str:
     return {
+        "bundled": ".",
         "github-repo": ".",
         "figma": "design-tokens",
         "docs": "docs",
@@ -375,6 +411,14 @@ def _load_project_yaml(project_root: Path) -> dict[str, Any]:
         return _parse_yaml(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
+
+
+def load_project_yaml(project_root: Path) -> dict[str, Any]:
+    """Public alias over _load_project_yaml — the orchestration spine reads
+    current_phase + stack/cms/commerce through this, without reaching into a
+    private or duplicating a loader (DESIGN-orchestration-spine.md § 5.2). Same
+    defensive contract: missing/unreadable project.yaml → {} (never raises)."""
+    return _load_project_yaml(project_root)
 
 
 # ---------------------------------------------------------------------------
@@ -696,6 +740,47 @@ def autoclone_for_state(
                     source_url=source_url,
                 )
             )
+            continue
+
+        # Bundled corpus (plugin-shipped) — copy inline; no network, no deferral.
+        if _rtype == "bundled":
+            lib_target = _library_dir(project_root) / target
+            if lib_target.exists() and any(lib_target.iterdir()):
+                # Filesystem-level idempotency: already on disk (may not be in
+                # the registry yet, e.g. after a fresh project_root copy).
+                results.append(
+                    CloneResult(
+                        resource=resource,
+                        status="skipped",
+                        target=target,
+                        reason="already present on disk (idempotent)",
+                        trigger=trigger,
+                        phase=phase,
+                        source_url=source_url,
+                    )
+                )
+            else:
+                copied = _bundled_copy(source_url, lib_target)
+                results.append(
+                    CloneResult(
+                        resource=resource,
+                        status="cloned" if copied else "error",
+                        target=target,
+                        reason=(
+                            "bundled corpus copied into library/"
+                            if copied
+                            else "bundled copy failed — source dir missing in plugin"
+                        ),
+                        trigger=trigger,
+                        phase=phase,
+                        source_url=source_url,
+                    )
+                )
+                if copied:
+                    emit(
+                        f"[{MODULE_NAME}] bundled '{resource}' -> library/{target} "
+                        f"(source: {source_url})"
+                    )
             continue
 
         # Resolvable + not present. Record intent; defer the network fetch.
@@ -1026,6 +1111,8 @@ def _fetch_resource(
     Never raises on fetch failure — records nothing, returns False, lets the
     caller surface a "fetch deferred" message (Tier-2 discipline).
     """
+    if rtype == "bundled":
+        return _bundled_copy(source_url, target, refresh=refresh)
     if rtype == "github-repo":
         return _git_clone(source_url, target, refresh=refresh)
     # web-page / docs / figma / catalogue refs: the agent fetches via
@@ -1033,6 +1120,31 @@ def _fetch_resource(
     # register-and-defer. (DESIGN-resource-curation: fetch-on-demand is reached
     # by the agent; clone-into-project docs land when the agent does the fetch.)
     return False
+
+
+def _bundled_copy(source_ref: str, target: Path, *, refresh: bool = False) -> bool:
+    """Copy a plugin-bundled reference-corpus directory into target.
+
+    source_ref: a plugin-root-relative path (e.g. 'reference-corpus/voice-archetypes').
+    target:     the destination path inside the project's library/ dir.
+    Returns True if a local copy is available, False on a missing source or OS error.
+    Never raises.
+    """
+    plugin_root = Path(__file__).resolve().parent.parent
+    src = plugin_root / source_ref
+    if not src.is_dir():
+        return False
+    if target.exists():
+        if refresh:
+            shutil.rmtree(target, ignore_errors=True)
+        else:
+            return True  # already present — idempotent
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(src, target)
+        return True
+    except (shutil.Error, OSError):
+        return False
 
 
 def _git_clone(source_url: str, target: Path, *, refresh: bool = False) -> bool:
