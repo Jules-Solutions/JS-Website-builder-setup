@@ -1,0 +1,63 @@
+# tests/cms-adapters/payload/fixture/components.yaml
+# Synthetic component specs at phase-12-complete. Each component becomes one Payload Block config in blocks/{Name}.ts (per cms-payload.md § "Pattern: Pages collection with Blocks field for composable layouts").
+# Minimal 3 components for fixture; production projects ship 13-15+ per the website-starter sibling pattern.
+
+components:
+  - name: Hero
+    payload_block_slug: hero        # → blocks/Hero.ts
+    props:
+      headline: { type: string, max_chars: 60, localized: true }
+      sub: { type: string, max_chars: 120, localized: true }
+      cta_label: { type: string, max_chars: 24, localized: true }
+      cta_href: { type: string }
+      background_image: { type: image, optional: true }
+      variant: { type: select, options: [text-left, text-center, image-right], default: text-center }
+    responsive:
+      mobile_360: { headline_size: 32px, layout: stacked }
+      desktop_1280: { headline_size: 64px, layout: stacked }
+    accessibility:
+      heading_hierarchy: "headline = h1 on home; h2 elsewhere"
+      alt_text_required: background_image
+
+  - name: RichText
+    payload_block_slug: richText    # → blocks/RichText.ts
+    props:
+      content: { type: lexical, localized: true }      # Payload Lexical richText field
+    responsive:
+      mobile_360: { font_size: 16px }
+      desktop_1280: { font_size: 18px }
+    accessibility:
+      heading_hierarchy: "respects markdown heading levels in source"
+
+  - name: FeaturesGrid
+    payload_block_slug: featuresGrid    # → blocks/FeaturesGrid.ts
+    props:
+      heading: { type: string, localized: true }
+      items:
+        type: array
+        max_rows: 6
+        fields:
+          - { name: title, type: string, localized: true }
+          - { name: description, type: string, localized: true }
+          - { name: icon, type: select, options: [check, star, zap, shield] }
+      variant: { type: select, options: [2-col, 3-col, 4-col], default: 3-col }
+    responsive:
+      mobile_360: { columns: 1 }
+      tablet_768: { columns: 2 }
+      desktop_1280: { columns_per_variant: true }
+    accessibility:
+      heading_hierarchy: "heading = h2; item titles = h3"
+
+  - name: CallToAction
+    payload_block_slug: cta             # → blocks/CallToAction.ts
+    props:
+      headline: { type: string, localized: true }
+      sub: { type: string, optional: true, localized: true }
+      cta_label: { type: string, localized: true }
+      cta_href: { type: string }
+      variant: { type: select, options: [primary, secondary, ghost], default: primary }
+    responsive:
+      mobile_360: { layout: stacked }
+      desktop_1280: { layout: inline }
+    accessibility:
+      heading_hierarchy: "headline = h2 (section-level CTA)"

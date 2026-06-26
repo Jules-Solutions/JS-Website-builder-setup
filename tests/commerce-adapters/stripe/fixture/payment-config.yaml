@@ -1,0 +1,58 @@
+# tests/commerce-adapters/stripe/fixture/payment-config.yaml
+# Phase 4 Captain L — Stripe Checkout fixture, phase-24b output.
+#
+# Schema authority: commerce-adapters/payment-config-schema.md
+# This file embodies all 5 conditions of the TWINT contract for CH audience:
+#   (1) stripe provider entry with enabled: true
+#   (2) Stripe payment_methods[] includes twint
+#   (3) Stripe currencies[] includes CHF
+#   (4) regional_overrides.CH.primary is stripe
+#   (5) Captain L's fixture (this file + expected.yaml) embodies the contract
+#
+# Verification contract: a future Phase 5+ test runner loads project.yaml; if
+# audience_regions includes CH, walks payment-config.yaml and asserts all 5
+# conditions. Failure = phase 4 DoD violation.
+
+primary_provider: stripe
+
+providers:
+  - name: stripe
+    enabled: true
+    api_key_env: STRIPE_SECRET_KEY
+    publishable_key_env: STRIPE_PUBLISHABLE_KEY
+    webhook_secret_env: STRIPE_WEBHOOK_SECRET
+    # MANDATORY for TWINT: payment_methods[] includes twint
+    payment_methods: [card, apple_pay, google_pay, twint]
+    # MANDATORY for TWINT: currencies[] includes CHF
+    currencies: [CHF, EUR]
+    # Fixture is test-mode; live-mode flip requires explicit user confirmation
+    # per commerce-stripe.md § Auth model + § Common failure modes
+    test_mode: true
+    test_keys_env:
+      api_key: STRIPE_TEST_SECRET_KEY
+      publishable_key: STRIPE_TEST_PUBLISHABLE_KEY
+
+  # Secondary provider: PayPal for legacy-trust audiences (older / international
+  # customers preferring PayPal). Note: PayPal does NOT bridge TWINT; CHF
+  # TWINT only flows via the Stripe provider.
+  - name: paypal
+    enabled: true
+    client_id_env: PAYPAL_CLIENT_ID
+    client_secret_env: PAYPAL_CLIENT_SECRET
+    payment_methods: [paypal, pay_later]
+    currencies: [CHF, EUR]
+    test_mode: true
+
+# Regional overrides per audience. CH override is MANDATORY per TWINT
+# contract point 4 — forces the TWINT-enabled flow for Swiss-origin
+# transactions.
+regional_overrides:
+  CH:
+    primary: stripe       # MANDATORY: forces TWINT-enabled flow for Swiss customers
+    secondary: paypal     # legacy-trust fallback
+  DE:
+    primary: stripe       # standard EU Stripe flow (cards + SEPA + Klarna)
+    secondary: paypal
+  AT:
+    primary: stripe
+    secondary: paypal

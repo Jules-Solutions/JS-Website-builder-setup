@@ -1,0 +1,27 @@
+---
+# tests/cms-adapters/none/fixture/project.yaml
+# Synthetic phase-12-complete fixture state for cms-none adapter validation.
+# Per tests/cms-adapters/README.md § "Per-CMS fixture notes" — none/ fixture.
+
+name: still-humans
+description: "Synthetic fixture — a writer's brochure site with weekly essays. Filler content; tests the cms-none adapter's content-layer mapping at phase 12 complete."
+
+stack: astro              # default Native pairing for cms-none per cms-adapters/README.md cross-CMS × stack table
+cms: none                 # this fixture's identity
+transactional: false      # commerce branch NOT exercised in Phase 4 fixture; commerce/payload-commerce/ are Phase 10+ scope
+entry_mode: greenfield    # Scenario B per DESIGN-cms-none.md § "Phase 6.5 ingestion"
+
+default_language: en
+languages: [en, de]       # multilingual coverage — exercises i18n path per README line 161 strongly-recommended guidance
+language_routing: prefix  # per Decision 38 default
+rtl_languages: []
+
+audience_regions: [CH, DE]   # illustrative — Swiss + DACH
+
+# Phase-11 transactional sibling decision: false
+# Phase-12 CMS decision: none (this file's identity)
+phase_state:
+  phase_11_stack_locked: true
+  phase_11_transactional_sibling_locked: true
+  phase_12_cms_locked: true
+  current_phase: 13          # ready for phase 13 (content per page) onward

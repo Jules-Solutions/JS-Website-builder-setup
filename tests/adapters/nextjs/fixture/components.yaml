@@ -1,0 +1,50 @@
+# Components — fixture. 3 component types. Each composes shadcn primitives.
+# Maps to Next.js: components/{Name}.tsx (RSC-by-default; 'use client' where interactivity needed).
+
+components:
+  - name: HeroBlock
+    purpose: "Top-of-page hero — headline + sub + optional CTA"
+    rendering: server   # Static-display; Server Component
+    props:
+      headline: { type: string, max_chars: 60 }
+      sub: { type: string, max_chars: 120 }
+      cta_text: { type: string, max_chars: 24, optional: true }
+      cta_href: { type: string, optional: true }
+      background_image: { type: image, optional: true }
+    shadcn_primitives: [button]
+    responsive:
+      mobile_360: { headline_size: 32px, layout: stacked }
+      desktop_1280: { headline_size: 64px, layout: stacked }
+    accessibility:
+      heading_hierarchy: "headline = h1 (only on home), h2 elsewhere"
+      alt_text_required: background_image
+      cta_contrast_ratio: "4.5:1"
+
+  - name: NavBar
+    purpose: "Header navigation — primary nav + language switcher"
+    rendering: server   # Server Component for the shell; LanguageSwitcher child is Client
+    props:
+      logo_text: { type: string }
+      nav_items: { type: array, items: { type: object } }
+    shadcn_primitives: [button, dropdown-menu, sheet]   # sheet for mobile hamburger
+    children_clients: [LanguageSwitcher]
+    responsive:
+      mobile_360: { layout: hamburger }
+      desktop_1280: { layout: horizontal_inline }
+    accessibility:
+      landmark: "<nav>"
+      mobile_drawer_focus_trap: true
+      keyboard_nav: "Tab + Arrow + Enter + Escape"
+
+  - name: FooterBlock
+    purpose: "Site footer — secondary nav + copyright + language switcher"
+    rendering: server
+    props:
+      copyright: { type: string }
+      footer_nav_items: { type: array }
+    shadcn_primitives: [button]
+    responsive:
+      mobile_360: { layout: stacked }
+      desktop_1280: { layout: horizontal }
+    accessibility:
+      landmark: "<footer>"

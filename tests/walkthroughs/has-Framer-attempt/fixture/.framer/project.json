@@ -1,0 +1,10 @@
+{
+  "name": "Still Humans (fixture)",
+  "version": "1.0",
+  "framerVersion": "2024.10",
+  "id": "fixture-framer-project-id",
+  "createdAt": "2026-04-01T12:00:00Z",
+  "updatedAt": "2026-05-09T18:30:00Z",
+  "primaryDomain": null,
+  "_note": "Mock Framer project metadata for entry-mode detection fixture. Schema mirrors Framer's project.json shape but contains no real project data."
+}

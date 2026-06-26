@@ -1,0 +1,21 @@
+# tests/cms-adapters/decap/fixture/.website-builder/project.yaml
+# Fixture baseline: phase-12-complete
+# Synthetic — no real client, no real brand. Filler content; the contract is the shape.
+
+project:
+  name: synthetic-decap-fixture
+  description: Phase-12-complete fixture exercising the Decap CMS adapter
+  entry_mode: greenfield
+
+stack: astro                    # Decap + Astro = Native pairing (default per cms-adapters/README.md cross-CMS × stack anchor)
+cms: decap                       # this fixture's identity
+
+transactional: false             # commerce branch NOT exercised in Phase 4 fixture (Phase 10+ scope)
+
+languages: [en, de]              # exercises i18n per Decision 39 Pattern A (multiple_files)
+default_language: en
+language_routing: prefix
+fallback_strategy: missing-key-shows-default
+rtl_languages: []
+
+audience_regions: [CH, DE]       # Swiss + German audiences — realistic muggle target for DE/EN

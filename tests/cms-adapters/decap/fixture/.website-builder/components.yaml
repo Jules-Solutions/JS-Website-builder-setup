@@ -1,0 +1,32 @@
+# tests/cms-adapters/decap/fixture/.website-builder/components.yaml
+# Layer 2 — section / component shapes. Maps 1:1 to Decap's list+types pattern.
+
+sections:
+  - name: hero
+    label: Hero
+    fields:
+      - { name: headline, widget: string, i18n: true }
+      - { name: sub, widget: text, i18n: true }
+      - { name: cta_label, widget: string, i18n: true }
+      - { name: cta_href, widget: string, i18n: false }
+      - { name: background, widget: image, required: false }
+      - { name: variant, widget: select, options: [text-left, text-center, image-right], default: text-left }
+
+  - name: rich_text
+    label: "Rich Text"
+    fields:
+      - { name: body, widget: markdown, i18n: true }
+
+  - name: cta
+    label: CTA
+    fields:
+      - { name: headline, widget: string, i18n: true }
+      - { name: sub, widget: text, i18n: true }
+      - { name: button_label, widget: string, i18n: true }
+      - { name: button_href, widget: string, i18n: false }
+
+shared:
+  - name: NavBar
+    description: Site-wide navigation bar; consumes nav.* strings from L3
+  - name: FooterBlock
+    description: Site-wide footer; consumes footer.* strings from L3

@@ -1,0 +1,2 @@
+# Keeps the empty library/ dir in git. The auto-clone runtime + `wb library add`
+# populate this dir at runtime; the fixture ships it empty so tests start clean.

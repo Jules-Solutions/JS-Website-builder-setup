@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "courses": "Courses",
+    "consulting": "Consulting",
+    "language_switcher_label": "Language"
+  },
+  "hero": {
+    "headline": "Stay sharp in the AI era",
+    "subheadline": "Practical training and consulting for knowledge workers — make AI a daily tool, not an existential question.",
+    "cta_primary": "Browse courses",
+    "cta_secondary": "Book a consult"
+  },
+  "courses": {
+    "index_title": "Courses",
+    "foundations_title": "Foundations of Practical AI Use",
+    "foundations_description": "A 6-week cohort program covering the daily-driver workflows that compound across your week.",
+    "foundations_buy_button": "Enroll — CHF 49",
+    "applied_title": "Applied AI for Knowledge Workers",
+    "applied_description": "Intermediate course focused on agent-assisted research, writing, and decision support patterns.",
+    "applied_buy_button": "Enroll — CHF 149"
+  },
+  "consult": {
+    "title": "Consulting — One-on-One Strategy",
+    "description": "60-minute strategy session, bookable quarterly. Designed for executives and senior knowledge workers who want personalized guidance.",
+    "buy_button": "Subscribe — CHF 299/quarter"
+  },
+  "checkout": {
+    "redirect_message": "Redirecting to secure checkout..."
+  },
+  "post_checkout": {
+    "success_title": "Thank you for your purchase",
+    "success_body": "We've sent your confirmation and access details to your email. If anything looks off, reply to that email and we'll fix it within one business day.",
+    "cancel_title": "Checkout canceled",
+    "cancel_body": "Your transaction was canceled and you have not been charged. Pick up where you left off whenever you're ready."
+  },
+  "footer": {
+    "refunds": "Refunds",
+    "tcs_of_sale": "Terms of Sale",
+    "imprint": "Imprint",
+    "privacy": "Privacy"
+  },
+  "payment_methods_disclosure": {
+    "ch": "Accepted in Switzerland: TWINT, Visa, Mastercard, Apple Pay, Google Pay, PayPal.",
+    "eu": "Accepted in the EU: Visa, Mastercard, SEPA Direct Debit, Apple Pay, Google Pay, PayPal."
+  }
+}

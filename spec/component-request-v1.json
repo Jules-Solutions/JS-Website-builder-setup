@@ -1,0 +1,323 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jules.solutions/website-builder/spec/component-request-v1.json",
+  "title": "component-request-v1",
+  "description": "The v1 contract for the agent -> external-tool handoff brief. The agent emits a JSON file at .website-builder/briefs/{component}-{ts}.json matching this schema; the user pastes it into ChatGPT / Claude.ai / v0 / Cursor / Lovable / Bolt.new or hands it to a human freelancer. Stack-agnostic: the same brief retargets to any output stack by editing only the output_format block. Concrete realisation of handoff-spec/component-request-v1.md (block-by-block SSOT) + DESIGN-handoff-protocol.md + DESIGN-content-layers.md Layer 5. Per locked decisions 24 (protocol is fundamental) + 35 (default agent-writes-code; brief-emit opt-in).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "$version",
+    "type",
+    "id",
+    "created",
+    "iteration",
+    "subject",
+    "brand_context",
+    "request",
+    "output_format",
+    "iteration_history",
+    "instructions_for_external_tool"
+  ],
+  "properties": {
+    "$schema": {
+      "description": "Schema identifier the brief declares. The plugin's session-start hook matches this to look up the right parser. Relative-path form per JSON-Schema-in-plugin convention (DESIGN-handoff-protocol.md 'Schema location precedent').",
+      "const": "spec/component-request-v1.json"
+    },
+    "$version": {
+      "description": "Spec version. Breaking changes ship as component-request-v2 with migration notes.",
+      "const": "v1"
+    },
+    "type": {
+      "description": "Discriminator. Always component-request for this schema.",
+      "const": "component-request"
+    },
+    "id": {
+      "description": "Round-trip binding key — output files reference it back. Format: {component-slug}-{iso-8601-ts} with NO colons in the timestamp (filename-safe) and a Z suffix for UTC. e.g. hero-block-2026-05-19T16-32-00Z.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}Z$"
+    },
+    "created": {
+      "description": "Emission timestamp, ISO 8601 UTC (with colons; this is a real timestamp, not a filename).",
+      "type": "string",
+      "format": "date-time"
+    },
+    "iteration": {
+      "description": "Round counter. 0 = first emission; 1 = first re-attempt with iteration_history populated. Must equal iteration_history length.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "subject": { "$ref": "#/$defs/subject" },
+    "brand_context": { "$ref": "#/$defs/brand_context" },
+    "request": { "$ref": "#/$defs/request" },
+    "output_format": { "$ref": "#/$defs/output_format" },
+    "iteration_history": {
+      "description": "Round-trip memory. Empty array on round 0. Each entry carries what a prior attempt got wrong so the next round-trip improves.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/iteration_entry" }
+    },
+    "instructions_for_external_tool": {
+      "description": "Templated instruction string the agent generates from the other blocks. Carries the load-bearing 'use ONLY the provided design tokens' discipline clause. The user may edit before pasting, but the agent warns if the discipline clause is removed.",
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "subject": {
+      "title": "subject",
+      "description": "What is being generated. handoff-spec/component-request-v1.md Block 1.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name", "purpose"],
+      "properties": {
+        "kind": {
+          "description": "What class of artifact. Most briefs are component.",
+          "type": "string",
+          "enum": ["component", "page", "section", "full-site"]
+        },
+        "name": {
+          "description": "PascalCase component name (or kebab-case page slug for kind: page).",
+          "type": "string",
+          "minLength": 1
+        },
+        "purpose": {
+          "description": "1-2 sentences. Why this exists in the project.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "brand_context": {
+      "title": "brand_context",
+      "description": "The brand the external tool must respect. Sourced from .website-builder/ project state at emission time. The external tool MUST use ONLY tokens from this block. handoff-spec/component-request-v1.md Block 2.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["voice", "color_palette", "typography", "spacing", "motion", "dark_mode"],
+      "properties": {
+        "voice": {
+          "description": "Brand voice from phase-5 outputs.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["descriptors"],
+          "properties": {
+            "descriptors": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            "exemplars_say": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "exemplars_avoid": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "color_palette": {
+          "description": "brand.yaml.tokens.colors (Layer 1). OKLCH always — perceptually uniform, predictable contrast. Free-form key -> OKLCH-string map (primary / neutral_900 / semantic_error / etc.).",
+          "type": "object",
+          "minProperties": 1,
+          "patternProperties": {
+            "^[a-z0-9_]+$": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": false
+        },
+        "typography": {
+          "description": "brand.yaml.tokens.typography (Layer 1). Display / body / mono families + a type scale.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["display", "body"],
+          "properties": {
+            "display": { "type": "string", "minLength": 1 },
+            "body": { "type": "string", "minLength": 1 },
+            "mono": { "type": "string", "minLength": 1 },
+            "scale": {
+              "description": "Map of role (h1 / h2 / body / ...) -> { size, lh, weight }.",
+              "type": "object",
+              "additionalProperties": { "$ref": "#/$defs/type_scale_entry" }
+            }
+          }
+        },
+        "spacing": {
+          "description": "brand.yaml.tokens.spacing (Layer 1). Base unit + scale array.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["base_unit", "scale"],
+          "properties": {
+            "base_unit": { "type": "string", "minLength": 1 },
+            "scale": {
+              "type": "array",
+              "items": { "type": ["number", "string"] },
+              "minItems": 1
+            }
+          }
+        },
+        "motion": {
+          "description": "brand.yaml.tokens.motion (Layer 1). Duration(s) + easing + preference.",
+          "type": "object",
+          "required": ["preference"],
+          "properties": {
+            "easing_default": { "type": "string" },
+            "preference": {
+              "type": "string",
+              "enum": ["subtle", "lively", "none"]
+            }
+          },
+          "patternProperties": {
+            "^duration_[a-z0-9]+$": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "dark_mode": {
+          "description": "brand.yaml.tokens.dark_mode (Layer 1).",
+          "type": "string",
+          "enum": ["auto", "manual", "none"]
+        }
+      }
+    },
+    "type_scale_entry": {
+      "title": "type_scale_entry",
+      "description": "One role in the type scale: size + line-height + weight.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["size"],
+      "properties": {
+        "size": { "type": "string", "minLength": 1 },
+        "lh": { "type": ["string", "number"] },
+        "weight": { "type": ["integer", "string"] }
+      }
+    },
+    "request": {
+      "title": "request",
+      "description": "What is actually wanted. Sourced from components.yaml if the component exists; from a freshly-drafted spec if net-new at phase 18. handoff-spec/component-request-v1.md Block 3.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["props", "behavior", "responsive", "accessibility"],
+      "properties": {
+        "props": {
+          "description": "Map of prop-name -> typed prop descriptor.",
+          "type": "object",
+          "minProperties": 0,
+          "additionalProperties": { "$ref": "#/$defs/prop" }
+        },
+        "behavior": {
+          "description": "Bullet list of behavioural requirements. Plain prose.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "responsive": {
+          "description": "Per phase-14 breakpoints. Keys are breakpoint names (mobile_360 / tablet_768 / desktop_1280 or whatever the project uses); values are free-form breakpoint spec objects.",
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "accessibility": {
+          "description": "Required a11y obligations the external tool must honour.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["heading_hierarchy", "contrast_ratio", "keyboard_nav"],
+          "properties": {
+            "heading_hierarchy": { "type": "string", "minLength": 1 },
+            "alt_text_required": {
+              "description": "Image prop(s) requiring alt text. String or array of strings.",
+              "type": ["string", "array"],
+              "items": { "type": "string" }
+            },
+            "contrast_ratio": { "type": "string", "minLength": 1 },
+            "keyboard_nav": { "type": "string", "minLength": 1 }
+          }
+        },
+        "states": {
+          "description": "Default / loading / hover / focus / error states as applicable. Map of state-name -> description.",
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "prop": {
+      "title": "prop",
+      "description": "A single typed component prop. handoff-spec/component-request-v1.md Block 3 props table.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "image", "boolean", "enum", "array", "object"]
+        },
+        "max_chars": { "type": "integer", "minimum": 1 },
+        "required": { "type": "boolean" },
+        "default": {}
+      }
+    },
+    "output_format": {
+      "title": "output_format",
+      "description": "What the external tool should produce. The ONLY block that varies by stack — change it to retarget the same brief to a different stack. handoff-spec/component-request-v1.md Block 4.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["framework", "library", "style_system", "language", "file_count_hint"],
+      "properties": {
+        "framework": {
+          "type": "string",
+          "enum": ["react", "vue", "svelte", "astro", "solid", "vanilla-js", "php", "framer-custom-component"]
+        },
+        "library": {
+          "type": "string",
+          "enum": ["shadcn", "radix", "mantine", "headless-ui", "daisy-ui", "framer-stock", "wp-gutenberg", "none"]
+        },
+        "style_system": {
+          "type": "string",
+          "enum": ["tailwind", "css-modules", "vanilla-css", "styled-components", "emotion", "framer-style"]
+        },
+        "language": {
+          "type": "string",
+          "enum": ["tsx", "jsx", "vue-sfc", "svelte", "astro", "php", "html-css-js"]
+        },
+        "file_path_hint": {
+          "description": "Suggestion only — external tools place files where they default; the agent moves on ingest.",
+          "type": "string"
+        },
+        "file_count_hint": {
+          "description": "Integer — 1 for a single component; >1 when multi-file output is expected.",
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "iteration_entry": {
+      "title": "iteration_entry",
+      "description": "One round-trip record. handoff-spec/component-request-v1.md Block 5.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["iteration", "tool_used", "timestamp", "issues_found"],
+      "properties": {
+        "iteration": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_used": {
+          "description": "Free-form (v0 / chatgpt / claude-ai / cursor / lovable / bolt-new / human-freelancer-{name}).",
+          "type": "string",
+          "minLength": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "output_ingested_at": {
+          "description": "Path the output was saved at, e.g. .website-builder/outputs/HeroBlock-...tsx.",
+          "type": "string"
+        },
+        "issues_found": {
+          "description": "Issues the palette validator + token-fidelity sweep caught on this round. Carried into the next round's instructions_for_external_tool.",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

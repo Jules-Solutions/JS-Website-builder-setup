@@ -1,0 +1,38 @@
+# tests/cms-adapters/payload/fixture/project.yaml
+# Synthetic .website-builder/project.yaml at phase-12-complete baseline for Payload CMS adapter testing.
+# Paired stack: Next.js + shadcn (the only Native pairing for Payload v3 per cms-adapters/README.md cross-CMS × stack table).
+# Two-deploy headless mode with Astro/SvelteKit (S3) is documented in cms-payload.md but NOT exercised by this fixture (Phase 10+ scope).
+
+project_name: payload-fixture
+default_language: en
+languages: [en, de]            # multilingual coverage exercises i18n integration per Decision 39 Pattern A
+language_routing: prefix
+fallback_strategy: missing-key-shows-default
+rtl_languages: []
+
+stack: nextjs                  # phase 11 locked
+cms: payload                   # phase 12 locked (the contract this fixture tests)
+transactional: false           # phase 11 transactional sibling — false in this fixture; commerce branch not exercised (Phase 10+ payload-commerce/ fixture)
+component_library: shadcn
+
+# Phase 12 CMS sub-decisions captured (S4 — three-way DB/hosting decision)
+cms_config:
+  db_decision: vercel-marketplace-neon        # Payload Cloud | vercel-marketplace-neon | direct-neon | supabase | self-hosted
+  db_adapter: postgres                        # postgres | mongo | sqlite
+  hosting_decision: vercel                    # payload-cloud | vercel | render | railway | fly | self-hosted
+  blocks_localization_approach: 2             # 1 = entire layout localized (per-locale layouts); 2 = fields-inside-blocks localized (shared layout, translated text) — default per Decision 39 Pattern A
+  strings_layer_option: A                     # A = CDJSON kept in messages/{lang}.json via next-intl (default); B = Strings global with localized fields
+
+entry_mode: greenfield
+provenance:
+  fixture_baseline: phase-12-complete
+  paired_with_captain: G (stack-nextjs)
+  authoring_captain: K (cms-payload)
+  authored: 2026-05-20
+
+# Environment variables Payload requires at runtime (referenced only — values not in fixture, schema-only)
+env_requirements:
+  - PAYLOAD_SECRET                # openssl rand -hex 32; per secrets-conventions.md from 1Password
+  - DATABASE_URI                  # Postgres connection string (Neon / Vercel-Marketplace-Neon)
+  - NEXT_PUBLIC_SITE_URL          # http://localhost:3000 dev; production URL prod
+  - REVALIDATE_SECRET             # ISR revalidation shared secret for afterChange hooks

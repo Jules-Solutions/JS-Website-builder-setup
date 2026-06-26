@@ -1,0 +1,14 @@
+[project]
+name = "website-builder-tests"
+version = "0.1.0"
+description = "Plugin-level test infrastructure for the website-builder CC plugin (Phase 1 / Captain E scope: entry-mode detection + bootstrap initialization smoke tests)."
+requires-python = ">=3.11"
+dependencies = [
+  "pytest>=8.0",
+  "pyyaml>=6.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["smoke_test.py", "test_*.py"]
+addopts = "-v --tb=short"

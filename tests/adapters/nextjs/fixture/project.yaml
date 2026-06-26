@@ -1,0 +1,45 @@
+# Synthetic Next.js + shadcn project state — phase-11-complete fixture.
+# Mirrors the canonical project.yaml schema per DESIGN-project-scaffold.md.
+
+name: "wb-fixture-nextjs"
+current_phase: 11
+entry_mode: greenfield
+
+# Phase 11 outputs (stack decision + transactional sibling)
+stack: nextjs
+stack_reasoning: |
+  User wants a real codebase they can read + extend a year out (5/5 code comfort).
+  Vercel-first host preference. Visual canvas not load-bearing.
+  Site stays small-to-medium (5 pages baseline; may grow to ~15-20).
+  Next.js + shadcn is the right choice over Framer (canvas-led) and WordPress (PHP/host-managed).
+transactional: false
+transactional_kind: none
+transactional_reasoning: |
+  No payments, no bookings. Marketing site for a designer consultancy.
+  If user later wants to add a paid course (decision 34 pivot), restart from phase 12.
+
+# Phase 17 + 18 outputs (design system + component library)
+component_library:
+  primary: shadcn-ui
+  complementary: []   # magic-ui not added — no motion-heavy sections in this fixture
+
+# i18n (locked at session-start; see content/strings/)
+languages: [en, de]
+default_language: en
+language_routing: prefix   # /en/about + /de/about (default prefix routing per decision 38)
+rtl_languages: []
+language_regions:          # region-targeted hreflang codes per i18n/hreflang.md#next-js--shadcn
+  en: en
+  de: de-CH
+
+# Deploy
+host: vercel
+canonical_host: https://wb-fixture-nextjs.vercel.app
+
+# CMS (phase 12 — expected output documented in expected.yaml)
+# This field will be written by phase 12; left unset here as the fixture
+# baseline is phase-11-complete (CMS pick is downstream).
+# cms: null
+
+# Maintainer template (phase 31+) — kept for completeness
+maintenance_cadence: monthly

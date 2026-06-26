@@ -1,0 +1,485 @@
+#!/usr/bin/env bash
+# scripts/install-skills.sh — fetch upstream design-skill flavors per locked decision 32.
+#
+# v0.1 scope per locked decision 55: fetches the UI/UX Pro Max skill only.
+# Other 5 flavors (Impeccable / Emil Kowalski / Taste / Framer Motion / 21st.dev) ship
+# in expansion phase 10 — this script is structured to extend, but those branches are
+# stubbed for v0.1 and surface a "deferred" message if requested.
+#
+# Invoked by the wb-bootstrap skill (skills/wb-bootstrap/SKILL.md) at first-run, and
+# re-invokeable via `wb skills update` (per locked decision 48; CLI ships in Phase 5).
+#
+# Idempotent: re-running detects existing installs via skills-installed.yaml in the
+# user's project's .website-builder/ directory and only fetches what's missing.
+#
+# See:
+#   - Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md
+#   - Workstreams/website-builder/skills-bundle/ui-ux-pro-max.md  (composition manifest;
+#     authored in Phase 5 — for v0.1 this script uses inline metadata; the manifest read
+#     path lands when Phase 5 ships skills-bundle/ content).
+#   - .claude/rules/tool-dependency-discipline.md (Tier 2 third-party-failure handling)
+
+set -euo pipefail
+
+# ---------- Configuration ----------
+
+SCRIPT_NAME="install-skills.sh"
+SCRIPT_VERSION="0.1.0"
+
+# v0.1 known skills. Format per entry:
+#   ID|name|upstream_method|upstream_ref|marketplace_source|status|notes
+# upstream_method: "registry" (Claude Code plugin marketplace) | "git" (git clone) | "deferred" (not in v0.1)
+# upstream_ref:
+#   - registry  → the `/plugin install` id in <plugin>@<marketplace> form
+#                 (e.g. ui-ux-pro-max@ui-ux-pro-max-skill). NOTE: this is the INSTALL id,
+#                 distinct from the Skill-tool INVOKE id which is <plugin>:<skill>
+#                 (e.g. ui-ux-pro-max:ui-ux-pro-max). See DESIGN-skill-distribution.md.
+#   - git       → the clone URL.
+#   - deferred  → a placeholder URL (no real install in v0.1).
+# marketplace_source: registry → the `/plugin marketplace add` argument (owner/repo or URL);
+#                     empty for git/deferred rows.
+# Forms verified 2026-06-16 against the upstream repo manifests (marketplace.json name
+# `ui-ux-pro-max-skill`, plugin.json name `ui-ux-pro-max`) + the canonical CC plugin docs
+# (code.claude.com: `/plugin install plugin@marketplace`; invoke via `/plugin:skill`). Decision 90.
+# For v0.1, UI/UX Pro Max is the only active entry; the others are tracked as deferred so
+# the script can surface a clear "ships in expansion phase 10" message if requested.
+KNOWN_SKILLS=(
+  "ui-ux-pro-max|UI/UX Pro Max|registry|ui-ux-pro-max@ui-ux-pro-max-skill|nextlevelbuilder/ui-ux-pro-max-skill|active|v0.1 default per decision 55"
+  "impeccable|Impeccable|deferred|https://impeccable.style||deferred|expansion phase 10"
+  "emil-kowalski|Emil Kowalski|deferred|https://emilkowal.ski/skill||deferred|expansion phase 10"
+  "taste|Taste|deferred|https://tasteskill.dev||deferred|expansion phase 10"
+  "framer-motion|Framer Motion|deferred|https://github.com/C-Jeril/framer-motion-skills||deferred|expansion phase 10"
+  "twenty-first-dev|21st.dev Magic|deferred|https://21st.dev||deferred|expansion phase 10"
+)
+
+# ---------- OS detection + paths ----------
+
+detect_os() {
+  case "$(uname -s 2>/dev/null || echo unknown)" in
+    Darwin*)              echo "macos" ;;
+    Linux*)               echo "linux" ;;
+    MINGW*|CYGWIN*|MSYS*) echo "windows-bash" ;;
+    *)                    echo "unknown" ;;
+  esac
+}
+
+cc_skills_dir() {
+  local os="$1"
+  case "$os" in
+    macos|linux)      echo "${HOME}/.claude/skills" ;;
+    windows-bash)     echo "${USERPROFILE:-${HOME}}/.claude/skills" ;;
+    *)                echo "" ;;  # caller must check empty
+  esac
+}
+
+# ---------- Output helpers ----------
+
+# Strip ANSI when not on a TTY; lightweight color via tput when available.
+if [[ -t 1 ]] && command -v tput >/dev/null 2>&1; then
+  COLOR_BOLD="$(tput bold 2>/dev/null || true)"
+  COLOR_GREEN="$(tput setaf 2 2>/dev/null || true)"
+  COLOR_YELLOW="$(tput setaf 3 2>/dev/null || true)"
+  COLOR_RED="$(tput setaf 1 2>/dev/null || true)"
+  COLOR_CYAN="$(tput setaf 6 2>/dev/null || true)"
+  COLOR_RESET="$(tput sgr0 2>/dev/null || true)"
+else
+  COLOR_BOLD=""
+  COLOR_GREEN=""
+  COLOR_YELLOW=""
+  COLOR_RED=""
+  COLOR_CYAN=""
+  COLOR_RESET=""
+fi
+
+log_info() {  printf "%s[install-skills]%s %s\n" "$COLOR_CYAN" "$COLOR_RESET" "$*" ; }
+log_ok()   {  printf "%s[install-skills]%s %s\n" "$COLOR_GREEN" "$COLOR_RESET" "$*" ; }
+log_warn() {  printf "%s[install-skills]%s %s\n" "$COLOR_YELLOW" "$COLOR_RESET" "$*" >&2 ; }
+log_err()  {  printf "%s[install-skills]%s %s\n" "$COLOR_RED" "$COLOR_RESET" "$*" >&2 ; }
+
+# ---------- Skill registry parsing ----------
+
+# Look up a skill row by id; emits to stdout the pipe-delimited row, or empty + nonzero exit.
+lookup_skill() {
+  local id="$1"
+  for row in "${KNOWN_SKILLS[@]}"; do
+    if [[ "${row%%|*}" == "$id" ]]; then
+      echo "$row"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Parse a row into individual variables (returns via global SKILL_ID etc.). Bash 3.2 safe.
+parse_skill_row() {
+  local row="$1"
+  IFS='|' read -r SKILL_ID SKILL_NAME SKILL_METHOD SKILL_REF SKILL_MARKETPLACE SKILL_STATUS SKILL_NOTES <<< "$row"
+}
+
+# ---------- Install state tracking ----------
+
+# Path of the per-project skills-installed.yaml. Default: cwd/.website-builder/skills-installed.yaml.
+# wb-bootstrap invokes us from the user's project root, so cwd is correct.
+SKILLS_INSTALLED_YAML=".website-builder/skills-installed.yaml"
+
+ensure_state_yaml() {
+  local dir
+  dir="$(dirname "$SKILLS_INSTALLED_YAML")"
+  if [[ ! -d "$dir" ]]; then
+    log_warn "Project state dir '$dir' doesn't exist. Creating it (this should normally be pre-created by wb-bootstrap)."
+    mkdir -p "$dir"
+  fi
+  if [[ ! -f "$SKILLS_INSTALLED_YAML" ]]; then
+    cat > "$SKILLS_INSTALLED_YAML" <<EOF
+version: 1
+# Generated by scripts/install-skills.sh — records per-skill install state.
+# Used by 'wb skills sync' to re-create installs on a second machine.
+installed_at: ""
+skills: []
+EOF
+  fi
+}
+
+# Returns 0 if the skill id is already recorded as installed in the state yaml.
+is_recorded_installed() {
+  local id="$1"
+  if [[ ! -f "$SKILLS_INSTALLED_YAML" ]]; then
+    return 1
+  fi
+  # Lightweight grep — full YAML parsing happens in `wb skills sync` (Phase 5).
+  grep -q "^  - name: ${id}\$" "$SKILLS_INSTALLED_YAML" 2>/dev/null
+}
+
+# Append an install record to the state yaml. Uses simple text append; the wb CLI in Phase 5
+# replaces this with proper YAML manipulation.
+record_install() {
+  local id="$1" role="$2" upstream_ref="$3" install_path="$4" install_method="$5"
+  local now
+  now="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || echo 'unknown')"
+
+  # Update top-level installed_at only if currently empty.
+  if grep -q '^installed_at: ""' "$SKILLS_INSTALLED_YAML" 2>/dev/null; then
+    # Portable in-place edit: write new file then move
+    awk -v ts="$now" '
+      /^installed_at: ""$/ { print "installed_at: \"" ts "\""; next }
+      { print }
+    ' "$SKILLS_INSTALLED_YAML" > "${SKILLS_INSTALLED_YAML}.tmp"
+    mv "${SKILLS_INSTALLED_YAML}.tmp" "$SKILLS_INSTALLED_YAML"
+  fi
+
+  # Append a skills entry. If the skills: list was empty (`skills: []`), expand it.
+  if grep -q '^skills: \[\]$' "$SKILLS_INSTALLED_YAML" 2>/dev/null; then
+    awk '/^skills: \[\]$/ { print "skills:"; next } { print }' \
+      "$SKILLS_INSTALLED_YAML" > "${SKILLS_INSTALLED_YAML}.tmp"
+    mv "${SKILLS_INSTALLED_YAML}.tmp" "$SKILLS_INSTALLED_YAML"
+  fi
+
+  cat >> "$SKILLS_INSTALLED_YAML" <<EOF
+  - name: ${id}
+    role: ${role}
+    upstream_ref: ${upstream_ref}
+    install_path: ${install_path}
+    install_method: ${install_method}
+    fetched_at: "${now}"
+EOF
+}
+
+# ---------- Install methods ----------
+
+# Per locked decision 32, the canonical UI/UX Pro Max install path is via the Claude Code
+# skill registry. The exact registry-fetch protocol is upstream-blessed and may change as
+# CC's plugin/skill ecosystem evolves; this v0.1 stub does the right thing AND surfaces a
+# clear "registry fetch goes here" pointer so a future Phase 5 Captain can plug in the
+# actual registry call without rewriting the script.
+install_via_registry() {
+  local id="$1" name="$2" upstream_ref="$3" target_dir="$4" marketplace_source="${5:-}"
+
+  # Build the user-facing install command block. CC plugin install is two steps:
+  #   /plugin marketplace add <source>   (registers the marketplace)
+  #   /plugin install <plugin>@<marketplace>   (installs the plugin from it)
+  # (verified against code.claude.com plugin docs — see Decision 90 / KNOWN_SKILLS note).
+  local install_cmds
+  if [[ -n "$marketplace_source" ]]; then
+    install_cmds="/plugin marketplace add ${marketplace_source}
+/plugin install ${upstream_ref}"
+  else
+    install_cmds="/plugin install ${upstream_ref}"
+  fi
+
+  # Detect whether the skill is already in the user's CC skills dir. CC's skill discovery
+  # is location-based: anything under ~/.claude/skills/{slug}/SKILL.md is auto-loaded.
+  if [[ -f "${target_dir}/SKILL.md" ]]; then
+    log_ok "${name} (${id}) — already present at ${target_dir}; skipping fetch."
+    return 0
+  fi
+
+  log_info "${name} (${id}) — fetching from registry ref '${upstream_ref}'..."
+
+  # v0.1 implementation note: the Claude Code skill registry fetch protocol is documented
+  # in the CC plugin spec recon at .claude/temp/ctx7-docs/claude-code-plugin-spec.md.
+  # For v0.1, the bootstrap script's role is to PREPARE the install slot (create the dir
+  # and seed a stub SKILL.md with a "fetch pending" notice). The actual registry-fetch
+  # mechanism — whether it's `claude /plugin install` invoked from a child process, an
+  # HTTP fetch from the registry index, or a plugin-marketplace command — is finalized in
+  # Phase 5 (Captain M, per BUILD-strategy.md lines 213-221) when the upstream protocol
+  # is locked and the skills-bundle/ composition manifests are authored.
+  #
+  # The behaviour here:
+  #   - Create the target dir.
+  #   - Write a stub SKILL.md that the user (or CC) can replace with the real upstream
+  #     skill content via the registry mechanism.
+  #   - Surface a clear next-step message so the user knows what to do.
+  #
+  # This is a Tier 3 install-discipline correct-environment outcome per
+  # `.claude/rules/tool-dependency-discipline.md` — the dir is in the right place; the
+  # actual fetch happens via the upstream-blessed mechanism, not via the agent inventing
+  # an ad-hoc curl/git-clone of unverified sources.
+
+  if [[ -d "$target_dir" ]] && [[ -n "$(ls -A "$target_dir" 2>/dev/null)" ]]; then
+    log_warn "${target_dir} already exists and is non-empty; not overwriting."
+    return 0
+  fi
+
+  mkdir -p "$target_dir"
+
+  cat > "${target_dir}/SKILL.md" <<EOF
+---
+name: ${name} (install pending)
+description: Stub placeholder — the actual ${name} skill installs from the Claude Code plugin marketplace. See "To complete the install manually" below (full mechanism lands in Phase 5 of the website-builder build).
+version: 0.0.0-pending
+---
+
+# ${name} — install pending
+
+This is a stub placeholder created by \`scripts/install-skills.sh\` v${SCRIPT_VERSION}
+(website-builder v0.1).
+
+The full Claude Code skill-registry fetch mechanism for upstream ID
+\`${upstream_ref}\` ships in Phase 5 of the website-builder build (Captain M
+per \`BUILD-strategy.md\`). For now, the slot at \`${target_dir}\` is reserved.
+
+## To complete the install manually
+
+Until Phase 5 ships, install the upstream skill via Claude Code's plugin
+marketplace (run these inside a Claude Code session):
+
+\`\`\`
+${install_cmds}
+\`\`\`
+
+Then invoke it with the \`Skill\` tool using the namespaced \`<plugin>:<skill>\`
+form — for this skill: \`${id}:${id}\`. (The \`@\` form above is the *install*
+id; the \`:\` form is the *invoke* id — they are different by design.)
+
+After install, this stub file is replaced by the upstream's real \`SKILL.md\`.
+You can also re-run \`scripts/install-skills.sh\` after the Phase 5 mechanism
+ships and it will replace this stub with the real fetch.
+
+## See also
+
+- \`Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md\` — the
+  hybrid skill-distribution design (composition manifests + setup script).
+- \`.claude/temp/ctx7-docs/claude-code-plugin-spec.md\` — Claude Code skill spec
+  reference.
+
+EOF
+
+  log_ok "${name} — slot reserved at ${target_dir} (full fetch ships Phase 5)."
+}
+
+install_via_git() {
+  local id="$1" name="$2" upstream_ref="$3" target_dir="$4"
+
+  if [[ -d "${target_dir}/.git" ]]; then
+    log_ok "${name} (${id}) — already present at ${target_dir} (git repo); skipping clone."
+    return 0
+  fi
+
+  if [[ -d "$target_dir" ]] && [[ -n "$(ls -A "$target_dir" 2>/dev/null)" ]]; then
+    log_warn "${target_dir} already exists and is non-empty (not a git checkout); not overwriting."
+    return 0
+  fi
+
+  if ! command -v git >/dev/null 2>&1; then
+    log_err "git not available; cannot install '${id}'."
+    return 1
+  fi
+
+  log_info "${name} (${id}) — cloning from ${upstream_ref}..."
+  if git clone --depth 1 "$upstream_ref" "$target_dir" 2>&1; then
+    log_ok "${name} — cloned to ${target_dir}."
+    return 0
+  else
+    log_err "${name} — clone failed."
+    return 1
+  fi
+}
+
+# ---------- Skill install dispatcher ----------
+
+# install_skill <id> <role>
+#   role: "primary" | "complementary"
+# Looks up the skill row, validates it's installable in v0.1, and routes to the right method.
+install_skill() {
+  local id="$1" role="$2"
+
+  if ! row="$(lookup_skill "$id")"; then
+    log_err "Unknown skill id: '${id}'. Known ids: ui-ux-pro-max, impeccable, emil-kowalski, taste, framer-motion, twenty-first-dev."
+    return 1
+  fi
+  parse_skill_row "$row"
+
+  if [[ "$SKILL_STATUS" == "deferred" ]]; then
+    log_warn "${SKILL_NAME} (${SKILL_ID}) — ${SKILL_NOTES}. Not installable in v0.1."
+    log_warn "  Use '${SKILL_REF}' once Phase 5 / Phase 10 of the build ships the upstream-fetch protocol."
+    return 0  # not an error in v0.1; just deferred
+  fi
+
+  local os
+  os="$(detect_os)"
+  if [[ "$os" == "unknown" ]]; then
+    log_err "Unsupported OS. Detected: $(uname -s 2>/dev/null || echo unknown)."
+    log_err "  This script supports macOS, Linux, and Windows-via-Git-Bash / WSL."
+    return 1
+  fi
+
+  local skills_dir
+  skills_dir="$(cc_skills_dir "$os")"
+  if [[ -z "$skills_dir" ]]; then
+    log_err "Cannot resolve Claude Code skills directory for OS '${os}'."
+    return 1
+  fi
+
+  if [[ ! -d "$skills_dir" ]]; then
+    log_info "Creating Claude Code skills directory at ${skills_dir}."
+    mkdir -p "$skills_dir"
+  fi
+
+  local target_dir="${skills_dir}/${SKILL_ID}"
+
+  if is_recorded_installed "$SKILL_ID"; then
+    log_ok "${SKILL_NAME} — already recorded as installed in skills-installed.yaml; skipping."
+    return 0
+  fi
+
+  case "$SKILL_METHOD" in
+    registry)
+      install_via_registry "$SKILL_ID" "$SKILL_NAME" "$SKILL_REF" "$target_dir" "$SKILL_MARKETPLACE" || return 1
+      ;;
+    git)
+      install_via_git "$SKILL_ID" "$SKILL_NAME" "$SKILL_REF" "$target_dir" || return 1
+      ;;
+    *)
+      log_err "Unknown install method '${SKILL_METHOD}' for ${SKILL_ID}."
+      return 1
+      ;;
+  esac
+
+  record_install "$SKILL_ID" "$role" "$SKILL_REF" "$target_dir" "$SKILL_METHOD"
+}
+
+# ---------- Argument parsing ----------
+
+PRIMARY_SKILL=""
+COMPLEMENTARY_SKILLS=()
+
+usage() {
+  cat <<EOF
+Usage: ${SCRIPT_NAME} [--primary <skill-id>] [--complementary <skill-id>]... [--help]
+
+Fetches upstream design-skill flavors per locked decision 32 of the website-builder
+workstream. v0.1 ships UI/UX Pro Max only (decision 55); other flavors are deferred
+to expansion Phase 10.
+
+Options:
+  --primary <skill-id>          Primary design-skill flavor. Defaults to ui-ux-pro-max.
+  --complementary <skill-id>    Complementary skill (repeatable). Empty in v0.1.
+  --help                        Show this message.
+
+Known skill ids: ui-ux-pro-max, impeccable, emil-kowalski, taste, framer-motion,
+                 twenty-first-dev.
+
+Idempotent: re-running detects existing installs via .website-builder/skills-installed.yaml
+and only fetches what's missing.
+
+See:
+  - Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md
+  - skills/wb-bootstrap/SKILL.md (the invoking skill)
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --primary)
+      PRIMARY_SKILL="$2"
+      shift 2
+      ;;
+    --complementary)
+      COMPLEMENTARY_SKILLS+=("$2")
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      log_err "Unknown argument: $1"
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+# Default primary if not specified.
+if [[ -z "$PRIMARY_SKILL" ]]; then
+  PRIMARY_SKILL="ui-ux-pro-max"
+fi
+
+# ---------- Pre-flight ----------
+
+log_info "${SCRIPT_NAME} v${SCRIPT_VERSION} — installing skills for the website-builder plugin."
+log_info "Primary: ${PRIMARY_SKILL}"
+if [[ ${#COMPLEMENTARY_SKILLS[@]} -gt 0 ]]; then
+  log_info "Complementary: ${COMPLEMENTARY_SKILLS[*]}"
+else
+  log_info "Complementary: (none — v0.1 ships UI/UX Pro Max only per decision 55)"
+fi
+
+OS="$(detect_os)"
+if [[ "$OS" == "unknown" ]]; then
+  log_err "Unsupported OS: $(uname -s 2>/dev/null || echo unknown)."
+  log_err "Supported: macOS, Linux, Windows-via-Git-Bash / WSL."
+  exit 1
+fi
+
+CC_SKILLS_DIR="$(cc_skills_dir "$OS")"
+log_info "OS: ${OS}; Claude Code skills directory: ${CC_SKILLS_DIR}"
+
+ensure_state_yaml
+
+# ---------- Install ----------
+
+EXIT_CODE=0
+
+if ! install_skill "$PRIMARY_SKILL" "primary"; then
+  log_err "Failed to install primary skill '${PRIMARY_SKILL}'."
+  EXIT_CODE=1
+fi
+
+for skill in "${COMPLEMENTARY_SKILLS[@]}"; do
+  if ! install_skill "$skill" "complementary"; then
+    log_err "Failed to install complementary skill '${skill}'."
+    EXIT_CODE=1
+  fi
+done
+
+# ---------- Summary ----------
+
+if [[ $EXIT_CODE -eq 0 ]]; then
+  log_ok "Done. Install state recorded at ${SKILLS_INSTALLED_YAML}."
+  log_info "If a skill shows 'install pending' in its SKILL.md, run \`/plugin install\` for the upstream ref to complete the fetch (full mechanism ships Phase 5)."
+else
+  log_err "One or more skills failed to install. See messages above."
+fi
+
+exit $EXIT_CODE

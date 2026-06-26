@@ -1,0 +1,7 @@
+{
+  "pages": [
+    { "id": "home", "path": "/", "title": "Still Humans" },
+    { "id": "about", "path": "/about", "title": "About" }
+  ],
+  "_note": "Mock Framer pages list. Real Framer pages.json has substantially more structure (frames, components, breakpoints, animations). This stand-in suffices for entry-mode detection."
+}

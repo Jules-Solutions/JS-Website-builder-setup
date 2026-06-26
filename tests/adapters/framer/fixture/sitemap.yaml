@@ -1,0 +1,19 @@
+# Layer 2 — Structural specs / sitemap (per DESIGN-content-layers.md)
+# Each page becomes a Framer Frame; navigation becomes a NavBar Code Component prop.
+
+pages:
+  - slug: /
+    title: { en: "Home", de: "Start" }
+    sections: [hero, value-prop, signup-cta]
+  - slug: /about
+    title: { en: "About", de: "Über" }
+    sections: [bio, philosophy]
+  - slug: /contact
+    title: { en: "Contact", de: "Kontakt" }
+    sections: [contact-form]
+
+navigation:
+  primary:
+    - { slug: /, label_key: nav.primary.home }
+    - { slug: /about, label_key: nav.primary.about }
+    - { slug: /contact, label_key: nav.primary.contact }

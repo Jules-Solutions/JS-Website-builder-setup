@@ -1,0 +1,239 @@
+# expected.yaml — Next.js + shadcn adapter expected per-phase output.
+# Schema per tests/adapters/README.md §"expected.yaml".
+# Adapter under test: adapters/stack-nextjs.md
+
+fixture_baseline: phase-11-complete
+
+# What the adapter SHOULD produce at each downstream pipeline phase
+# when fed the fixture's .website-builder/ state.
+expected_per_phase:
+
+  phase_12_cms:
+    # Per adapters/stack-nextjs.md §"CMS pairing" Default-for-muggle logic:
+    # 5 pages + transactional:false + small editorial team → "none" (file-based MDX)
+    cms_recommendation: none
+    confidence: high
+    alternatives_surfaced: [decap, payload]   # adapter surfaces both with trade-offs
+    rationale: |
+      5-page site, content-light, no editorial team — file-based MDX is enough.
+      Decap surfaced as upgrade path (git-backed admin UI) — note Decap is in
+      maintenance mode; agent surfaces Sveltia / Static CMS as active forks.
+      Payload surfaced for content-heavy pivot, but YAGNI for 5 pages.
+    i18n_strategy_lock: pattern-a   # shared structure, translated prose (decision 39 default)
+    mcps_used: []                  # cms=none → no CMS-specific MCP needed at phase 12
+    mcps_skipped_with_rationale:
+      payload_cms_mcp: "cms=none; would activate only if cms_recommendation=payload"
+      decap_cms_mcp: "no Decap MCP exists (negative finding 2026-05-20); fallback is /admin UI + GitHub MCP"
+
+  phase_17_design_system:
+    # Per adapters/stack-nextjs.md §"Component library pairing" → Tokens section
+    tokens_written_to:
+      - brand.yaml                    # canonical source preserved
+      - app/globals.css               # OKLCH :root + .dark + @theme inline
+      - components.json               # cssVariables: true; baseColor: neutral
+    css_pattern: oklch_with_theme_inline
+    drift_check: pass   # no token drift; globals.css fully derived from brand.yaml
+    custom_token_handling: |
+      Custom colors (semantic_error, ring) declared in :root/.dark, mapped via
+      @theme inline { --color-semantic-error: var(--semantic-error) } so they
+      become Tailwind utility classes automatically.
+
+  phase_18_component_build:
+    components_generated: [HeroBlock, NavBar, FooterBlock, LanguageSwitcher]
+    # LanguageSwitcher generated additionally because fixture is multilingual
+    # (en + de) — see i18n/language-switcher.md#next-js--shadcn inline-variant.
+    output_paths:
+      HeroBlock: components/HeroBlock.tsx
+      NavBar: components/NavBar.tsx
+      FooterBlock: components/FooterBlock.tsx
+      LanguageSwitcher: components/LanguageSwitcher.tsx
+    shadcn_primitives_installed:
+      - button         # for HeroBlock CTA + LanguageSwitcher inline variant
+      - dropdown-menu  # for LanguageSwitcher dropdown variant (≥4 langs) — installed for future-proofing
+      - sheet          # for NavBar mobile hamburger drawer
+    server_client_boundary:
+      HeroBlock: server
+      NavBar: server   # outer shell; LanguageSwitcher is the Client island
+      FooterBlock: server
+      LanguageSwitcher: client   # 'use client' at file top per discipline
+    rsc_directive_placement: line_1_before_imports   # enforced
+    palette_validator: pass
+    a11y_audit: pass
+    expected_imports:
+      next_intl: ["useTranslations", "useLocale"]
+      next_intl_navigation: ["Link", "usePathname"]   # from custom @/i18n/navigation
+      shadcn: ["Button", "DropdownMenu*", "Sheet*"]
+    mcps_used:
+      - shadcn_ui_mcp                # https://ui.shadcn.com/docs/mcp — natural-language component install + block scaffold
+    mcps_fallback_paths:
+      shadcn_ui_mcp: "npx shadcn@latest add <name> CLI directly; agent reads cached docs at .website-builder/library/docs/shadcn-components.md"
+
+  phase_22_i18n:
+    # Fixture has en + de → multilingual checks active
+    hreflang_emitted: true
+    hreflang_codes: [en, de-CH, x-default]   # language_regions config applied per fixture
+    hreflang_reciprocity: pass
+    language_switcher_added: true
+    language_switcher_variant: inline   # 2 locales → inline per i18n/language-switcher.md#next-js--shadcn
+    language_switcher_min_target_size: 44px   # WCAG 2.2 SC 2.5.8 enforced
+    rtl_handling: n_a   # fixture has en + de only (both LTR)
+    locale_persistence: cookie_plus_localStorage   # see i18n/language-switcher.md persistence pattern
+    mcps_used:
+      - playwright_mcp             # foundation-bundled — RTL/LTR walk; switcher click + URL change verification
+    mcps_skipped_with_rationale:
+      next_intl_mcp: "no next-intl MCP exists (negative finding 2026-05-20); next-intl is file-based, edit messages/{lang}.json + i18n/*.ts directly"
+
+  phase_26_seo:
+    # Per adapters/stack-nextjs.md §"Deploy" → Phase 26 cross-cut + i18n/hreflang.md verification
+    hreflang_verification_pass: true
+    sitemap_xml_generated: true
+    sitemap_locales_covered: 2   # en + de variants per page
+    canonical_url_per_page: set
+    robots_txt_generated: true
+
+  phase_28_deploy:
+    target: vercel
+    dns_handoff_ready: true
+    ssl_strategy: vercel_lets_encrypt_auto
+    custom_domain_via_mcp: true
+    env_vars_propagated:
+      - NEXT_PUBLIC_CANONICAL_HOST    # for hreflang absolute URLs
+    cms_specific_build_command: false   # cms: none → standard `next build`
+    # If cms were Payload, expected build command would be `pnpm payload migrate && next build`
+    mcps_used:
+      - vercel_mcp                 # mcp.vercel.com — custom-domain add + env-var management + deploy
+      - cloudflare_mcp             # mcp.cloudflare.com — DNS-record set (CNAME / A / TXT-verification)
+      - github_mcp                 # api.githubcopilot.com/mcp — PR automation per dev → master workflow
+    mcps_fallback_paths:
+      vercel_mcp: "vercel CLI (vercel + vercel --prod + vercel domains add + vercel env add/pull) OR REST API via curl with Vercel PAT"
+      cloudflare_mcp: "Cloudflare REST API via curl with scoped DNS-edit API token; OR wrangler CLI; OR manual dashboard set"
+      github_mcp: "gh CLI (gh pr create + gh issue list + gh repo view); OR Bash + git directly for push/pull/branch"
+
+  phase_29_deploy_verification:
+    playwright_walk_pass: true
+    pages_walked: 10   # 5 pages × 2 locales
+    hreflang_curl_check_pass: true
+    language_switcher_walk_pass: true
+    mcps_used:
+      - playwright_mcp             # foundation-bundled — production-URL walk per page per locale
+      - vercel_mcp                 # to read latest deploy URL + runtime logs if walk fails
+
+  phase_30_analytics:
+    vercel_analytics_enabled: true
+    vercel_speed_insights_enabled: true
+    third_party_analytics: plausible   # muggle-default privacy posture per adapter §"Deploy" → Phase 30
+    sitemap_submitted: [google_search_console, bing_webmaster]
+    mcps_used:
+      - vercel_mcp                 # toggle Vercel Analytics + Speed Insights via Project Settings API
+      - plausible_mcp              # OR ga4_mcp — conditional on third_party_analytics choice
+      - sentry_mcp                 # configure Sentry SDK + initial alert thresholds
+      - github_mcp                 # author .github/dependabot.yml for monthly dep-update cadence
+    mcps_fallback_paths:
+      plausible_mcp: "Plausible web dashboard + Stats API v2 via curl with PLAUSIBLE_API_KEY"
+      sentry_mcp: "@sentry/nextjs SDK directly + Sentry web UI"
+
+# What the adapter SHOULD surface as cannot-do (verbatim from §"Limitations + escape hatches")
+expected_limitations:
+  - "No visual canvas — users edit MDX directly or use a CMS"
+  - "Complex routing requires App Router conventions (catch-all, parallel, intercepting)"
+  - "Server-side complexity when adding Route Handlers / DB / auth"
+  - "Next.js 15 fetch no-store default is a footgun migrating from 14"
+  - "Vercel pricing at scale (Hobby tier 100GB bandwidth cap)"
+  - "shadcn lock-in to Tailwind"
+  - "Copy-paste shadcn means the repo grows per component"
+
+# What failure paths the adapter handles (verbatim from §"Limitations" → ### Failure modes table)
+expected_failure_modes_covered:
+  - "Hydration mismatch (Server vs Client output divergence)"
+  - "'use client' directive ignored (placed after imports)"
+  - "next-intl useTranslations 'No intl context' (missing provider boundary)"
+  - "OKLCH unsupported in old browsers (Safari < 15.4) — sRGB fallback via color-mix()"
+  - "Stripe webhook signature verification failed (raw body vs parsed)"
+  - "Payload admin not loading post-deploy (missed `pnpm payload migrate`)"
+  - "sitemap.ts empty (missing generateStaticParams for dynamic routes)"
+  - "Vercel deploy `pnpm install` failure (lockfile / private dep auth)"
+  - "next/image 504 (missing images.remotePatterns)"
+  - "hreflang missing on prod (incorrect generateMetadata pattern)"
+
+# Schema-conformance assertion (cross-references adapters/README.md)
+schema_compliance:
+  fourteen_h2_sections_in_order: true
+  content_layer_mapping_table_row_labels:
+    - "L1 brand.yaml.tokens"
+    - "L2 sitemap.yaml + sections.yaml"
+    - "L3 strings/{lang}.json"
+    - "L4 content/pages/*.md"
+    - "L5 briefs/{component}.json"
+  identity_h3_present_in_mental_model: true
+  crud_vocabulary_h3_present_in_auth_setup: true
+  failure_modes_h3_present_in_limitations: true
+  i18n_cross_refs:
+    - i18n/language-switcher.md#next-js--shadcn
+    - i18n/hreflang.md#next-js--shadcn
+  per_stack_codegen_cross_ref: skills/wb-component-build/references/per-stack-codegen.md#nextjs
+  context7_freshness_pattern_present: true
+  context7_primary_id: /vercel/next.js
+  context7_secondary_ids:
+    - /shadcn-ui/ui
+    - /tailwindlabs/tailwindcss.com
+    - /payloadcms/payload
+    - /radix-ui/primitives
+  next_js_15_fetch_breaking_change_surfaced: true   # the Lock-3 canonical example
+  re_fetch_threshold_documented: "30 days"
+
+# Round 3 MCP ecosystem audit assertions — per Commander lock 2026-05-20
+mcp_audit_compliance:
+  mcp_h3_present_in_auth_setup: true              # ### MCP servers (recommended at setup)
+  setup_is_part_of_connector_setup_not_bundled: true   # plugin doesn't bundle any MCP; user installs
+  mcps_investigated_positive_findings:
+    core_platform_mandatory:
+      - vercel_mcp                    # https://mcp.vercel.com — official OAuth (verified 2026-05-20)
+      - shadcn_ui_mcp                 # https://ui.shadcn.com/docs/mcp — official (verified 2026-05-20)
+      - context7_mcp                  # foundation-bundled — Lock-3 freshness
+      - playwright_mcp                # foundation-bundled — visual verification
+    optional_conditional:
+      - cloudflare_mcp                # https://mcp.cloudflare.com — DNS when on Cloudflare
+      - github_mcp                    # https://github.com/github/github-mcp-server — git ops + PR automation
+      - stripe_mcp                    # https://docs.stripe.com/mcp — transactional=true
+      - payload_cms_mcp               # Antler Digital plugin — cms=payload
+      - supabase_mcp                  # official Claude connector — Postgres backend
+      - neon_mcp                      # https://mcp.neon.com/mcp — Postgres backend (Hobby-scale-to-zero)
+      - sentry_mcp                    # https://mcp.sentry.dev/mcp — phase 34 monitoring
+      - ga4_mcp                       # multiple community options
+      - plausible_mcp                 # github.com/alexanderop/plausible-mcp
+      - calcom_mcp                    # cal.com custom Claude connector — transactional_kind=bookings
+      - image_gen_mcp                 # community @fastmcp-me/imagegen-mcp + alternates
+  mcps_investigated_negative_findings:
+    decap_cms_mcp:
+      exists: false
+      fallback: "/admin UI + GitHub MCP / gh CLI for git-side observation"
+      verified_date: "2026-05-20"
+    next_intl_mcp:
+      exists: false
+      fallback: "Direct Edit/Write on messages/{lang}.json + i18n/*.ts; context7 /amannn/next-intl for docs freshness"
+      verified_date: "2026-05-20"
+    mdx_mcp:
+      exists: false
+      fallback: "@next/mdx config + standard fs reads of MDX with gray-matter frontmatter"
+      verified_date: "2026-05-20"
+    tailwind_mcp:
+      exists: false
+      fallback: "context7 /tailwindlabs/tailwindcss.com for docs freshness; tailwind.config.ts + globals.css direct edit"
+      verified_date: "2026-05-20"
+    better_auth_mcp:
+      exists: false
+      fallback: "Better Auth SDK directly + Supabase/Neon MCP for underlying DB"
+      verified_date: "2026-05-20"
+    anthropic_official_image_gen_mcp:
+      exists: false
+      fallback: "Community @fastmcp-me/imagegen-mcp OR direct provider API"
+      verified_date: "2026-05-20"
+  fallback_path_documented_per_mcp: true   # every positive-finding MCP entry includes a Fallback line
+  context7_cross_ref_present_in_mcp_h3: true   # context7 MCP listed in MCP H3 + reciprocal note in §"context7 lookups"
+  cross_references_added_per_h2:
+    phase_6_5_ingestion: "Playwright MCP cross-ref (Tier-1 system-integrity)"
+    cms_pairing: "Payload MCP + Decap-no-MCP negative-finding"
+    component_library_pairing: "shadcn MCP cross-ref"
+    commerce_integration: "Stripe MCP + Cal.com MCP cross-refs"
+    deploy: "Vercel + Cloudflare + GitHub + Sentry + GA4/Plausible + Supabase/Neon — 6-MCP block"
+    context7_lookups: "reciprocal pointer to MCP H3 (docs-freshness vs operational layer separation)"

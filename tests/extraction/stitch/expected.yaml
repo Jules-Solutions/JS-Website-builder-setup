@@ -1,0 +1,94 @@
+# expected.yaml — Stitch DESIGN.md → normalized project-state contract.
+#
+# The end-to-end assertion for tests/extraction/stitch/ (BUILD-strategy DoD line 225:
+# "Stitch extraction runs from a URL → DESIGN.md import works end-to-end").
+#
+# INPUT:  fixture/stitch-export.md  (a synthetic Stitch DESIGN.md export — the
+#         artifact a user pastes back after Path-1 browser-in-loop extraction).
+# OUTPUT: this file — the normalized project-state shapes the phase-6.5 import
+#         step (step 4 "Normalize" of extraction/stitch.md § "Runtime recipe")
+#         produces, mapped per the destination table in extraction/stitch.md +
+#         DESIGN-extraction-stitch.md § "Output format".
+#
+# test_stitch.py parses the export with a reference normalizer (mirroring the
+# Phase-1 detector.py reference-implementation pattern) and asserts the result
+# equals these shapes. Pure input->output, no network — Tier 1.
+
+# Where each DESIGN.md section lands (the destination-table contract).
+# Asserted structurally by test_stitch.py::TestStitchNormalize.
+normalization_targets:
+  brand_identity_voice: ["project.yaml.voice_descriptors", "voice/exemplars.md"]
+  design_tokens_colors: "brand.yaml.tokens.colors"
+  design_tokens_typography: "brand.yaml.tokens.typography"
+  design_tokens_spacing: "brand.yaml.tokens.spacing"
+  design_tokens_motion: "brand.yaml.tokens.motion"
+  design_tokens_dark_mode: "brand.yaml.tokens.dark_mode"
+  components: "components.yaml"
+
+# --- project.yaml fragment (Layer 5 voice seed) ---------------------------
+project_yaml:
+  brand_name: "Northwind Studio"
+  tagline: "Design that earns trust."
+  voice_descriptors: ["warm", "confident", "editorial"]
+
+# --- brand.yaml.tokens (Layer 1) ------------------------------------------
+brand_yaml:
+  tokens:
+    colors:
+      primary: "oklch(64% 0.18 30)"
+      secondary: "oklch(52% 0.12 220)"
+      accent: "oklch(76% 0.16 80)"
+      surface: "oklch(98% 0.01 100)"
+      on_surface: "oklch(20% 0.02 100)"
+      muted: "oklch(45% 0.02 100)"
+      danger: "oklch(58% 0.20 25)"
+      success: "oklch(60% 0.15 145)"
+    typography:
+      display:
+        family: '"Fraunces", Georgia, serif'
+        sizes: ["3.5rem", "2.5rem", "2rem"]
+        weights: [700, 600]
+        line_height: 1.1
+      body:
+        family: '"Inter", -apple-system, sans-serif'
+        sizes: ["1.125rem", "1rem", "0.875rem"]
+        weights: [400, 500]
+        line_height: 1.55
+    spacing:
+      base_unit: "4px"
+      scale: ["4px", "8px", "12px", "16px", "24px", "32px", "48px", "64px", "96px"]
+    motion:
+      duration_med: "280ms"
+      easing_default: "cubic-bezier(0.32, 0.72, 0, 1)"
+    dark_mode: "auto"
+
+# --- components.yaml (Layer 2) — one entry per recognized component --------
+# Every entry carries extracted: true (per DESIGN-extraction-stitch.md
+# § "Output format" — components get an extracted: true flag).
+components_yaml:
+  components:
+    - name: Hero
+      extracted: true
+      props: ["headline", "sub_headline", "primary_cta_text", "primary_cta_href", "image"]
+      behaviors: ["scroll-triggered reveal", "CTA hover lift"]
+    - name: Nav
+      extracted: true
+      props: ["logo_text", "nav_items"]
+      behaviors: ["sticky on scroll", "mobile hamburger drawer"]
+    - name: Card
+      extracted: true
+      props: ["title", "body", "icon", "href"]
+      behaviors: ["hover elevation"]
+    - name: Footer
+      extracted: true
+      props: ["copyright", "footer_nav_items"]
+      behaviors: []
+
+# --- phase-6.5 hand-off invariants (step 5 of the runtime recipe) ----------
+# These are NOT produced by the normalizer; they are the discipline the
+# integration step must honor. Asserted as presence/shape checks, not values.
+phase_6_5_handoff:
+  conflict_policy: halt-and-ask        # locked decision 36 — no silent overwrite/merge
+  decision_log_always_written: true    # decisions/ingest-{ts}.md even on zero conflicts
+  raw_export_cached: ".website-builder/outputs/stitch-{ts}.md"
+  reversible: true                     # re-extraction diffs against prior ingest log

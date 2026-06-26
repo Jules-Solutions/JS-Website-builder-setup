@@ -1,0 +1,40 @@
+# tests/commerce-adapters/calcom/fixture/brand.yaml
+# Minimal brand baseline for the Cal.com fixture. Cal.com embed accepts a subset
+# of theme tokens via Atoms themeOverrides; standard embed uses Cal.com styling.
+
+name: Solo Consultant
+domain: soloconsultant.example.com
+
+tokens:
+  colors:
+    primary: oklch(56% 0.18 250)         # cool blue — professional/consulting brand
+    primary_foreground: oklch(98% 0 0)
+    background: oklch(100% 0 0)
+    foreground: oklch(15% 0 0)
+    semantic_success: oklch(60% 0.15 145)
+    border: oklch(90% 0.005 250)
+
+  typography:
+    display: "Inter, sans-serif"
+    body: "Inter, sans-serif"
+    scale:
+      h1: { size: 56px, lh: 1.05, weight: 700 }
+      h2: { size: 40px, lh: 1.15, weight: 600 }
+      body: { size: 18px, lh: 1.5, weight: 400 }
+
+  spacing:
+    base_unit: 4px
+    scale: [0, 4, 8, 12, 16, 24, 32, 48, 64, 96]
+
+  motion:
+    duration_med: 300ms
+    easing_default: cubic-bezier(0.4, 0, 0.2, 1)
+
+  dark_mode: auto
+
+# Cal.com Atoms themeOverrides — subset of brand tokens forwarded to the embed
+# (per booking-calcom.md § Content layer mapping → L1 row)
+calcom_atoms_theme_overrides:
+  colors:
+    primary: oklch(56% 0.18 250)
+  theme: auto       # follows browser preference

@@ -1,0 +1,51 @@
+# tests/commerce-adapters/calcom/fixture/project.yaml
+# Phase 4 Captain L — Cal.com booking adapter fixture (free-booking-only baseline).
+#
+# Per tests/commerce-adapters/README.md § "calcom/ fixture":
+#   - free bookings (no paid event types) — exercises phase 24a fully
+#   - phase 24b skipped (no payment)
+#   - phase 24c minimal (cancellation policy + GDPR; no T&Cs of sale)
+#   - paid-booking-with-TWINT variant is Phase 10+ scope (calcom-paid-ch/)
+#
+# CH-region note: the calcom fixture does NOT have audience_regions: [CH] because
+# Cal.com's TWINT support is conditional on paid bookings + Stripe bridge, and this
+# Phase 4 fixture exercises free bookings only. A future paid-CH variant (Phase 10+)
+# would carry CH region + Stripe bridge + TWINT validation.
+
+name: solo-consultant-bookings-fixture
+description: >
+  Synthetic fixture for the Cal.com booking adapter — a solo consultant offering
+  two free event types (30-min intro consult + 60-min coaching session) for an
+  English-speaking international audience. Embedded on a Next.js site as the
+  primary "Book a call" CTA.
+
+stack: nextjs
+cms: none
+
+# Transactional flag — booking IS transactional (a service interaction)
+transactional: true
+transactional_kind: bookings    # vs products (covered by stripe fixture) or both
+
+# Free bookings — no paid event types in this Phase 4 baseline
+# (paid CHF + TWINT variant deferred to Phase 10+)
+paid_bookings: false
+
+# Audience: international English-speaking; CH region NOT included
+# (avoiding the conditional paid-booking-TWINT-via-Stripe-bridge scope)
+audience_regions: [US, GB, DE]
+
+# Currencies: irrelevant for free bookings (no transactions)
+currencies: []
+
+default_language: en
+languages: [en]
+
+# Booking platform pick at phase 24a
+booking_provider: calcom
+calcom_deployment: cloud         # vs self-hosted; Cloud Free tier sufficient for solo
+calcom_tier: free                # $0/mo solo
+
+# Brand identity (minimal)
+brand:
+  name: Solo Consultant
+  domain: soloconsultant.example.com

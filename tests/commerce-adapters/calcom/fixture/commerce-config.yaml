@@ -1,0 +1,94 @@
+# tests/commerce-adapters/calcom/fixture/commerce-config.yaml
+# Phase 24a output for the booking branch — Cal.com event types + integrations.
+#
+# Schema per DESIGN-phase-contracts.md phase 24a (booking branch) +
+# commerce-adapters/booking-calcom.md § "Phase 24a/24b/24c integration (booking branch)".
+#
+# Free-booking-only fixture — no payment processor wiring, no paid event types.
+
+# Cal.com is the booking branch of commerce-config; products section absent.
+bookings:
+  provider: calcom
+  deployment: cloud                    # vs self-hosted
+  tier: free                            # $0/mo solo
+  account_username: soloconsultant     # cal.com/{username}
+  api_key_env: CALCOM_API_KEY
+
+  # MCP availability — community FastMCP exists; NOT official Cal.com MCP
+  # Re-verified 2026-05-20 per booking-calcom.md § "API + MCP availability"
+  mcp_integration:
+    official_cal_com_mcp: false        # confirmed by Cal.com's own blog post: API-first stance
+    anthropic_plugin_catalog_entry: false   # confirmed via claude.com/plugins scan 2026-05-20
+    community_fastmcp: Danielpeter-99/calcom-mcp   # https://github.com/Danielpeter-99/calcom-mcp
+    composio_hosted: https://mcp.composio.dev/cal
+    agent_default_path: rest-api       # agent uses Cal.com REST API directly (no MCP dependency)
+
+  # Event types created at phase 24a (both free — no price field)
+  event_types:
+    - id: consult-30
+      title: 30-min Intro Consult
+      slug: consult-30
+      length_minutes: 30
+      location:
+        type: integrations:google:meet
+      description: Free 30-minute intro call to discuss your situation and how I can help.
+      buffer_minutes_before: 5
+      buffer_minutes_after: 10
+      booking_window:
+        notice_minimum_hours: 24
+        booking_ahead_max_days: 60
+
+    - id: coaching-60
+      title: 1-hour Coaching Session
+      slug: coaching-60
+      length_minutes: 60
+      location:
+        type: integrations:google:meet
+      description: One-hour focused coaching session. Free for first session.
+      buffer_minutes_before: 5
+      buffer_minutes_after: 15
+      booking_window:
+        notice_minimum_hours: 48
+        booking_ahead_max_days: 60
+
+  # Calendar integration (Google Calendar declared; not actually connected at fixture)
+  calendar_integration:
+    provider: google                   # google | microsoft | apple | caldav
+    sync_availability: true
+    write_events: true
+    fixture_note: declared-not-connected   # Phase 5+ runner scope adds real Google OAuth
+
+  # Video integration (per event type — Google Meet for both)
+  video_integration:
+    provider: google-meet
+    auto_generate_meeting_links: true
+
+  # Embed mode (popup is the muggle default)
+  embed_mode: popup
+  embed_namespace: book                 # data-cal-namespace="book"
+  embed_script: "https://embed.cal.com/embed/embed.js"
+  embed_react_package: "@calcom/embed-react"   # for Cal.com Atoms (Next.js stack)
+
+  # Webhooks (Cal.com webhook events the user-side handler subscribes to)
+  webhooks:
+    endpoint: /api/calcom-webhook
+    events:
+      - BOOKING_CREATED
+      - BOOKING_RESCHEDULED
+      - BOOKING_CANCELLED
+      - MEETING_STARTED
+    # Webhook signature verification mandatory per booking-calcom.md § Common failure modes
+    signature_verification_required: true
+
+# Free-booking specifics
+free_bookings_only: true
+payment_processor: null               # null = no payment bridge (free bookings)
+
+# Test-mode rehearsal (Cal.com supports test bookings; agent uses dedicated
+# test calendar to avoid polluting user's real calendar)
+test_mode_rehearsal:
+  test_calendar_recommended: true
+  fixture_calcom_api_key: cal_test_mock_xxx   # mock; not a real key
+  # Runtime API call is out of scope for Phase 4 manual verification;
+  # fixture verifies the adapter's recipe shape + embed code shape.
+  api_runtime_test_scope: phase_5_plus

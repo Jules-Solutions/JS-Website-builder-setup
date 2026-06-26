@@ -1,0 +1,62 @@
+# tests/cms-adapters/decap/expected.yaml
+# Declarative spec: what the Decap CMS adapter SHOULD produce at each pipeline phase, starting from this fixture's phase-12-complete baseline.
+# Schema per tests/cms-adapters/README.md "Minimum contents per CMS → expected.yaml".
+
+fixture_baseline: phase-12-complete
+
+expected_per_phase:
+  phase_12_cms:
+    cms_selected: decap
+    admin_url: /admin/
+    auth_configured: "schema-only (no real OAuth in fixture; phase 4 manual verification = config.yml is well-formed YAML; phase 5+ runner integration wires real GitHub OAuth App + sandbox repo)"
+    first_content_item_created: "src/content/pages/home.md (committed to the synthetic repo by the agent at phase 12; admin UI would commit subsequent edits)"
+    schema_config_path: "public/admin/config.yml (Astro convention) — generated from .website-builder/sitemap.yaml + components.yaml + project.yaml"
+    backend: github
+    publish_mode: simple   # editorial_workflow opt-in at phase 12 — not exercised in this fixture
+    maintenance_status_disclosed: true  # S2: must surface Decap maintenance-mode-historical + Sveltia fork active + Static CMS archived
+    forks_named: [Sveltia, Static]      # S2: both forks must be named; status of each explicit
+
+  phase_17_design_system:
+    tokens_written_to: "src/styles/tokens.css (generated from .website-builder/brand.yaml). BrandTokens file collection NOT enabled in this fixture (opt-in; not the muggle default)."
+    drift_check: pass
+
+  phase_18_component_build:
+    components_generated: [Hero, RichText, CTA, NavBar, FooterBlock]
+    schema_validation: pass   # config.yml's `types` list matches components.yaml shapes
+    palette_validator: pass
+    a11y_audit: pass
+    list_types_blocks_generated: true   # the agent's list+types blocks-approximation pattern produced types for hero, rich_text, cta
+
+  phase_22_i18n:
+    per_locale_files_present: true      # home.en.md + home.de.md (multiple_files structure per Decision 39 Pattern A)
+    structure_chosen: multiple_files    # per Decision 39 Pattern A default
+    locales_configured: [en, de]
+    default_locale: en
+    blocks_localization: "Pattern A (Decision 39) — shared layout structure (`layout` field is `i18n: duplicate`), translated text inside blocks (`headline` / `sub` / `cta_label` are `i18n: true`)"
+    missing_string_fallback: "documented per Decision 41 — frontend's i18n library falls back to default-locale string + emits a console warning. Build-time validation NOT enforced in fixture; PR-check enforces no-missing-keys for production deploys at phase 28."
+    language_switcher_added: true       # implementation per i18n/language-switcher.md (stack-specific — Astro uses astro-i18n)
+    hreflang_emitted: true              # per i18n/hreflang.md
+
+  phase_24a_commerce: n/a                # transactional=false in fixture; commerce branch not exercised (Phase 10+ scope)
+
+expected_limitations:
+  - "Project maintenance status — Decap was in self-described maintenance mode 2023-2025; revitalized in 2026 with v3.12.2 (April 2026) + Plate-based richtext widget + website rewrite. S2 disclosure is REQUIRED at phase 12."
+  - "Active fork: Sveltia CMS — https://github.com/sveltia/sveltia-cms — actively maintained as of 2026-05-20, 559 releases, near-drop-in for Decap config. Surface at phase 12 as upgrade path."
+  - "Archived fork: Static CMS — https://github.com/StaticJsCMS/static-cms — archived 2024-09-09; explicitly NOT recommended. Surface at phase 12 to prevent user from picking an archived fork."
+  - "No real API. Content is files; the static site generator builds them."
+  - "No real-time multi-editor. Two editors saving the same file produces a git conflict; no locks, no presence."
+  - "Slow saves (one git commit per save). ~1-3 second save latency."
+  - "OAuth requires git accounts for editors (workaround: Git Gateway via Netlify Identity)."
+  - "Image management = files in repo by default (workaround: media library — Cloudinary / Uploadcare / Bunny)."
+  - "Schema migrations are manual (Decap doesn't migrate existing files when config.yml fields rename)."
+  - "Markdown widget deprecated April 2026 in favor of Plate-based richtext widget; fixture uses markdown for stack-wide compatibility."
+  - "Build-time only — Decap commit → site rebuilds → live ~30-60s later."
+
+expected_failure_modes_covered:
+  - "OAuth setup forgotten → admin loads but can't authenticate (agent's phase 12 wires this; fixture documents the gap as schema-only-not-runtime)"
+  - "media_folder / public_folder mismatch with stack convention → broken images at render (agent's fixture uses Astro's `src/assets/uploads` + `/_astro/uploads` mapping)"
+  - "Smart quotes from Word paste → pre-commit content-validation sanitizes at phase 22 (fixture documents but doesn't include the hook itself — Phase 5+ scope)"
+  - "Editorial workflow + auto-deploy → surprise publishes (agent surfaces at phase 12; fixture uses simple publish_mode to keep the contract simple)"
+  - "Schema drift when adding new block types → agent regenerates config.yml from updated components.yaml (fixture covers initial generation; subsequent regeneration is Phase 5+ runner scope)"
+  - "User picks archived fork (Static CMS) → adapter's S2 disclosure prevents (verbatim: archived 2024-09-09)"
+  - "User picks Decap thinking it's still in maintenance mode → adapter's S2 disclosure reframes (verbatim: revitalized in 2026)"

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Still Humans — One-shot AI landing page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --color-primary: oklch(64% 0.18 30);
+      --color-secondary: oklch(72% 0.05 200);
+      --color-neutral-50: oklch(98% 0 0);
+      --color-neutral-900: oklch(15% 0 0);
+      --font-display: 'Fraunces', serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    body { font-family: var(--font-body); }
+    .display { font-family: var(--font-display); }
+  </style>
+</head>
+<body className="min-h-screen bg-neutral-50 text-neutral-900">
+  <main className="flex flex-col">
+    <section className="flex flex-col items-center justify-center min-h-screen px-6 py-24 text-center">
+      <h1 className="display text-6xl md:text-8xl font-bold mb-6 leading-none">
+        Still Humans
+      </h1>
+      <p className="text-xl md:text-2xl max-w-2xl mb-12 text-neutral-700">
+        Weekly essays on staying a person in 2026.
+      </p>
+      <a
+        href="#subscribe"
+        className="inline-flex items-center gap-2 px-8 py-4 bg-orange-600 text-white rounded-full font-semibold hover:bg-orange-700 transition-colors"
+      >
+        Get the newsletter
+      </a>
+    </section>
+
+    <section className="flex flex-col items-start gap-8 max-w-3xl mx-auto px-6 py-24">
+      <h2 className="display text-4xl md:text-5xl font-bold">Manifesto</h2>
+      <p className="text-lg leading-relaxed text-neutral-700">
+        You're not broken. The world is heavy. We write about staying human in
+        an AI-saturated world — slowly, weekly, without a curated optimization
+        roadmap.
+      </p>
+    </section>
+
+    <section
+      id="subscribe"
+      className="flex flex-col items-center gap-6 px-6 py-24 bg-neutral-100"
+    >
+      <h2 className="display text-4xl font-bold">One essay a week</h2>
+      <p className="text-lg text-neutral-700">No spam. Unsubscribe whenever.</p>
+      <form className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+        <input
+          type="email"
+          placeholder="you@example.com"
+          className="flex-1 px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          required
+        />
+        <button
+          type="submit"
+          className="px-6 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors"
+        >
+          Subscribe
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    document.querySelector('form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert("You're in. Check your inbox.");
+    });
+  </script>
+</body>
+</html>
