@@ -91,6 +91,15 @@ if str(_THIS_DIR) not in sys.path:
 import wb_markdown  # noqa: E402  (sys.path nudge must precede)
 import wb_library  # noqa: E402
 
+# wb_claudemd (gap #2 — the project-root CLAUDE.md orientation surface) is a Wave-3
+# sibling leaf module. SOFT-imported + guarded: keeping the project CLAUDE.md's phase
+# line fresh is peripheral to the spine's injection, so a present-but-broken or absent
+# module must NEVER break the spine import — it degrades the refresh to a no-op.
+try:
+    import wb_claudemd  # type: ignore
+except Exception:  # noqa: BLE001 — absent/broken module degrades the CLAUDE.md refresh to a no-op
+    wb_claudemd = None  # type: ignore[assignment]
+
 
 # ---------- Consumer/validation soft-imports (import-guarded — § 4.3) ----------
 #
@@ -474,6 +483,26 @@ def _resolve_current_phase(project_root: Path) -> int | None:
     return _coerce_phase(project.get("current_phase"))
 
 
+def _refresh_project_claudemd(project_root: Path) -> None:
+    """Phase-entry side effect (§7 gap #2) — keep the project-root CLAUDE.md's managed
+    orientation block fresh (phase line + stack/cms) from the current project.yaml.
+
+    Placed in the CALLERS (run_post_tool_use / run_session_start), alongside the marker
+    write, NOT inside orchestrate_phase_entry — both are phase-entry bookkeeping writes
+    the callers own, keeping orchestrate_phase_entry pure for unit testing.
+
+    Defensive: only refreshes an EXISTING managed block (bootstrap creates the file; the
+    spine never does). wb_claudemd.refresh_project_claudemd is itself crash-proof; this
+    wrapper adds belt-and-suspenders so a refresh failure never breaks the spine."""
+    if wb_claudemd is None:
+        return
+    try:
+        project = wb_library.load_project_yaml(project_root)
+        wb_claudemd.refresh_project_claudemd(project_root, project)
+    except Exception as exc:  # noqa: BLE001 — CLAUDE.md refresh must never break the spine
+        log_warn(f"[{MODULE_NAME}] project CLAUDE.md refresh failed: {exc}")
+
+
 # ---------- Slug normalization + adapter resolution ----------
 
 
@@ -741,6 +770,7 @@ def run_post_tool_use(project_root: Path) -> OrchestrationResult | None:
     _write_marker(
         project_root, last_phase=phase, digest=_project_yaml_digest(project_root)
     )
+    _refresh_project_claudemd(project_root)
     return result
 
 
@@ -756,6 +786,7 @@ def run_session_start(project_root: Path) -> OrchestrationResult | None:
     _write_marker(
         project_root, last_phase=phase, digest=_project_yaml_digest(project_root)
     )
+    _refresh_project_claudemd(project_root)
     return result
 
 
