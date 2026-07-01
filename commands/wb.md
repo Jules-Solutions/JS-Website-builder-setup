@@ -34,7 +34,9 @@ full flag surface of any one):
   Max). Verbs: `update`, `sync`.
 - **`maintain <verb>`** — re-run setup. Verbs: `reconfig` (re-confirm
   entry-mode / secrets-backend / flavor without destroying content),
-  `install-skills` (re-run the skill installer).
+  `install-skills` (re-run the skill installer), `postlaunch` (materialize the
+  post-launch maintainer template into `.website-builder/post-launch/`,
+  customized via `--answers <file.json>`; re-runnable any time after phase 29).
 
 ## Notes for interpreting output
 

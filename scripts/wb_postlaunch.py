@@ -27,13 +27,13 @@ deploy + § Wizard config output + § Skill installation):
      `website-maintainer.md` (placeholders resolved) + the runbooks + README
      into `.website-builder/post-launch/`.
 
-WHY A STANDALONE RUNNER, NOT A `wb` VERB:
-  The `wb` CLI verb surface is locked (scripts/wb.py lines 72-77; adding a verb
-  is a General-review change). This runner ships standalone — invoked by the
-  wb-deploy skill at phase 29 + re-runnable directly — exactly as wb-bootstrap.py
-  is the runner behind the wb-bootstrap skill. Wiring a `wb maintain postlaunch`
-  CLI verb is a clean follow-up once the dispatcher surface is open for edits
-  (see RPT-phase-6-captain-s.md § Follow-ups).
+WHY A STANDALONE RUNNER (not reimplemented inside the `wb` CLI):
+  This runner ships standalone — invoked by the wb-deploy skill at phase 29 +
+  re-runnable directly — exactly as wb-bootstrap.py is the runner behind the
+  wb-bootstrap skill. `scripts/wb.py`'s `wb maintain postlaunch` verb (the F7
+  audit-follow-up, see RPT-phase-6-captain-s.md § Follow-ups) is a thin
+  subprocess delegate to THIS file, the same way `maintain reconfig` delegates
+  to wb-bootstrap.py — it does not reimplement materialize().
 
 CONTRACT: invoked with cwd = the user's project directory (or --project-dir),
 reads/writes `.website-builder/`. Pure-stdlib (argparse); PyYAML when available,

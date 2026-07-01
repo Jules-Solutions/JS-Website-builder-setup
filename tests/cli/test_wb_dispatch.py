@@ -308,10 +308,18 @@ class TestWbDispatch:
         rc, out, err = _run_wb_py(["skills", verb, "--help"])
         assert rc == 0, f"`wb skills {verb} --help` exited {rc}: {err}"
 
-    @pytest.mark.parametrize("verb", ["reconfig", "install-skills"])
+    @pytest.mark.parametrize("verb", ["reconfig", "install-skills", "postlaunch"])
     def test_maintain_subverb_help(self, verb):
         rc, out, err = _run_wb_py(["maintain", verb, "--help"])
         assert rc == 0, f"`wb maintain {verb} --help` exited {rc}: {err}"
+
+    def test_maintain_help_lists_postlaunch(self):
+        """F7 discoverability: `wb maintain --help` must list `postlaunch` so
+        the post-launch materializer (scripts/wb_postlaunch.py) isn't only
+        reachable by a user/agent who already knows the script exists."""
+        rc, out, err = _run_wb_py(["maintain", "--help"])
+        assert rc == 0, f"`wb maintain --help` exited {rc}: {err}"
+        assert "postlaunch" in (out + err)
 
     def test_unknown_command_rejected(self):
         rc, _, _ = _run_wb_py(["bogus-verb"])
@@ -425,3 +433,66 @@ class TestWbDelegateIntegration:
         # wb-bootstrap.py ran: it initializes .website-builder/project.yaml.
         proj_yaml = project_dir / ".website-builder" / "project.yaml"
         assert proj_yaml.is_file(), "reconfig did not produce project.yaml"
+
+    def test_maintain_postlaunch_delegates(self, project_dir):
+        """F7: `wb maintain postlaunch` delegates to scripts/wb_postlaunch.py
+        (the standalone phase-29 materializer), the same subprocess-delegate
+        shape as `maintain reconfig` → wb-bootstrap.py."""
+        if _find_bootstrap_runner() is None:
+            pytest.skip("wb-bootstrap.py not present (Phase-1 substrate).")
+        postlaunch_runner = SCRIPTS_DIR / "wb_postlaunch.py"
+        if not postlaunch_runner.is_file():
+            pytest.skip("wb_postlaunch.py not present (Phase-6 substrate).")
+        env = _isolated_home(project_dir)
+
+        # postlaunch requires an initialized .website-builder/ (materialize()
+        # exits 2 without one) — bootstrap first via `maintain reconfig`, the
+        # same precondition the real phase-29 wizard has by that point.
+        rc0, out0, err0 = _run_wb_py(
+            ["--project-dir", str(project_dir), "maintain", "reconfig"], env=env,
+        )
+        assert rc0 == 0, f"bootstrap precondition failed: {rc0}\n{out0}{err0}"
+
+        rc, out, err = _run_wb_py(
+            ["--project-dir", str(project_dir), "maintain", "postlaunch"],
+            env=env,
+        )
+        combined = out + err
+        assert rc == 0, f"`maintain postlaunch` delegate exited {rc}\n{combined}"
+        config = project_dir / ".website-builder" / "post-launch" / "config.yaml"
+        assert config.is_file(), "postlaunch delegate did not write post-launch/config.yaml"
+
+    def test_maintain_postlaunch_passes_through_answers_and_force(self, project_dir):
+        """--answers and --force on the `maintain postlaunch` verb reach the
+        underlying wb_postlaunch.py invocation (not silently dropped)."""
+        if _find_bootstrap_runner() is None:
+            pytest.skip("wb-bootstrap.py not present (Phase-1 substrate).")
+        postlaunch_runner = SCRIPTS_DIR / "wb_postlaunch.py"
+        if not postlaunch_runner.is_file():
+            pytest.skip("wb_postlaunch.py not present (Phase-6 substrate).")
+        env = _isolated_home(project_dir)
+
+        rc0, out0, err0 = _run_wb_py(
+            ["--project-dir", str(project_dir), "maintain", "reconfig"], env=env,
+        )
+        assert rc0 == 0, f"bootstrap precondition failed: {rc0}\n{out0}{err0}"
+
+        answers_file = project_dir / "answers.json"
+        answers_file.write_text(
+            '{"maintainer_skills_installed": ["wb-maintain-content"]}',
+            encoding="utf-8",
+        )
+        rc, out, err = _run_wb_py(
+            [
+                "--project-dir", str(project_dir), "maintain", "postlaunch",
+                "--answers", str(answers_file), "--force",
+            ],
+            env=env,
+        )
+        assert rc == 0, f"`maintain postlaunch --answers --force` exited {rc}\n{out}{err}"
+        skills_dir = project_dir / ".website-builder" / "post-launch" / "skills"
+        installed = {p.name for p in skills_dir.iterdir()} if skills_dir.is_dir() else set()
+        assert installed == {"wb-maintain-content"}, (
+            f"--answers subset not honored via the `wb maintain postlaunch` verb; "
+            f"materialized {installed}"
+        )

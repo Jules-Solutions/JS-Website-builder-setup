@@ -13,6 +13,17 @@ should agree with this detector's output for every fixture in tests/walkthroughs
 If Captain C's hook disagrees, the integration test (smoke_test.py::test_hook_*)
 fails — the General iterates with Captain C until alignment.
 
+SYNC CONTRACT (F9, website-builder audit 2026-06-15): hooks-handlers/session_start.py
+keeps an INDEPENDENT hand-synced reimplementation of this module's detect()
+precedence (branch order + gating conditions), not an import of this file — the
+plugin's shipped hook can't depend on a tests/-only module. The single-signal
+walkthrough fixtures can only catch a classification mismatch when exactly one
+signal is present; smoke_test.py::TestDetectorHookPrecedenceParity additionally
+exercises COMBINED-signal synthetic projects (e.g. both a .framer/ dir AND a
+.fig file at once) to catch branch-order drift that single-signal fixtures
+can't see. If you reorder or re-gate a branch in detect() below, mirror the
+change in session_start.py::detect_entry_mode() and re-run that test class.
+
 The detector is INTENTIONALLY minimal (single-file, no plugin imports) so the
 fixture suite can be validated in isolation, and so the reference vs. actual
 comparison is unambiguous.

@@ -312,6 +312,115 @@ class TestHookIntegration:
             shutil.rmtree(tempdir, ignore_errors=True)
 
 
+# --- Tier 2 — detector/hook precedence-parity drift guard (F9) -------------
+#
+# tests/detector.py is the reference implementation; hooks-handlers/session_start.py
+# keeps an INDEPENDENT hand-synced reimplementation of the same entry-mode
+# precedence (branch order + gating), not an import — the shipped hook can't
+# depend on a tests/-only module. test_hook_classifies_fixture above only
+# exercises the 5 walkthrough fixtures, each of which carries exactly ONE
+# signal, so it can't catch a precedence-ORDER divergence (e.g. "which mode
+# wins when a project has both a .framer/ dir AND a stray .fig file"). This
+# class builds synthetic COMBINED-signal projects specifically to make that
+# class of drift loud instead of silent — see the sync-contract comments atop
+# tests/detector.py::detect() and hooks-handlers/session_start.py::detect_entry_mode().
+
+_COMBINED_SIGNAL_CASES = [
+    pytest.param(
+        {".framer": "dir", "design.fig": "file"},
+        "has-Framer-attempt",
+        id="framer-and-figma",
+    ),
+    pytest.param(
+        {"next.config.js": "file", "design.fig": "file"},
+        "has-existing-site",
+        id="stack-config-and-figma",
+    ),
+    pytest.param(
+        {".framer": "dir", "next.config.js": "file"},
+        "has-Framer-attempt",
+        id="framer-and-stack-config",
+    ),
+]
+
+
+def _build_combined_signal_dir(spec: dict[str, str]) -> Path:
+    """Build a synthetic project dir carrying MULTIPLE entry-mode signals at
+    once (unlike the single-signal tests/walkthroughs/ fixtures), so precedence
+    order between competing signals is actually exercised."""
+    tmp = Path(tempfile.mkdtemp(prefix="wb-test-combined-"))
+    for name, kind in spec.items():
+        if kind == "dir":
+            (tmp / name).mkdir(parents=True, exist_ok=True)
+        else:
+            (tmp / name).write_text("placeholder", encoding="utf-8")
+    return tmp
+
+
+class TestDetectorHookPrecedenceParity:
+    """
+    Tier 2. Skipped under the same condition as TestHookIntegration (hook not
+    yet authored). For each combined-signal case, asserts BOTH the reference
+    detector.py AND the production session_start.py hook agree on the winning
+    entry_mode — proving the two hand-synced precedence orders haven't drifted.
+    """
+
+    hook: Path
+
+    @pytest.fixture(autouse=True)
+    def _skip_if_missing(self):
+        hook = _find_session_start_hook()
+        if hook is None:
+            pytest.skip(
+                "SessionStart hook not yet authored (Captain C scope). "
+                "Re-run after Captain C's branch merges to dev."
+            )
+        self.hook = hook
+
+    @pytest.mark.parametrize("signals,expected_mode", _COMBINED_SIGNAL_CASES)
+    def test_precedence_agrees_on_combined_signals(self, signals, expected_mode):
+        tempdir = _build_combined_signal_dir(signals)
+        try:
+            det_result = detect(tempdir)
+            assert det_result.entry_mode == expected_mode, (
+                f"tests/detector.py's OWN documented precedence disagrees with "
+                f"itself for combined signals {signals}: got "
+                f"{det_result.entry_mode}, expected {expected_mode}. Fix the "
+                f"test's expectation or detect()'s branch order before "
+                f"trusting the cross-hook comparison below."
+            )
+
+            cmd = _hook_invocation_command(self.hook)
+            proc = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                env={**os.environ, "CLAUDE_PLUGIN_ROOT": str(PLUGIN_ROOT)},
+                cwd=str(tempdir),  # hook reads Path.cwd() per CC SessionStart spec
+                timeout=30,
+            )
+            assert proc.returncode == 0, (
+                f"hook exited {proc.returncode} for combined signals {signals}\n"
+                f"stdout: {proc.stdout}\nstderr: {proc.stderr}"
+            )
+            output = _parse_hook_output(proc.stdout)
+            assert output is not None, (
+                f"hook output unparseable for combined signals {signals}\n"
+                f"stdout: {proc.stdout}"
+            )
+            assert output.get("entry_mode") == expected_mode, (
+                f"session_start.py's detect_entry_mode() DISAGREES with "
+                f"detector.py's precedence for combined signals {signals}: "
+                f"hook picked {output.get('entry_mode')!r}, detector.py picks "
+                f"{expected_mode!r}. This is exactly the drift the F9 sync "
+                f"contract exists to catch — align detect_entry_mode()'s "
+                f"branch order/gating with detect()'s (see the sync-contract "
+                f"comments in both files)."
+            )
+        finally:
+            shutil.rmtree(tempdir, ignore_errors=True)
+
+
 # --- Tier 2 — Bootstrap-skill integration tests ----------------------------
 
 def _find_bootstrap_skill() -> Path | None:
