@@ -48,7 +48,7 @@ The work product is a structured voice record stored under `.website-builder/bra
 
 1. **Voice description.** One or two sentences in the agent's prose summarizing how this site sounds. *"Warm and direct, like a friend who tells you the truth even when it's inconvenient — never preachy, never apologetic, never glib."* The description is grounded in specifics, not stacked adjectives.
 
-2. **Voice attributes.** 3-5 specific adjectives. Not "professional" — "rigorous", "quietly confident", "plainspoken". The agent challenges generic words; reaches for the attribute corpus in `${CLAUDE_PLUGIN_ROOT}/reference-corpus/voice-archetypes/` when the user struggles to find words.
+2. **Voice attributes.** 3-5 specific adjectives. Not "professional" — "rigorous", "quietly confident", "plainspoken". The agent challenges generic words; reaches for the attribute corpus in `.website-builder/library/voice-archetypes/` when the user struggles to find words.
 
 3. **Nielsen Norman 4D tone profile.** Each of four dimensions placed on a 3-point scale (or left neutral for that dimension):
    - **Humor:** funny / neutral / serious
@@ -60,7 +60,7 @@ The work product is a structured voice record stored under `.website-builder/bra
 
 4. **Say / never-say examples.** 3-5 phrases the brand would say + 3-5 phrases the brand would never say. The never-say list is more diagnostic than the say list — the brand defines itself partly by what it refuses. *Say*: "You're not broken; the world is heavy." *Never say*: "Optimize your wellness journey." The agent surfaces patterns: corporate-AI-cheerleader vocabulary, LinkedIn-buzzword stack, anti-vision phrases from the agent profile, generic-marketing-speak.
 
-5. **1-2 voice exemplars.** Existing brands whose voice the user wants the site to share family with. The agent loads from `${CLAUDE_PLUGIN_ROOT}/reference-corpus/voice-archetypes/` (Mailchimp, Slack, Patagonia, Liquid Death, Stripe, Apple, Notion etc. — each catalogued with their published voice guide) and helps the user pick 1-2 that resonate. Voice exemplars do NOT have to be in the user's industry — Stripe's voice is referenced by writers building consumer wellness brands; what matters is the verbal posture, not the category.
+5. **1-2 voice exemplars.** Existing brands whose voice the user wants the site to share family with. The agent loads from `.website-builder/library/voice-archetypes/` (Mailchimp, Slack, Patagonia, Liquid Death, Stripe, Apple, Notion etc. — each catalogued with their published voice guide) and helps the user pick 1-2 that resonate. Voice exemplars do NOT have to be in the user's industry — Stripe's voice is referenced by writers building consumer wellness brands; what matters is the verbal posture, not the category.
 
 Output schema:
 
@@ -118,7 +118,7 @@ The override path applies — the user can advance with thin voice and the agent
 - **`AskUserQuestion`** — heavy use. The voice extraction is conversation-shaped; each of the five output parts (description / attributes / NN4D profile / say-never-say / exemplars) emerges via several rounds of questioning + reflecting.
 - **`Read`** — to read `.website-builder/project.yaml` (idea + vision + requirements + entity) at phase entry; to read any prior artifact's voice samples when entry mode is non-greenfield (existing site copy, social posts, client emails).
 - **`Write` / `Edit`** — to update `.website-builder/brand.yaml.voice`. This is the first write to `brand.yaml` in the pipeline.
-- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/voice-archetypes/` is the core corpus, catalogued in `DESIGN-ecosystem-catalog.md`. Each archetype entry has: brand name, public voice guide URL, attributes, NN4D profile, say/never-say excerpts. Agent surfaces 5-10 candidates when the user wants to react to options rather than start cold.
+- **Reference-data load** — `.website-builder/library/voice-archetypes/` is the core corpus, catalogued in `DESIGN-ecosystem-catalog.md`. Each archetype entry has: brand name, public voice guide URL, attributes, NN4D profile, say/never-say excerpts. Agent surfaces 5-10 candidates when the user wants to react to options rather than start cold.
 - **`WebFetch`** — used to load voice-guide pages of named exemplars when they're public (Slack's voice guide at api.slack.com/start/designing/voice-tone; Mailchimp's at mailchimp.com/resources/issue-19-brand-voice/; etc.). Fresh-fetched at this phase so training-data drift doesn't matter. Also used when the user names a smaller brand the agent doesn't have catalogued — the agent fetches their site, reads the about + footer + a representative page, and summarizes the voice for the user to confirm.
 - **`WebSearch`** — used when the user wants exposure to current voice-guide methodologies (Nielsen Norman's 4D framework, Mailchimp's brand archetype framework, Slack's voice + tone playbook, Bigeye / Frontify / Sprout Social guides) but doesn't have a particular reference in mind.
 
@@ -166,7 +166,7 @@ The agent updates `.website-builder/project.yaml.current_phase` to `6` upon user
 - **Design doc — voice-output layer (CDJSON):** `DESIGN-content-layers.md` § Layer 3 — Content Design JSON (microcopy + UI strings) — the voice lives in `brand.yaml.voice`; phase 16 + content phases write strings that reflect it; the methodology source for that pattern is https://uxcontent.com/content-design-json/
 - **Design doc — multi-language voice interaction:** `DESIGN-i18n.md` § Translation workflow (per-language voice rendering happens at phase 16; this phase captures the language-neutral profile)
 - **Design doc — voice-archetype corpus catalogue:** `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources (catalog entry for `voice-archetypes/`)
-- **Plugin corpus — voice archetypes:** `${CLAUDE_PLUGIN_ROOT}/reference-corpus/voice-archetypes/` — catalogued brand voice exemplars with public voice-guide URLs, NN4D profiles, say/never-say excerpts
+- **Plugin corpus — voice archetypes:** `.website-builder/library/voice-archetypes/` — catalogued brand voice exemplars with public voice-guide URLs, NN4D profiles, say/never-say excerpts
 - **External methodology (loaded fresh 2026-05-18 for this contract):**
   - Nielsen Norman Group — The Four Dimensions of Tone of Voice — https://www.nngroup.com/articles/tone-of-voice-dimensions/ (the empirical scaffold this contract uses: humor / formality / respectfulness / enthusiasm, each as a 3-point scale)
   - Nielsen Norman Group — The Impact of Tone of Voice on Users' Brand Perception — https://www.nngroup.com/articles/tone-voice-users/ (research grounding why voice matters in UX context)

@@ -1,6 +1,6 @@
 # reference-corpus/
 
-> Selectively cloneable reference docs that ship with the plugin. The agent reads from here directly (at `${CLAUDE_PLUGIN_ROOT}/reference-corpus/<dir>/`) at session-start or phase-trigger when content is load-bearing — no vault, no network required.
+> Reference docs that ship with the plugin at `${CLAUDE_PLUGIN_ROOT}/reference-corpus/<dir>/`. The orchestration spine auto-clones the relevant corpus into `.website-builder/library/<dir>/` at phase entry (a local copy, no network), where the agent reads it — no vault required.
 >
 > **The menu:** `ECOSYSTEM-CATALOG.md` (this directory) is the shipped, self-contained catalogue of every tool / library / platform / inspiration source the agent surfaces across the pipeline, each tagged with its surfacing mode (`bundled` / `clone-into-project` / `fetch-on-demand`). Read it to hand the user options; hand it to the user for inspiration.
 

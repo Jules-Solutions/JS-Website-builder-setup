@@ -39,7 +39,7 @@ For every section type across the site (de-duplicated — a section on 3 pages i
 4. **Content placeholder per prose slot.** A spec, not prose: approximate length, voice constraint (phase 5), content source (phase 6 inventory). The brief phase 16 writes against.
 5. **String-key declarations.** Every reusable microcopy slot gets its key declared in `strings/${default_language}.json` with empty/placeholder value. Phase 16 supplies values.
 
-Propose first-draft specs from `${CLAUDE_PLUGIN_ROOT}/reference-corpus/component-patterns/` (the ~20 canonical types — hero, feature-grid, testimonial, pricing-table, faq-accordion, cta-band, logo-cloud, team-grid, blog-card, contact-form, etc.) and let the user adjust rather than author from scratch.
+Propose first-draft specs from `.website-builder/library/component-patterns/` (the ~20 canonical types — hero, feature-grid, testimonial, pricing-table, faq-accordion, cta-band, logo-cloud, team-grid, blog-card, contact-form, etc.) and let the user adjust rather than author from scratch.
 
 Reconcile reuse: a section type used on multiple pages is specced once; each page references it. Merge accidental near-duplicates; use component `variants` (per `sections.yaml`) when uses genuinely differ rather than creating near-duplicate components. Healthy component count for a 5-15 page site: **10-20 distinct types**; if component count approaches section count, force de-duplication.
 
@@ -55,7 +55,7 @@ Reconcile reuse: a section type used on multiple pages is specced once; each pag
 | Failure | Recovery |
 |---|---|
 | "Just put the headline text in the component" | The most common failure. Move it: component gets `headline: {type: string, max_chars: 60}`; the literal sentence becomes a phase-16 placeholder in the page body. Explain once per occurrence (the German-version + change-words-without-touching-component rationale). Sticks after 2-3. |
-| "This section needs a custom one-off component" | Often premature. Check `${CLAUDE_PLUGIN_ROOT}/reference-corpus/component-patterns/` + `components.yaml` for a reusable existing type first. Genuinely novel = fine; near-duplicate ("HeroBlockV2" differing only in content) = merge. |
+| "This section needs a custom one-off component" | Often premature. Check `.website-builder/library/component-patterns/` + `components.yaml` for a reusable existing type first. Genuinely novel = fine; near-duplicate ("HeroBlockV2" differing only in content) = merge. |
 | "I'll write the actual copy here" | Phase 15 is content *spec*, not copy. Allow drafting but flag phase-16 voice pass will re-touch it. Push back on vague placeholders — *"good copy here"* is not a spec; *"≤60 chars, warm-direct, communicates what-this-is in one line, sourced from phase-1 idea"* is. |
 | "What data does the testimonial section pull?" | The static-vs-dynamic distinction. 3 fixed user-supplied quotes = static (page-body placeholders). CMS collection that grows = dynamic (`data:` block, wired phase 18). Spec accordingly — wrong here = wrong data-fetching code at 18. |
 | Mixing components into content bodies | Inverse failure. `max_chars: 60` / `responsive: stacked` in a page-body placeholder → move to `components.yaml`. Page bodies hold content; `components.yaml` holds shapes. |

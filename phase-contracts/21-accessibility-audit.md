@@ -122,7 +122,7 @@ Foundation docs:
 - `DESIGN-architecture.md` § Integration with Claude Code primitives (Playwright + Bash audit tooling) / § context7 integration.
 - `DESIGN-project-scaffold.md` § `audit/` conventions; `components.yaml` a11y-obligation fields.
 - `DESIGN-context7-integration.md` — phase 21 invokes context7 for axe-core + Lighthouse current invocation + library a11y patterns; cross-stack a11y library IDs (`/dequelabs/axe-core`, `/GoogleChrome/lighthouse`).
-- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/component-patterns/` — canonical accessible patterns for the common component types (the a11y baseline the audit checks against).
+- `.website-builder/library/component-patterns/` — canonical accessible patterns for the common component types (the a11y baseline the audit checks against).
 
 WCAG + tooling (mandatory at this phase — current as of the freshness date):
 

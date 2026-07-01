@@ -71,7 +71,7 @@ Override is available on the skip-into-design gate via explicit confirmation wit
 - **Read** — agent reads `.website-builder/content/pages/{slug}.md` briefs (phase 13 output), `.website-builder/project.yaml.vision` (phase 2), `.website-builder/sitemap.yaml.navigation` (phase 10) to anchor wireframes.
 - **WebFetch** — the agent loads phase-2 reference URLs and walks their layout structure with the user as wireframe inspiration ("the site you cited stacks the hero like this — want that, or the inverse?"). Per `DESIGN-templates-catalog.md`: templates and reference sites are *studied for layout patterns, never imported*.
 - **WebSearch** — to surface current text-based-wireframe conventions so the wireframes the agent produces use the patterns developers and AI tools currently parse cleanly (Unicode box-drawing, labeled regions, breakpoint annotations).
-- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` for per-stack inspiration sources; `${CLAUDE_PLUGIN_ROOT}/reference-corpus/component-patterns/` for canonical section-layout archetypes.
+- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` for per-stack inspiration sources; `.website-builder/library/component-patterns/` for canonical section-layout archetypes.
 
 No `Write` / `Edit` on actual code files — those are gated until phase 18. The wireframe is a text artifact in `.website-builder/`, not stack code.
 
@@ -168,8 +168,8 @@ Current text-based-wireframe convention (so the agent produces wireframes that h
 
 Inspiration corpus:
 
-- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/component-patterns/` — canonical section-layout archetypes (hero variants, feature-grid variants, pricing-table variants) the agent draws wireframe options from.
-- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` — complete brand systems showing how mature brands sequence and lay out page-types.
+- `.website-builder/library/component-patterns/` — canonical section-layout archetypes (hero variants, feature-grid variants, pricing-table variants) the agent draws wireframe options from.
+- `.website-builder/library/brand-examples/` — complete brand systems showing how mature brands sequence and lay out page-types.
 - Per-stack template catalog (per `DESIGN-templates-catalog.md`) — the agent surfaces the stack's curated templates (from phase 11's stack pick) as layout inspiration the user reacts to, never imports.
 
 Phase-2 vision input:

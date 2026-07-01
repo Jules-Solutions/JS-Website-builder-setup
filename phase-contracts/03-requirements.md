@@ -112,7 +112,7 @@ The override path applies — the user can advance with under-defined audience o
 - **`WebSearch`** — used when the user cannot name competitors or wants to broaden the scan ("are there competitors in this space I might be missing?"). Industry-specific positioning frameworks (B2B research questionnaire patterns; named methodologies like Kalungi's competitive scoring; the prospeo / product-marketing-alliance persona templates) are surfaced when the user wants structured templates instead of conversational extraction.
 - **`Read`** — to read `.website-builder/project.yaml.idea` and `.vision` at phase entry; to read any prior artifact's audience/CTA hints when entry mode is non-greenfield.
 - **`Write` / `Edit`** — to update `.website-builder/project.yaml` with the captured requirements.
-- **Reference-data load** — the agent may surface 2026 B2B persona templates and conversion-design playbooks when the user wants structured guides (catalogued in `${CLAUDE_PLUGIN_ROOT}/reference-corpus/seo-checklists/` and external resources cited in `Reference materials`).
+- **Reference-data load** — the agent may surface 2026 B2B persona templates and conversion-design playbooks when the user wants structured guides (catalogued in `.website-builder/library/seo-checklists/` and external resources cited in `Reference materials`).
 
 No subagent spawn by default. When the user wants a parallel competitor scan ("WebFetch all 5 competitor sites at once and summarize each"), the agent may spawn a research subagent — but the default is sequential, in-conversation, so each competitor becomes a real anchor for the positioning discussion.
 

@@ -75,7 +75,7 @@ Override is available only on the voice-drift and LinkedIn-speak gates via expli
 - **WebSearch** — to surface current copywriting / voice-and-tone best-practice and current Content Design JSON microcopy conventions, so the agent's voice cross-check reflects current professional practice, not stale training data.
 - **WebFetch** — to load a phase-5 voice-exemplar brand's live site and study its actual register (the agent reads the exemplar's microcopy and headlines to calibrate the voice cross-check against a real example, per `DESIGN-templates-catalog.md`: studied for voice, never copied).
 - **Write** — for multilingual sites, the agent writes per-language `content/pages/{slug}.{lang}.md` files (Pattern A) and per-language `content/strings/{lang}.json` files; for translator-handoff (Pattern 2), the agent writes `briefs/translation-{lang}-{ts}.json`.
-- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/voice-archetypes/` for voice calibration; `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` for how mature brands carry voice through microcopy.
+- **Reference-data load** — `.website-builder/library/voice-archetypes/` for voice calibration; `.website-builder/library/brand-examples/` for how mature brands carry voice through microcopy.
 
 The `wb-content` phase-group skill (loaded since phase 13) carries the cross-phase contract: the prose phase 16 writes goes into the same files phase 13-15 specced, and phase 19 (composition) renders them into stack code. No re-architecting at phase 16 — only the words change; the structure is locked.
 
@@ -201,8 +201,8 @@ Content Design JSON methodology (the microcopy-as-system discipline):
 
 Voice corpus:
 
-- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/voice-archetypes/` — exemplars across the verbal-identity spectrum, for calibrating the phase-5 voice cross-check.
-- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` — complete brand systems showing how mature brands carry one voice through headlines, body, and microcopy consistently.
+- `.website-builder/library/voice-archetypes/` — exemplars across the verbal-identity spectrum, for calibrating the phase-5 voice cross-check.
+- `.website-builder/library/brand-examples/` — complete brand systems showing how mature brands carry one voice through headlines, body, and microcopy consistently.
 - Phase-5 `exemplar_brands` — the agent WebFetches the live sites of the 1-2 voice-exemplar brands from `brand.yaml.voice.exemplar_brands` and studies their actual microcopy + headline register to calibrate the cross-check against a real example (studied for voice, never copied, per `DESIGN-templates-catalog.md`).
 
 WebSearch / WebFetch (recommended at this phase):

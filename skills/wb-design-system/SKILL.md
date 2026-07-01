@@ -20,7 +20,7 @@ Design-doc grounding (read as needed, do not paraphrase blindly):
 
 - `DESIGN-skill-uiuxpromax.md` — the MVP primary design-skill flavor (locked decision 55). The 50+ styles / 161 palettes / 57 font pairings / 99 UX guidelines surface it drives, plus the option-narrowing discipline and composition/conflict rules.
 - `DESIGN-context7-integration.md` — context7 is a foundation tool (locked decision 23); the invocation pattern + when it fires at phase 17.
-- `DESIGN-resource-curation.md` — how `${CLAUDE_PLUGIN_ROOT}/reference-corpus/design-systems/` + the awesome-design-md corpus subset surface (read for inspiration, never imported).
+- `DESIGN-resource-curation.md` — how `.website-builder/library/design-systems/` + the awesome-design-md corpus subset surface (read for inspiration, never imported).
 - `DESIGN-architecture.md` § Skills + § Stack-agnostic output design — why tokens are stack-independent and survive a stack switch.
 
 ## Bundled reference depth (progressive disclosure — load on demand)
@@ -59,7 +59,7 @@ If an entry condition is unmet, stop and route the user back — do not design o
 
 At phase-17 entry:
 
-- The awesome-design-md corpus subset auto-clones into `.website-builder/library/awesome-design-md/` (10–20 entries matched to the user's aesthetic direction, decision 42). Read these for *how mature systems articulate themselves in prose* — never to copy values. Same for `${CLAUDE_PLUGIN_ROOT}/reference-corpus/design-systems/` (Material 3 / Apple HIG / IBM Carbon role taxonomies).
+- The awesome-design-md corpus subset auto-clones into `.website-builder/library/awesome-design-md/` (10–20 entries matched to the user's aesthetic direction, decision 42). Read these for *how mature systems articulate themselves in prose* — never to copy values. Same for `.website-builder/library/design-systems/` (Material 3 / Apple HIG / IBM Carbon role taxonomies).
 - **context7 fires here** (foundation tool, decision 23 — the agent works with a *named* technology, Tailwind v4, whose token API changed materially v3→v4). Resolve + query:
   - `mcp__context7__resolve-library-id` → `mcp__context7__query-docs` for `/tailwindlabs/tailwindcss.com` — verify the current `@theme` directive + OKLCH default-palette shape + `--ease-*` tokens.
   - Same for `/shadcn-ui/ui` — verify the current `:root`/`.dark` OKLCH semantic-variable + `@theme inline` scaffold (this is the exact shape `brand.yaml.tokens.css` mirrors for the default path).

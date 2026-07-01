@@ -63,7 +63,7 @@ Override is available for any gating rule via explicit user confirmation. The ag
 
 ## Tools and skills used
 
-- **AskUserQuestion** — the primary tool. Each of the 8 decisions above surfaces as one or more `AskUserQuestion` interactions. The agent presents the trade-offs concretely (with examples from reference sites in `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` and `reference-corpus/inspiration/`) and lets the user pick.
+- **AskUserQuestion** — the primary tool. Each of the 8 decisions above surfaces as one or more `AskUserQuestion` interactions. The agent presents the trade-offs concretely (with examples from reference sites in `.website-builder/library/brand-examples/` and `reference-corpus/inspiration/`) and lets the user pick.
 - **Read** — agent reads `.website-builder/sitemap.yaml` to enumerate pages, parent relationships, and page-types.
 - **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` for accepted IA patterns; `.website-builder/library/component-patterns/navigation.md` (when populated) for nav component archetypes; `.website-builder/library/seo-checklists/ia.md` for SEO-driven IA constraints (URL depth, breadcrumb schema, navigational page-naming for crawlability).
 - **WebFetch** (occasional) — the agent may load a competitor or reference URL from phase 2 and walk its nav structure with the user, naming what works and what doesn't.

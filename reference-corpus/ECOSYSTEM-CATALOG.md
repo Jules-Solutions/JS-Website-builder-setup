@@ -10,7 +10,7 @@ Every entry carries a **surfacing tag** telling the agent how the resource reach
 
 | Tag | Meaning |
 |---|---|
-| `bundled` | Ships inside the plugin at `${CLAUDE_PLUGIN_ROOT}/reference-corpus/<dir>/`. Always present; the agent reads it directly — no clone, no network. |
+| `bundled` | Ships inside the plugin at `${CLAUDE_PLUGIN_ROOT}/reference-corpus/<dir>/`. The orchestration spine auto-clones it into `.website-builder/library/<dir>/` at phase entry (a local copy — no network), where the agent reads it. Always present on any install. |
 | `clone-into-project` | A local copy is installed into `.website-builder/library/` at session-start or phase trigger when it is load-bearing for the current phase (via `wb library` / auto-clone). Used for docs queried repeatedly during a phase. |
 | `fetch-on-demand` | The agent reaches it via WebFetch / context7 / HTTP API / MCP at the moment of need. Used for large/changing docs, rare lookups, big registries, and inspiration surfaces. |
 
@@ -20,7 +20,7 @@ Every entry carries a **surfacing tag** telling the agent how the resource reach
 
 ## Bundled reference corpora
 
-These ship inside the plugin and the agent reads them directly at `${CLAUDE_PLUGIN_ROOT}/reference-corpus/<dir>/`. They are guaranteed present on any install (no vault, no network required).
+These ship inside the plugin at `${CLAUDE_PLUGIN_ROOT}/reference-corpus/<dir>/`. At phase entry the orchestration spine auto-clones the relevant corpus into `.website-builder/library/<dir>/` (a local copy — no network), where the agent reads it. They are guaranteed present on any install (no vault, no network required).
 
 | Corpus | Path | Surfacing | Consumed at | What it is |
 |---|---|---|---|---|
@@ -321,4 +321,4 @@ As the project progresses, `clone-into-project` resources land in `.website-buil
 └── README.md          # what's here + when each was cloned
 ```
 
-Bundled corpora (the six above) are read directly from `${CLAUDE_PLUGIN_ROOT}/reference-corpus/` and do **not** need cloning — they always ship with the plugin.
+Bundled corpora (the six above) always ship with the plugin (in `reference-corpus/`); the orchestration spine auto-clones the relevant ones into `.website-builder/library/<dir>/` at phase entry (a local copy, no network), where the agent reads them alongside the runtime-cloned resources.
