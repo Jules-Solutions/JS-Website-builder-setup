@@ -3,7 +3,7 @@
 scripts/wb_fanout.py — the website-builder plugin's parallel-research fan-out helper.
 
 Gap #8 of the orchestration-spine remediation program
-(`Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md` § 8, Wave 3b
+(`DESIGN-orchestration-spine.md` § 8, Wave 3b
 row). Parallel-agent research fan-out was prompt-only recipe text in the opt-in phase
 contracts (2 / 3 / 5 / 8). This module makes the parts Python CAN do real + tested.
 
@@ -57,7 +57,7 @@ Interface rules (locked — scripts/README.md § Interface rules + the spine mod
     wb_library / wb_orchestrate. Depends only on wb_markdown (a leaf util) + stdlib.
 
 See also:
-  - Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md § 8 (the contract)
+  - DESIGN-orchestration-spine.md § 8 (the contract)
   - skills/wb-fanout/SKILL.md (the agent-facing surface that executes the spawn-recipe)
   - scripts/wb_markdown.py (parse_yaml — brief + results + ledger reads)
   - scripts/wb.py (the `wb fanout` dispatch route)
@@ -105,7 +105,7 @@ TASKS_YAML_NAME = "tasks.yaml"      # the local task mirror (agents/website-buil
 LEDGER_KEY = "fanout"               # this module owns ONLY this subtree of tasks.yaml
 LIBRARY_DIR_NAME = "library"        # synthesis artifacts land in .website-builder/library/
 
-DESIGN_DOC = "Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md"
+DESIGN_DOC = "DESIGN-orchestration-spine.md"
 
 # The phases that surface the parallel-research opt-in (§ 8 + phase-contracts).
 # Fan-out at any other phase is a warning, not a hard error: the helper stays callable

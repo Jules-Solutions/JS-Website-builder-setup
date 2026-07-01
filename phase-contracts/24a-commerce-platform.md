@@ -9,12 +9,12 @@ next_phase: "24b"
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md
-  - Workstreams/website-builder/commerce/DESIGN-booking-calcom.md
-  - Workstreams/website-builder/commerce/DESIGN-payment-providers.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-commerce-stripe-checkout.md
+  - DESIGN-booking-calcom.md
+  - DESIGN-payment-providers.md
+  - DESIGN-secrets-and-keys.md
 ---
 
 # Phase 24a — Commerce platform setup *(only if `project.yaml.transactional` = true)*
@@ -76,7 +76,7 @@ Two deployment paths the agent helps pick: **Cal.com Cloud** (Cal-hosted at `cal
 
 ## Expansion commerce platforms (post-MVP, expansion phase 10 — brief mention)
 
-Fully designed in `Workstreams/website-builder/commerce/`, accessible to users who already know them, **not first-class in the MVP** (per decision 54). The agent names these only when the user asks or when Stripe Checkout / Cal.com is clearly the wrong fit, and logs an explicit expansion decision before proceeding with degraded (design-exists-runtime-adapter-later) support:
+Fully designed in the website-builder workstream (vault-side; not shipped as MVP adapters), accessible to users who already know them, **not first-class in the MVP** (per decision 54). The agent names these only when the user asks or when Stripe Checkout / Cal.com is clearly the wrong fit, and logs an explicit expansion decision before proceeding with degraded (design-exists-runtime-adapter-later) support:
 
 - **Shopify** — full storefront: catalogue, browse, search, inventory, shipping. The answer when the user needs a real store, not a buy-button. MVP substitute: none (Stripe Checkout is payment-only).
 - **Lemon Squeezy** — Merchant-of-Record for digital products; offloads sales-tax/VAT compliance. MVP substitute: Stripe Checkout + Stripe Tax (compliance stays the user's burden).
@@ -150,17 +150,17 @@ The `commerce-config.yaml` with embedded test-rehearsal evidence is the required
 
 ## Reference materials
 
-- **Design doc — Stripe Checkout (full recipe, read in full before standing up):** `Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md` — mental model, auth table, CRUD vocabulary, costs, stack pairings, i18n, TWINT section, the phase-24a 10-step setup sequence, limitations, failure modes
-- **Design doc — Cal.com booking (full recipe, read in full before standing up):** `Workstreams/website-builder/commerce/DESIGN-booking-calcom.md` — mental model, Cloud-vs-self-hosted, auth, CRUD vocabulary, costs, the phase-24a booking-branch sequence, TWINT-via-Stripe-only caveat, failure modes
-- **Design doc — payment-provider matrix (24b's source, TWINT-by-platform table):** `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` — the decision tree, the commerce-platform-TWINT-support table, the Swiss pause-and-report rule
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 24a (seed) + the 24→24a→24b→24c chain
-- **Design doc — key handling:** `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` § Provider key configuration UX + § Phase contracts (24a listed)
+- **Design doc — Stripe Checkout (full recipe, read in full before standing up):** `DESIGN-commerce-stripe-checkout.md` — mental model, auth table, CRUD vocabulary, costs, stack pairings, i18n, TWINT section, the phase-24a 10-step setup sequence, limitations, failure modes
+- **Design doc — Cal.com booking (full recipe, read in full before standing up):** `DESIGN-booking-calcom.md` — mental model, Cloud-vs-self-hosted, auth, CRUD vocabulary, costs, the phase-24a booking-branch sequence, TWINT-via-Stripe-only caveat, failure modes
+- **Design doc — payment-provider matrix (24b's source, TWINT-by-platform table):** `DESIGN-payment-providers.md` — the decision tree, the commerce-platform-TWINT-support table, the Swiss pause-and-report rule
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 24a (seed) + the 24→24a→24b→24c chain
+- **Design doc — key handling:** `DESIGN-secrets-and-keys.md` § Provider key configuration UX + § Phase contracts (24a listed)
 - **Phase 11 transactional decision (why this phase fired):** `phase-contracts/11-stack-decision.md` § Transactional decision + the donations/free-booking/paid-membership edge cases + decision-34 mid-project-change cost
 - **External research (loaded fresh 2026-05-18 for this contract):**
   - context7 `/stripe/stripe-node` v19.1.0 (High reputation, benchmark 74.21) — `stripe.checkout.sessions.create({ mode: 'payment'|'subscription', success_url, cancel_url, line_items, payment_method_types, metadata })`; webhook verification via `stripe.webhooks.constructEvent(rawBody, stripe-signature, whsec)`; cached to `.website-builder/library/docs/stripe.md`
   - Cal.com developer docs — https://cal.com/docs/api-reference (API v2 at `https://api.cal.com/v2/`; event-types, bookings, slots/available, webhooks; Cal.com Atoms React components for white-label) — confirmed current 2026-05-18
   - Stripe Checkout: https://docs.stripe.com/payments/checkout · Payment Links: https://docs.stripe.com/payments/payment-links · API: https://docs.stripe.com/api
   - Cal.com: https://cal.com · self-hosting: https://cal.com/docs/self-hosting · GitHub: https://github.com/calcom/cal.com
-- **Locked decision 54** (MVP commerce = Stripe Checkout + Cal.com) — STATE doc: `Workstreams/website-builder/website-builder.md`
+- **Locked decision 54** (MVP commerce = Stripe Checkout + Cal.com) — STATE doc: `website-builder.md`
 
 Freshness date for this contract: **2026-05-18**. The agent re-validates the Stripe + Cal.com API surface via context7/WebFetch at session start when phase 24a is active and re-fetches if the cached docs are >30 days old.

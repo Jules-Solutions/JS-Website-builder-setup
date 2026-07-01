@@ -77,7 +77,7 @@ The single sentence the agent can always fall back on: *"the words and the shape
 
 **Goal:** for every section across the site (de-duplicated by type), spec the component(s) it uses, the component fields/props with constraints, the data it needs (static vs dynamic), a content placeholder per prose slot, and the Content Design JSON string keys it needs. Write `components.yaml` (Layer 2), update `sections.yaml`, add content placeholders to page bodies (Layer 4 placeholder), declare string keys in `strings/{default_language}.json` (Layer 3).
 
-**Workflow:** for each section type ask: what component holds this? what fields? what data (static the user supplies, or dynamic from CMS/Stripe/recent-posts)? what must the prose in each slot accomplish? Propose first-draft specs from `.website-builder/library/component-patterns/` and let the user adjust rather than author from scratch. Reconcile reuse — a section used on 3 pages is specced once; merge accidental near-duplicates.
+**Workflow:** for each section type ask: what component holds this? what fields? what data (static the user supplies, or dynamic from CMS/Stripe/recent-posts)? what must the prose in each slot accomplish? Propose first-draft specs from `${CLAUDE_PLUGIN_ROOT}/reference-corpus/component-patterns/` and let the user adjust rather than author from scratch. Reconcile reuse — a section used on 3 pages is specced once; merge accidental near-duplicates.
 
 **The load-bearing discipline:** content/component separation. A section's *content* is what it says (the headline text). A section's *component* is the reusable shape that holds it (`HeroBlock` with `headline: {type: string, max_chars: 60}`). They live in separate layers. When the user puts a literal string into a component spec, move it out to a phase-16 placeholder or a string key; when they put `max_chars`/`responsive` into a content body, move it to `components.yaml`. Correct in place and explain — do not block advance over it. Full separation patterns + the diagnostic table in `references/content-component-separation.md`.
 
@@ -116,10 +116,10 @@ Reference files (loaded on demand — keep this SKILL.md lean):
 
 Foundation design docs (the source of truth — read directly):
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5-layer content stack; Layer 2 (structural specs), Layer 3 (Content Design JSON), Layer 4 (page prose). The `## What layer is what concern` diagnostic table is the agent's separation reference.
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — decisions 38-41, routing strategies, Pattern A/B, the three translation patterns, ICU pluralization, RTL.
-- `Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md` — templates and reference sites are studied for layout/voice, never imported. The phase-14 option-react method and phase-16 voice calibration draw from this.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` — the exact `.website-builder/content/` schemas these phases write.
+- `DESIGN-content-layers.md` — the 5-layer content stack; Layer 2 (structural specs), Layer 3 (Content Design JSON), Layer 4 (page prose). The `## What layer is what concern` diagnostic table is the agent's separation reference.
+- `DESIGN-i18n.md` — decisions 38-41, routing strategies, Pattern A/B, the three translation patterns, ICU pluralization, RTL.
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` — templates and reference sites are studied for layout/voice, never imported. The phase-14 option-react method and phase-16 voice calibration draw from this.
+- `DESIGN-project-scaffold.md` — the exact `.website-builder/content/` schemas these phases write.
 
 External methodology sources (cited because phases 13-16 implement them):
 

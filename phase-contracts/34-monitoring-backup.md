@@ -9,10 +9,10 @@ next_phase: ~
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-post-launch-template.md
+  - DESIGN-deploy-providers.md
 ---
 
 # Phase 34 — Monitoring + backup
@@ -108,16 +108,16 @@ The `monitoring.md` with the *verified-active* monitor + the *verified* recovery
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 34 (seed — **the gating one**: agent refuses to call the project complete without monitoring; common failure = "I'll know if it goes down", agent surfaces real-world evidence that users do not)
-- **Design doc — post-launch maintainer (the monitoring/escalate skills + the wizard that pre-decided uptime/error/backup, decisions 45/49):** `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` § Maintenance skill bundle (`wb-maintain-monitoring` / `wb-maintain-escalate`) + § Wizard-driven customization (uptime/error/backup wizard sections) — **referenced, not authored here**
-- **Design doc — deploy providers (per-host backup story + rollback path):** `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md` § Phase contracts that invoke this concern (phase 34 = "per-provider backup story documented; uptime monitoring configured")
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 34 (seed — **the gating one**: agent refuses to call the project complete without monitoring; common failure = "I'll know if it goes down", agent surfaces real-world evidence that users do not)
+- **Design doc — post-launch maintainer (the monitoring/escalate skills + the wizard that pre-decided uptime/error/backup, decisions 45/49):** `DESIGN-post-launch-template.md` § Maintenance skill bundle (`wb-maintain-monitoring` / `wb-maintain-escalate`) + § Wizard-driven customization (uptime/error/backup wizard sections) — **referenced, not authored here**
+- **Design doc — deploy providers (per-host backup story + rollback path):** `DESIGN-deploy-providers.md` § Phase contracts that invoke this concern (phase 34 = "per-provider backup story documented; uptime monitoring configured")
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
 - **Phase 29 (the wizard that pre-decided monitoring/backup + the deploy this watches):** `phase-contracts/29-hosting-deployment.md` § What Claude must establish
 - **Phase 33 (the prior post-launch phase; the no-gate contrast this phase breaks):** `phase-contracts/33-maintenance-cadence.md` § Skip authorization
-- **Secrets handling (monitor/error-tracking tokens — user-supplied, not persisted):** `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` § Phase contracts (phase 34 = "uptime monitor / error tracking secrets")
+- **Secrets handling (monitor/error-tracking tokens — user-supplied, not persisted):** `DESIGN-secrets-and-keys.md` § Phase contracts (phase 34 = "uptime monitor / error tracking secrets")
 - **External research (loaded fresh 2026-05-18 for this contract):**
   - Uptime monitoring SaaS 2026 (WebSearch) — UptimeRobot free tier = 50 monitors @ 5-min (strongest free plan; Solo $7/mo, Team $15/mo); Better Stack free = 10 monitors @ 3-min + incident mgmt/status pages/logs; Pingdom free = 1; StatusCake 10; Cloudflare Health Checks (paid-tier-included). Confirmed 2026-05-18.
   - Sentry (WebFetch sentry.io/welcome + corroborated) — free tier, widely used, per-stack SDK; LogRocket/Raygun alternatives. Confirmed 2026-05-18.
-- **Locked decisions 37 + 45 + 49** (phases 31-34 run once; the deploy wizard pre-decides; the 8-skill maintainer's monitoring/escalate own ongoing) — STATE doc: `Workstreams/website-builder/website-builder.md`
+- **Locked decisions 37 + 45 + 49** (phases 31-34 run once; the deploy wizard pre-decides; the 8-skill maintainer's monitoring/escalate own ongoing) — STATE doc: `website-builder.md`
 
 Freshness date for this contract: **2026-05-18**. Monitor/error-tracking provider state evolves; the agent re-checks current SaaS state at session start when phase 34 is active and verifies every monitor is *active and alerting to a watched channel* — the pipeline does not close on a configured-but-not-verified monitor.

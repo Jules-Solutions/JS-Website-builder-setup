@@ -1,6 +1,6 @@
 # Phase 16 — Multilingual Translation Workflow
 
-The phase-16 multilingual procedure per locked decisions 38-41. Source of truth: `Workstreams/website-builder/foundation/DESIGN-i18n.md` (the canonical i18n design) + the phase-16 contract. i18n is a **default-on capability** in the website-builder, not an afterthought — Switzerland is natively multilingual (DE/FR/IT/EN); EU sites expect 2-4 languages. Single-language sites still work (one strings file); multi-language builds on the same scaffold.
+The phase-16 multilingual procedure per locked decisions 38-41. Source of truth: `DESIGN-i18n.md` (the canonical i18n design) + the phase-16 contract. i18n is a **default-on capability** in the website-builder, not an afterthought — Switzerland is natively multilingual (DE/FR/IT/EN); EU sites expect 2-4 languages. Single-language sites still work (one strings file); multi-language builds on the same scaffold.
 
 ## The four locked decisions phase 16 implements
 
@@ -117,8 +117,8 @@ This makes both Pattern 1 (inline) and Pattern 2 (handoff) smoother, and reduces
 
 ## References
 
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — full i18n design (routing, RTL, locale formatting, language switcher, hreflang, authoring-effort estimates).
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 3/4.
+- `DESIGN-i18n.md` — full i18n design (routing, RTL, locale formatting, language switcher, hreflang, authoring-effort estimates).
+- `DESIGN-content-layers.md` § Layer 3/4.
 - `references/content-design-json.md` — the strings schema this workflow translates.
 - ICU Message Format: https://unicode-org.github.io/icu/userguide/format_parse/messages/
 - hreflang spec: https://developers.google.com/search/docs/specialty/international/localized-versions

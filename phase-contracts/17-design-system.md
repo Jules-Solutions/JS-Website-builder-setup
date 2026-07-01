@@ -9,14 +9,14 @@ next_phase: 18
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/skills/DESIGN-skill-uiuxpromax.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
+  - DESIGN-skill-uiuxpromax.md
+  - DESIGN-context7-integration.md
+  - DESIGN-resource-curation.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
 # library_clones_at_entry — auto-clone triggers read by wb_library.autoclone_for_state(trigger="phase-entry", phase=17).
 # Schema: scripts/README.md § library_clones_at_entry. This is the Phase-5 WORKING EXAMPLE (per the contract,
 # Captain P adds the field to phase 17 ONLY; the other 37 contracts are back-filled by a future follow-up INST).
@@ -156,7 +156,7 @@ Override is available **only** on the arbitrary-color gate, and only via explici
 - **`AskUserQuestion`** — the primary tool. Used to surface the 3-5 grounded palette options, the type-pairing options, the scale-ratio choice, the dark-mode-strategy decision, and each iteration round. The user reacts; the agent does not interrogate.
 - **The design-skill flavor (loaded skill)** — UI/UX Pro Max by default (per locked decision 55). It drives palette generation (narrowing its 161 palettes to 3-5 grounded in phase-2 vision + phase-5 voice + chosen style), the 57 font pairings, the 50+ aesthetic styles, the 99 UX guidelines (spacing rhythm, type rhythm, motion timing). The agent invokes it with design verbs (`design`, `create`, `plan`). See `DESIGN-skill-uiuxpromax.md` for the full surface and the expansion-flavor composition rules.
 - **`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`** — for the current Tailwind CSS v4 token API (the OKLCH `@theme` directive, the `@theme inline` semantic-variable pattern shadcn uses). Per `DESIGN-context7-integration.md`, context7 fires here because the agent works with a *named* technology (Tailwind v4) whose token API has changed materially (v3 JS config → v4 CSS-first `@theme`). The agent verifies the current syntax rather than trusting training data.
-- **Reference-data load** — `.website-builder/library/design-systems/` (Material 3 / Apple HIG excerpts / IBM Carbon as structural exemplars), `.website-builder/library/awesome-design-md/` (DESIGN.md exemplars from Stripe / Shopify / Notion / etc. — a 10-20-entry subset auto-cloned at phase 17 entry per decision 42, chosen by the user's aesthetic direction). Per `DESIGN-resource-curation.md`, these are inspiration exemplars the agent reads — never templates it imports.
+- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/design-systems/` (Material 3 / Apple HIG excerpts / IBM Carbon as structural exemplars), `.website-builder/library/awesome-design-md/` (DESIGN.md exemplars from Stripe / Shopify / Notion / etc. — a 10-20-entry subset auto-cloned at phase 17 entry per decision 42, chosen by the user's aesthetic direction). Per `DESIGN-resource-curation.md`, these are inspiration exemplars the agent reads — never templates it imports.
 - **Stitch / divmagic / Figma-token output (from phase 6.5, if applicable)** — when entry mode ingested an artifact, the extracted token seed is loaded and extended.
 - **Template inspiration (read-only)** — per `DESIGN-templates-catalog.md`, the agent surfaces 3-5 stack-matched templates at the start of phase 17 *for aesthetic-vocabulary discussion only*, never to import. Templates are studied, never shipped.
 - **`Write` / `Edit`** — to write `brand.yaml.tokens` + `brand.yaml.tokens.css`, and to iterate them across review rounds.
@@ -202,11 +202,11 @@ The `tokens:` block is the only always-required artifact. The override decision 
 
 Foundation + skill docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 17 — the seed for this contract.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Stack-agnostic output design — why tokens are stack-independent and survive a stack switch; § Resource curation pattern; § context7 integration.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `brand.yaml` — the `tokens:` key schema.
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — Layer 1 (design tokens); phase 17 is where Layer 1 is established and every later layer composes against it.
-- `Workstreams/website-builder/skills/DESIGN-skill-uiuxpromax.md` — **the MVP primary design-skill flavor (locked decision 55)**. The 50+ styles, 161 palettes, 57 font pairings, 99 UX guidelines, 25 chart types it provides; the option-narrowing discipline; the composition + conflict-resolution rules with complementary flavors.
+- `DESIGN-phase-contracts.md` § 17 — the seed for this contract.
+- `DESIGN-architecture.md` § Stack-agnostic output design — why tokens are stack-independent and survive a stack switch; § Resource curation pattern; § context7 integration.
+- `DESIGN-project-scaffold.md` § `brand.yaml` — the `tokens:` key schema.
+- `DESIGN-content-layers.md` — Layer 1 (design tokens); phase 17 is where Layer 1 is established and every later layer composes against it.
+- `DESIGN-skill-uiuxpromax.md` — **the MVP primary design-skill flavor (locked decision 55)**. The 50+ styles, 161 palettes, 57 font pairings, 99 UX guidelines, 25 chart types it provides; the option-narrowing discipline; the composition + conflict-resolution rules with complementary flavors.
 
 Design-skill flavor scope (locked decision 55):
 
@@ -228,7 +228,7 @@ context7 / WebSearch / WebFetch (mandatory at this phase — citations are curre
 
 Inspiration corpus (read, never imported):
 
-- `.website-builder/library/design-systems/` — Material 3 / Apple HIG / IBM Carbon excerpts as structural exemplars (how a mature system maps roles).
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/design-systems/` — Material 3 / Apple HIG / IBM Carbon excerpts as structural exemplars (how a mature system maps roles).
 - `.website-builder/library/awesome-design-md/` — DESIGN.md exemplars (Stripe / Shopify / Notion / Figma etc.); a 10-20-entry aesthetic-matched subset auto-clones into `.website-builder/library/awesome-design-md/` at phase-17 entry per decision 42.
 - Template catalog (per `DESIGN-templates-catalog.md`) — stack-matched templates surfaced for aesthetic-vocabulary discussion at phase-17 start. Studied, never shipped.
 

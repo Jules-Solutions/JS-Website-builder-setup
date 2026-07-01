@@ -6,7 +6,7 @@
 
 **Read-only canonical anchor.** Phase 4 Captain L authors `commerce-stripe.md` + `booking-calcom.md` referencing this file by path — Captain L does not duplicate or modify the schema. Future commerce-adapter Captains (Shopify, Lemon Squeezy, Paddle, Snipcart, Saleor — Phase 10 expansion) likewise reference this schema. Any schema evolution flows through a General-reviewed prep packet (this file), not through individual adapter files.
 
-> Source: `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` § "Payment provider config schema" (~lines 398-435). Quoted verbatim below.
+> Source: `DESIGN-payment-providers.md` § "Payment provider config schema" (~lines 398-435). Quoted verbatim below.
 
 ## Canonical schema
 
@@ -125,11 +125,11 @@ When a new payment provider is added (e.g., a future Asian payment provider for 
 
 ## See also
 
-- `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` — source design doc; this file is the verbatim-extract canonical anchor for the schema portion
-- `Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md` — Stripe-specific integration patterns; consumes this schema
-- `Workstreams/website-builder/commerce/DESIGN-booking-calcom.md` — Cal.com Stripe-bridge for TWINT-on-paid-bookings; consumes this schema
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` — phase 24b contract; this schema is phase 24b's primary output artifact (per phase-contracts line 173: *"Output: `payment-config.yaml` + transaction-test report."*)
-- `Workstreams/website-builder/BUILD-strategy.md` Phase 4 DoD line 202 — *"TWINT path validates on Stripe Checkout (CH-region simulation)"* — the contract this schema's TWINT section makes concrete
+- `DESIGN-payment-providers.md` — source design doc; this file is the verbatim-extract canonical anchor for the schema portion
+- `DESIGN-commerce-stripe-checkout.md` — Stripe-specific integration patterns; consumes this schema
+- `DESIGN-booking-calcom.md` — Cal.com Stripe-bridge for TWINT-on-paid-bookings; consumes this schema
+- `DESIGN-phase-contracts.md` — phase 24b contract; this schema is phase 24b's primary output artifact (per phase-contracts line 173: *"Output: `payment-config.yaml` + transaction-test report."*)
+- `BUILD-strategy.md` Phase 4 DoD line 202 — *"TWINT path validates on Stripe Checkout (CH-region simulation)"* — the contract this schema's TWINT section makes concrete
 - `commerce-adapters/README.md` — commerce + booking adapter schema (sibling Phase 4 Captain 0 prep file); both schemas' § "TWINT-for-Switzerland callout" reference this file
 - `tests/commerce-adapters/README.md` — per-commerce + booking adapter test fixture convention (sibling Phase 4 Captain 0 prep file); the TWINT-required fixture rule embodies this schema's TWINT contract
 - `.claude/rules/secrets-conventions.md` — secrets handling for env vars referenced by this schema (`*_env` fields point to env var names; secret values via 1Password)

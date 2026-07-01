@@ -9,11 +9,11 @@ next_phase: 17
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/foundation/DESIGN-i18n.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
+  - DESIGN-i18n.md
 library_clones_at_entry:
   - resource: component-patterns
     as: component-patterns
@@ -75,7 +75,7 @@ Override is available only on the voice-drift and LinkedIn-speak gates via expli
 - **WebSearch** — to surface current copywriting / voice-and-tone best-practice and current Content Design JSON microcopy conventions, so the agent's voice cross-check reflects current professional practice, not stale training data.
 - **WebFetch** — to load a phase-5 voice-exemplar brand's live site and study its actual register (the agent reads the exemplar's microcopy and headlines to calibrate the voice cross-check against a real example, per `DESIGN-templates-catalog.md`: studied for voice, never copied).
 - **Write** — for multilingual sites, the agent writes per-language `content/pages/{slug}.{lang}.md` files (Pattern A) and per-language `content/strings/{lang}.json` files; for translator-handoff (Pattern 2), the agent writes `briefs/translation-{lang}-{ts}.json`.
-- **Reference-data load** — `.website-builder/library/voice-archetypes/` for voice calibration; `.website-builder/library/brand-examples/` for how mature brands carry voice through microcopy.
+- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/voice-archetypes/` for voice calibration; `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` for how mature brands carry voice through microcopy.
 
 The `wb-content` phase-group skill (loaded since phase 13) carries the cross-phase contract: the prose phase 16 writes goes into the same files phase 13-15 specced, and phase 19 (composition) renders them into stack code. No re-architecting at phase 16 — only the words change; the structure is locked.
 
@@ -189,9 +189,9 @@ For multilingual sites — additionally:
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — Layer 4 (page-level prose) + Layer 3 (Content Design JSON values). Phase 16 is where Layer 4 placeholders become prose and Layer 3 keys become values. The `## Why a separate layer` rationale (localization-ready, variable copy, reuse, auditing, translation handoff) is why microcopy lives in `strings/{lang}.json` and gets voiced here.
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — the canonical source for the multilingual behavior of this phase. Decisions 38-41 are implemented here: decision 38 (prefix URL routing — affects per-language file naming), decision 39 (Pattern A pages-per-language default — shared structure, translated prose), decision 40 (Pattern 1 agent-translates-inline default; Pattern 2 translator-handoff via brief is the upgrade path; Pattern 3 user-driven external tool), decision 41 (missing-key-shows-default-language-string fallback with validation warning). The `## Translation workflow` section's caveats (idioms, brand terms, voice nuance, commercial/legal copy) are what the agent surfaces when recommending Pattern 2.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `content/pages/{slug}.md` + `content/strings/{lang}.json` + Pattern A/B file-naming — the exact output conventions.
+- `DESIGN-content-layers.md` — Layer 4 (page-level prose) + Layer 3 (Content Design JSON values). Phase 16 is where Layer 4 placeholders become prose and Layer 3 keys become values. The `## Why a separate layer` rationale (localization-ready, variable copy, reuse, auditing, translation handoff) is why microcopy lives in `strings/{lang}.json` and gets voiced here.
+- `DESIGN-i18n.md` — the canonical source for the multilingual behavior of this phase. Decisions 38-41 are implemented here: decision 38 (prefix URL routing — affects per-language file naming), decision 39 (Pattern A pages-per-language default — shared structure, translated prose), decision 40 (Pattern 1 agent-translates-inline default; Pattern 2 translator-handoff via brief is the upgrade path; Pattern 3 user-driven external tool), decision 41 (missing-key-shows-default-language-string fallback with validation warning). The `## Translation workflow` section's caveats (idioms, brand terms, voice nuance, commercial/legal copy) are what the agent surfaces when recommending Pattern 2.
+- `DESIGN-project-scaffold.md` § `content/pages/{slug}.md` + `content/strings/{lang}.json` + Pattern A/B file-naming — the exact output conventions.
 - `.website-builder/brand.yaml.voice` (phase-5 output) — the voice contract phase 16 writes against. Re-read per section for the voice cross-check.
 
 Content Design JSON methodology (the microcopy-as-system discipline):
@@ -201,8 +201,8 @@ Content Design JSON methodology (the microcopy-as-system discipline):
 
 Voice corpus:
 
-- `.website-builder/library/voice-archetypes/` — exemplars across the verbal-identity spectrum, for calibrating the phase-5 voice cross-check.
-- `.website-builder/library/brand-examples/` — complete brand systems showing how mature brands carry one voice through headlines, body, and microcopy consistently.
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/voice-archetypes/` — exemplars across the verbal-identity spectrum, for calibrating the phase-5 voice cross-check.
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` — complete brand systems showing how mature brands carry one voice through headlines, body, and microcopy consistently.
 - Phase-5 `exemplar_brands` — the agent WebFetches the live sites of the 1-2 voice-exemplar brands from `brand.yaml.voice.exemplar_brands` and studies their actual microcopy + headline register to calibrate the cross-check against a real example (studied for voice, never copied, per `DESIGN-templates-catalog.md`).
 
 WebSearch / WebFetch (recommended at this phase):

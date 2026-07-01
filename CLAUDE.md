@@ -11,31 +11,30 @@
 | **Type** | CC plugin (standalone — not a platform service) |
 | **Purpose** | Turn Claude Code into a freelancer-shaped collaborator for muggles building websites — disciplined, refuses to skip steps, writes code in user's chosen stack |
 | **Repo** | `Jules-Solutions/JS-Website-builder-setup` (private, empty) — clone here once Phase 1 begins |
-| **Workstream home** | `Workstreams/website-builder/` — full design surface (66 docs) + STATE doc + BUILD strategy + daily log + decisions ledger |
+| **Authoring home** | The `website-builder` workstream in the Jules.Life vault (authoring SSOT; not part of this distribution) — full design surface (66 docs) + STATE doc + BUILD strategy + daily log + decisions ledger |
 | **Coverage** | `general-website-builder` — General-rank persistent owner, reports to Commander directly |
 | **Distribution** | Invite-only via Jules's network until v1 functional milestone; public release after Phase 9 |
 
-## Quick navigation (workstream side)
+## Quick navigation (in-plugin homes)
 
-For all design + coordination work, look at `Workstreams/website-builder/`:
+The runtime plugin surface lives in this repo. Its authoring design SSOT lives vault-side in the `website-builder` workstream (Jules.Life vault; not part of this distribution). For work on the plugin itself, navigate the in-repo homes:
 
-| Need | Where |
+| Need | Where (in this repo) |
 |---|---|
-| Strategic positioning + market gap | `Workstreams/website-builder/VISION-website-builder.md` |
-| Build sequence (the master plan) | `Workstreams/website-builder/BUILD-strategy.md` |
-| Architecture / plugin internals | `Workstreams/website-builder/foundation/DESIGN-architecture.md` |
-| 36+ phase pipeline | `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` |
-| `.website-builder/` user-side directory layout | `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` |
-| 5-layer content stack | `Workstreams/website-builder/foundation/DESIGN-content-layers.md` |
-| Per-stack adapter docs | `Workstreams/website-builder/stacks/` |
-| Per-CMS docs | `Workstreams/website-builder/cms/` |
-| Commerce + payment + booking | `Workstreams/website-builder/commerce/` |
-| Design-skill bundle | `Workstreams/website-builder/skills/` |
-| Extraction tools | `Workstreams/website-builder/extraction/` |
-| Component library catalogs | `Workstreams/website-builder/components/` |
-| Cross-cutting infrastructure | `Workstreams/website-builder/cross-cutting/` |
-| Daily log + decisions ledger | `Workstreams/website-builder/website-builder.md` |
-| Research instruments (3 questionnaires) | `Workstreams/website-builder/research/` |
+| The plugin's agent profile | `agents/website-builder.md` |
+| Phase pipeline (contracts) | `phase-contracts/NN-name.md` |
+| Per-stack adapters (MVP) | `adapters/stack-{framer,nextjs,wordpress}.md` |
+| Per-CMS adapters (MVP) | `cms-adapters/cms-{none,decap,payload}.md` |
+| Commerce + payment + booking | `commerce-adapters/` |
+| Design-skill bundle manifests | `skills-bundle/` |
+| Extraction tools | `extraction/` |
+| Component libraries | `component-libraries/` |
+| Ecosystem catalogue (the shipped menu) | `reference-corpus/ECOSYSTEM-CATALOG.md` |
+| Bundled reference corpora | `reference-corpus/` |
+| CLI + scripts | `scripts/` (see `scripts/README.md`) |
+| `.website-builder/` user-side state layout | `state/README.md` |
+
+Strategic positioning (VISION), the master build plan (BUILD-strategy), the decisions ledger, and the full `DESIGN-*` design surface remain vault-side in the `website-builder` workstream — they are the authoring SSOT, not shipped with the plugin.
 
 ## Why this isn't in `platform/`
 
@@ -54,7 +53,7 @@ When cloned (Phase 1), standard branch workflow per `.claude/rules/git-and-deplo
 - `dev` = agent work (default branch for ongoing builds)
 - PRs: `dev` → `master`
 
-This dir is gitignored at the vault level (`.gitignore` rule `Projects/*/`) — the subproject has its own git history that's independent of the vault's. Vault tracks design + coordination (`Workstreams/website-builder/`); the repo tracks plugin code (here).
+This dir is gitignored at the vault level (`.gitignore` rule `Projects/*/`) — the subproject has its own git history that's independent of the vault's. Vault tracks design + coordination (the `website-builder` workstream); the repo tracks plugin code (here).
 
 ## Coordination
 
@@ -68,7 +67,7 @@ This dir is gitignored at the vault level (`.gitignore` rule `Projects/*/`) — 
 
 ## Status as of 2026-05-10
 
-- **Design phase**: ✓ Complete in `Workstreams/website-builder/`. 50 architectural decisions locked. 66 design docs across 8 organized subdirs.
+- **Design phase**: ✓ Complete (vault-side, the `website-builder` workstream). 50 architectural decisions locked. 66 design docs across 8 organized subdirs.
 - **Build strategy**: ✓ Complete. `BUILD-strategy.md` authored with full 10-phase sequence + DoD per phase.
 - **Phase 0 (pre-flight)**: in progress. General profile + subproject dir created. CC plugin spec recon + manifest format decision + repo clone pending.
 - **Phase 1+ (codebase build)**: not yet started. Begins when the General is spawned and dispatches Captain A (Plugin manifest + repo bootstrap) per `BUILD-strategy.md`.

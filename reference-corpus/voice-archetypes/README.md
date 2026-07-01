@@ -37,4 +37,4 @@ Every file is **original reference prose** written for the website-builder plugi
 - `skills/wb-discovery/references/voice-archetype-frameworks.md` — the canonical NN4D / Aaker / Jung reference these archetypes operationalize (and the phase-4/5 firing rules).
 - `../brand-examples/` — complete brand systems whose `## Voice & tone` sections show a single voice fully dressed with tokens + components.
 - `../component-patterns/` — microcopy slots (CTA labels, form errors, empty states) inherit voice from the chosen archetype.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` §330 — the spec this dir satisfies.
+- `DESIGN-architecture.md` §330 — the spec this dir satisfies.

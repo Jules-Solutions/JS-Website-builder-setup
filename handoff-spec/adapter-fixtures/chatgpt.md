@@ -1,6 +1,6 @@
 # Adapter Fixture — ChatGPT
 
-> Per-tool handoff fixture for **ChatGPT** (chat.openai.com / the ChatGPT app). The most common muggle tool — a user who got value from ChatGPT will keep using it, so the protocol embraces it. Canonical design anchor: `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
+> Per-tool handoff fixture for **ChatGPT** (chat.openai.com / the ChatGPT app). The most common muggle tool — a user who got value from ChatGPT will keep using it, so the protocol embraces it. Canonical design anchor: `DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
 >
 > Tool behaviour verified 2026-06-14 (see "Sources" at the bottom). Re-verify on a cadence — these tools ship fast.
 

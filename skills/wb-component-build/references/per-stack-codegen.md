@@ -1,6 +1,6 @@
 # Per-stack phase-18 codegen patterns + context7 manifest + verified-current library notes
 
-> Loaded on demand during phase 18 when the agent writes component code. Canonical sources: the stack adapter docs (`Workstreams/website-builder/stacks/DESIGN-stack-{name}.md`), the per-ecosystem component docs, and `cross-cutting/DESIGN-context7-integration.md`. This reference consolidates the codegen-relevant shape per stack plus the context7 freshness notes verified at authoring (2026-05-18).
+> Loaded on demand during phase 18 when the agent writes component code. Canonical sources: the stack adapter docs (`adapters/stack-{name}.md` for shipped MVP stacks; expansion stacks are designed vault-side), the per-ecosystem component design docs (vault-side), and the context7 integration notes. This reference consolidates the codegen-relevant shape per stack plus the context7 freshness notes verified at authoring (2026-05-18).
 
 ## context7 at phase-18 entry — mandatory
 

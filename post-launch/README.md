@@ -1,6 +1,6 @@
 # `post-launch/` — the maintainer template (plugin source)
 
-> The "killer template" the website-builder installs into the user's project at deploy (phase 29). Per locked decisions 28 / 37 / 45 / 49 and `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md`.
+> The "killer template" the website-builder installs into the user's project at deploy (phase 29). Per locked decisions 28 / 37 / 45 / 49 and `DESIGN-post-launch-template.md`.
 
 This directory is **plugin source** — it ships with the website-builder plugin and is **not** itself the running maintainer. At phase 29 (deploy), the `wb-deploy` skill runs the 7-section customization wizard, then materializes a customized copy of this tree into the user's project at `.website-builder/post-launch/`. From then on, that materialized copy is the user's long-term site maintainer.
 
@@ -64,10 +64,10 @@ The materialization mechanism is the runner `scripts/wb_postlaunch.py` (the non-
 
 ## References
 
-- Design: `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md`
+- Design: `DESIGN-post-launch-template.md`
 - Phase 29 contract: `phase-contracts/29-hosting-deployment.md`
 - Phases 31-34 (launch-once): `skills/wb-postlaunch/SKILL.md`
-- Deploy providers (wizard provider input): `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md`
-- Secrets + keys (provider keys for monitoring / analytics): `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md`
-- i18n (translation-preference wizard section, decision 40): `Workstreams/website-builder/foundation/DESIGN-i18n.md`
-- Locked decisions 28 / 37 / 45 / 49 — STATE doc: `Workstreams/website-builder/website-builder.md`
+- Deploy providers (wizard provider input): `DESIGN-deploy-providers.md`
+- Secrets + keys (provider keys for monitoring / analytics): `DESIGN-secrets-and-keys.md`
+- i18n (translation-preference wizard section, decision 40): `DESIGN-i18n.md`
+- Locked decisions 28 / 37 / 45 / 49 — STATE doc: `website-builder.md`

@@ -68,7 +68,7 @@ Account / instance creation flow, API key management (via `secrets-conventions.m
 
 If the CMS has a notable CRUD vocabulary that translates non-obviously into native API verbs, document as `### CRUD vocabulary` H3 subsection. This is mandatory for `cms-none` (where "publish a page" = "commit + push a markdown file") per S1.
 
-**For Payload (S4):** `## Auth + setup` MUST surface the three-way database / hosting decision as an explicit Phase 12 prompt — Payload Cloud (managed; simplest) vs Vercel Postgres (Vercel-bundled; ~$20/mo) vs Neon (best free tier) — with cost / DX / data-residency trade-offs. Derived from `Workstreams/website-builder/cms/DESIGN-cms-payload.md` lines 564-569.
+**For Payload (S4):** `## Auth + setup` MUST surface the three-way database / hosting decision as an explicit Phase 12 prompt — Payload Cloud (managed; simplest) vs Vercel Postgres (Vercel-bundled; ~$20/mo) vs Neon (best free tier) — with cost / DX / data-residency trade-offs. Derived from `DESIGN-cms-payload.md` lines 564-569.
 
 ### `## Authoring patterns`
 
@@ -283,15 +283,15 @@ The H3 subsection inside `## Auth + setup` should:
 
 ## See also
 
-- `Workstreams/website-builder/BUILD-strategy.md` Phase 4 — DoD + dispatch model (lines 187-209)
-- `Workstreams/website-builder/cms/DESIGN-cms-none.md` — Captain I's primary design-doc source
-- `Workstreams/website-builder/cms/DESIGN-cms-decap.md` — Captain J's primary design-doc source
-- `Workstreams/website-builder/cms/DESIGN-cms-payload.md` — Captain K's primary design-doc source
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` — plugin directory layout (`cms-adapters/` per line 115)
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5 content layers the §6 table maps
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — i18n model + per-CMS hooks
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` — phase 12 (CMS decision) + phase 22 (forms / transactional) + phase 24a/b/c (commerce branching)
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
+- `BUILD-strategy.md` Phase 4 — DoD + dispatch model (lines 187-209)
+- `DESIGN-cms-none.md` — Captain I's primary design-doc source
+- `DESIGN-cms-decap.md` — Captain J's primary design-doc source
+- `DESIGN-cms-payload.md` — Captain K's primary design-doc source
+- `DESIGN-architecture.md` — plugin directory layout (`cms-adapters/` per line 115)
+- `DESIGN-content-layers.md` — the 5 content layers the §6 table maps
+- `DESIGN-i18n.md` — i18n model + per-CMS hooks
+- `DESIGN-phase-contracts.md` — phase 12 (CMS decision) + phase 22 (forms / transactional) + phase 24a/b/c (commerce branching)
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
 - `adapters/README.md` — stack adapter contract (Phase 3 prep); the `## Content layer mapping` row labels MUST match
 - `commerce-adapters/README.md` — commerce + booking adapter contract (sibling Phase 4 prep)
 - `commerce-adapters/payment-config-schema.md` — canonical `payment-config.yaml` schema for TWINT-via-Stripe-on-CHF Swiss-market constraint

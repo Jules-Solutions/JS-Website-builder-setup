@@ -102,6 +102,6 @@ The synthesis is raw material, not a decision. **Go back to the in-person conver
 ## Reference
 
 - `${CLAUDE_PLUGIN_ROOT}/scripts/wb_fanout.py` — the substrate (`decompose` / `aggregate` / `status` + the importable `build_run` / `aggregate_results` cores).
-- `Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md` § 8 — the Wave-3b contract this skill implements.
+- `DESIGN-orchestration-spine.md` § 8 — the Wave-3b contract this skill implements.
 - `phase-contracts/{02,03,05,08}-*.md` — the opt-in phases; each carries the in-person-default doctrine verbatim in its "Tools and skills used" section.
 - `${CLAUDE_PLUGIN_ROOT}/agents/website-builder.md` § Tool usage discipline — `Agent` (parallelizable research) + `TaskCreate` / `.website-builder/tasks.yaml` mirror.

@@ -2,7 +2,7 @@
 
 > Runtime artifact the website-builder agent loads when `project.yaml.cms` is `decap`. The `wb-architecture` skill consumes this at phase 12 (CMS decision); `wb-component-build` at phase 18 (component build); the phase-6.5 re-runnable ingestion at any project lifecycle point. Authored against the canonical 12-section schema in `cms-adapters/README.md`.
 >
-> Primary design-doc source: `Workstreams/website-builder/cms/DESIGN-cms-decap.md` (~451 lines). i18n source: `Workstreams/website-builder/foundation/DESIGN-i18n.md`. Content-layer source: `Workstreams/website-builder/foundation/DESIGN-content-layers.md`. Phase contracts: `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md`.
+> Primary design-doc source: `DESIGN-cms-decap.md` (~451 lines). i18n source: `DESIGN-i18n.md`. Content-layer source: `DESIGN-content-layers.md`. Phase contracts: `DESIGN-phase-contracts.md`.
 
 ## Mental model
 
@@ -471,7 +471,7 @@ Content lives as MDX in `content/`; the app reads via `fs` + `gray-matter` at bu
 
 ## Content layer mapping
 
-The 5-layer content stack (`Workstreams/website-builder/foundation/DESIGN-content-layers.md`) maps onto Decap's native concepts. Row labels identical to `adapters/README.md` §"Content layer mapping" + sibling CMS adapters (`cms-none.md` / `cms-payload.md`) per the cross-anchor consistency rule.
+The 5-layer content stack (`DESIGN-content-layers.md`) maps onto Decap's native concepts. Row labels identical to `adapters/README.md` §"Content layer mapping" + sibling CMS adapters (`cms-none.md` / `cms-payload.md`) per the cross-anchor consistency rule.
 
 | Layer | Decap native concept |
 |---|---|
@@ -511,7 +511,7 @@ When the user adds a new block at phase 18, the agent regenerates `config.yml` s
 
 ## i18n integration
 
-Per `Workstreams/website-builder/foundation/DESIGN-i18n.md` + locked Decisions 38-41. Decap natively supports i18n via top-level + per-collection + per-field configuration.
+Per `DESIGN-i18n.md` + locked Decisions 38-41. Decap natively supports i18n via top-level + per-collection + per-field configuration.
 
 ### Configuration mechanism
 
@@ -684,8 +684,8 @@ If the user starts at phase 11 with `transactional: false` then later flips to `
 - `commerce-adapters/commerce-stripe.md` — Stripe commerce-adapter (Captain L Phase 4)
 - `commerce-adapters/booking-calcom.md` — Cal.com booking-adapter (Captain L Phase 4)
 - `commerce-adapters/payment-config-schema.md` — canonical `payment-config.yaml` schema for TWINT-via-Stripe-on-CHF Swiss-market constraint
-- `Workstreams/website-builder/commerce/` — design surface
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` — phase 22 / 24a / 24b / 24c contracts
+- `commerce-adapters/` — commerce adapters
+- `DESIGN-phase-contracts.md` — phase 22 / 24a / 24b / 24c contracts
 
 ## Limitations + escape hatches
 
@@ -744,13 +744,13 @@ Per Lock-3 freshness pattern. Cache home: `.website-builder/library/docs/decap-c
 
 ### Foundation design docs (this workstream)
 
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` — plugin directory layout (`cms-adapters/` per line 115)
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` — `.website-builder/` layout
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5 content layers this adapter's §6 table maps
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — i18n model + per-CMS hooks (Patterns A/B, Decisions 38-41)
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` — phase 12 (CMS decision) + phase 22 (forms / transactional) + phase 24a/b/c (commerce)
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
-- `Workstreams/website-builder/cms/DESIGN-cms-decap.md` — **primary source** for this adapter
+- `DESIGN-architecture.md` — plugin directory layout (`cms-adapters/` per line 115)
+- `DESIGN-project-scaffold.md` — `.website-builder/` layout
+- `DESIGN-content-layers.md` — the 5 content layers this adapter's §6 table maps
+- `DESIGN-i18n.md` — i18n model + per-CMS hooks (Patterns A/B, Decisions 38-41)
+- `DESIGN-phase-contracts.md` — phase 12 (CMS decision) + phase 22 (forms / transactional) + phase 24a/b/c (commerce)
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
+- `DESIGN-cms-decap.md` — **primary source** for this adapter
 
 ### Sibling adapters (this plugin)
 

@@ -14,9 +14,9 @@ version: 0.1.0
 
 Procedural workflow for the discovery-strategy group. The agent stays in conversational mode the whole time — `AskUserQuestion` is the primary tool across all five phases. The phase contracts at `${CLAUDE_PLUGIN_ROOT}/phase-contracts/0N-name.md` carry per-phase Mission / Entry / Exit / Gating / Tools / Outputs / Failure modes. This skill carries the cross-phase discipline that ties the five together and tells the agent which contract to read when.
 
-Two architectural anchors govern this whole group (locked decisions, STATE doc `Workstreams/website-builder/website-builder.md`):
+Two architectural anchors govern this whole group (locked decisions, STATE doc `website-builder.md`):
 
-- **Decision 2 — audience driven by data, not intuition.** Phase 3's persona is rigorous, grounded in what the user actually says about their buyer — never a guessed-from-vibes persona. (The Tier-1 research questionnaire at `Workstreams/website-builder/research/QUESTIONNAIRE-tier-1.md` is a *separate* instrument Jules uses for product research; do not confuse it with the phase-3 persona artifact — phase 3 captures *this user's* buyer into `project.yaml.requirements`.)
+- **Decision 2 — audience driven by data, not intuition.** Phase 3's persona is rigorous, grounded in what the user actually says about their buyer — never a guessed-from-vibes persona. (The Tier-1 research questionnaire at `QUESTIONNAIRE-tier-1.md` is a *separate* instrument Jules uses for product research; do not confuse it with the phase-3 persona artifact — phase 3 captures *this user's* buyer into `project.yaml.requirements`.)
 - **Decision 4 — no wizard UI; Claude Code is the wizard.** There is no form, no GUI, no multi-step web flow. The conversation *is* the wizard. The agent's questioning discipline is the entire interface. Do not build or imply a UI.
 
 ## The five phases — pointer map
@@ -33,7 +33,7 @@ Capture one paragraph (3-6 sentences) in the user's own words answering: what th
 
 Capture 3-5 reference URLs + one sentence per URL on *what* is admired + 1-2 sentences on the imagined feel + an extracted 3-6 adjective set. Output: `project.yaml.vision`.
 
-**This skill's discipline:** convert empty descriptors ("clean", "modern", "professional") into concrete observations grounded in specific examples. Use `WebFetch` to load each reference and *discuss* it (not just list it). When the user has no references, walk them through reference-sourcing per `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (Awwwards, Land-book, One Page Love, Mobbin, SaaS Pages) and the runtime corpus at `.website-builder/library/awesome-design-md/` (the Decision-42 auto-clone of 60+ DESIGN.md exemplars; read it if cloned, else fetch via `wb library`). Do not pick references on the user's behalf — surface a shortlist to react to, never decree taste.
+**This skill's discipline:** convert empty descriptors ("clean", "modern", "professional") into concrete observations grounded in specific examples. Use `WebFetch` to load each reference and *discuss* it (not just list it). When the user has no references, walk them through reference-sourcing per `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources (Awwwards, Land-book, One Page Love, Mobbin, SaaS Pages) and the runtime corpus at `.website-builder/library/awesome-design-md/` (the Decision-42 auto-clone of 60+ DESIGN.md exemplars; read it if cloned, else fetch via `wb library`). Do not pick references on the user's behalf — surface a shortlist to react to, never decree taste.
 
 ### Phase 3 — Requirements → read `phase-contracts/03-requirements.md`
 
@@ -104,13 +104,13 @@ If a `.website-builder/brand.yaml` already exists (re-entry / ingestion), read i
 
 ### Design docs (the source of truth this skill points at)
 
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 1-5 — seed for the five contracts
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills — how phase-group skills layer on the agent
-- `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources — vision (phase 2) reference-sourcing + competitor (phase 3) sources
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 1 (adjectives → tokens) + § Layer 3 (Content Design JSON, voice → microcopy)
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` § Translation workflow — multi-language voice interaction (phase 5 captures language-neutral profile)
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `project.yaml` — schema for `idea` / `vision` / `requirements` / `entity` keys + `inbox/INVENTORY.md` seed
-- STATE doc decisions ledger: `Workstreams/website-builder/website-builder.md` (decisions 2, 4)
+- `DESIGN-phase-contracts.md` § 1-5 — seed for the five contracts
+- `DESIGN-architecture.md` § Skills — how phase-group skills layer on the agent
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources — vision (phase 2) reference-sourcing + competitor (phase 3) sources
+- `DESIGN-content-layers.md` § Layer 1 (adjectives → tokens) + § Layer 3 (Content Design JSON, voice → microcopy)
+- `DESIGN-i18n.md` § Translation workflow — multi-language voice interaction (phase 5 captures language-neutral profile)
+- `DESIGN-project-scaffold.md` § `project.yaml` — schema for `idea` / `vision` / `requirements` / `entity` keys + `inbox/INVENTORY.md` seed
+- STATE doc decisions ledger: `website-builder.md` (decisions 2, 4)
 - Agent profile: `${CLAUDE_PLUGIN_ROOT}/agents/website-builder.md` § Anti-skip enforcement + § Voice characteristics + § Anti-pattern cheat sheet
 
 ### Runtime corpus (cloned into the project — loaded when the user wants to react to options rather than start cold)

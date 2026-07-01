@@ -96,4 +96,4 @@ Your `.website-builder/` state directory inside the website project is independe
 ## See also
 
 - `README.md` — what the plugin is and isn't
-- The website-builder workstream in the Jules.Life vault — `Workstreams/website-builder/` — has full design + architecture docs.
+- The `website-builder` workstream in the Jules.Life vault (authoring SSOT; not part of this distribution) — has full design + architecture docs.

@@ -1,6 +1,6 @@
 # Adapter Fixture — Lovable
 
-> Per-tool handoff fixture for **Lovable** (lovable.dev). A whole-app builder, not a component tool — so the brief must be scoped down to a single component in `instructions_for_external_tool`, or Lovable will generate an entire app around it. Canonical design anchor: `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
+> Per-tool handoff fixture for **Lovable** (lovable.dev). A whole-app builder, not a component tool — so the brief must be scoped down to a single component in `instructions_for_external_tool`, or Lovable will generate an entire app around it. Canonical design anchor: `DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
 >
 > Tool behaviour verified 2026-06-14 (see "Sources"). Re-verify on a cadence.
 

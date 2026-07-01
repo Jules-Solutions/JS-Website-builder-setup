@@ -2,7 +2,7 @@
 
 > Discipline for Arabic / Hebrew / Persian / Urdu / etc. — **stack-agnostic**. The agent uses CSS logical properties from phase 18 onward, which makes RTL "free" for simple layouts. Per-stack hooks for setting `dir="rtl"` + locale binding live in `adapters/stack-{name}.md#i18n-recipe`.
 >
-> Anchor: `Workstreams/website-builder/foundation/DESIGN-i18n.md` §"RTL support" (lines 256-267).
+> Anchor: `DESIGN-i18n.md` §"RTL support" (lines 256-267).
 
 ## When RTL applies
 
@@ -177,7 +177,7 @@ Phase 20 (responsive / mobile pass) explicitly tests each RTL language. Phase 26
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` §"RTL support" — design-doc anchor
+- `DESIGN-i18n.md` §"RTL support" — design-doc anchor
 - `i18n/strings-schema.md` — string format (RTL languages mirror the schema)
 - `i18n/language-switcher.md` — switcher behavior + per-stack implementation
 - `i18n/hreflang.md` — hreflang for RTL languages

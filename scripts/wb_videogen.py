@@ -5,7 +5,7 @@ scripts/wb_videogen.py — the website-builder plugin's video + audio gen consum
 Wave-2 module (orchestration-spine remediation). Sister of `wb_imagegen.py` — same
 shape, extended to the video + audio modalities. Surfaced as a session-start summary
 (hooks-handlers/session_start.py). The consumer contract lives in
-`Workstreams/website-builder/cross-cutting/DESIGN-video-audio-consumer.md`.
+`DESIGN-video-audio-consumer.md`.
 
 Public surface (the resolver-as-entry-point pattern — mirrors wb_keys.resolve_keys):
 
@@ -42,7 +42,7 @@ Modalities (DESIGN-video-audio-consumer.md § "Multi-provider configuration"):
   - audio           — a flat `audio_gen` block (provider/api_key_env at top level)
 
 See also:
-  - Workstreams/website-builder/cross-cutting/DESIGN-video-audio-consumer.md
+  - DESIGN-video-audio-consumer.md
   - scripts/wb_imagegen.py (sister consumer — image modality)
   - scripts/wb_keys.py (the locked module template + the .env / keys.yaml read model)
 """
@@ -79,7 +79,7 @@ PATH_CONSUMER = "consumer-fallback"
 PATH_GAP = "gap"
 
 VIDEO_DESIGN_DOC = (
-    "Workstreams/website-builder/cross-cutting/DESIGN-video-audio-consumer.md"
+    "DESIGN-video-audio-consumer.md"
 )
 
 

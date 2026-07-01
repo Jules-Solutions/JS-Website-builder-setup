@@ -1,6 +1,6 @@
 # Phase 13 — Page-Purpose Discipline
 
-Detailed patterns for the phase-13 content-per-page workflow. The SKILL.md summarizes; this file carries the recovery scripts and the conversion-anchoring detail. Source of truth: `Projects/Jules.Solutions/Subprojects/website-builder/phase-contracts/13-content-per-page.md` + `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 2/4.
+Detailed patterns for the phase-13 content-per-page workflow. The SKILL.md summarizes; this file carries the recovery scripts and the conversion-anchoring detail. Source of truth: `Projects/Jules.Solutions/Subprojects/website-builder/phase-contracts/13-content-per-page.md` + `DESIGN-content-layers.md` § Layer 2/4.
 
 ## The audience-page-purpose triangle
 
@@ -43,7 +43,7 @@ The inverse — a genuinely novel section type — is fine. Add it to `sections.
 | "The about page is just about us" | The recovery script above — force the conversion answer. |
 | "Every page has the same primary + secondary CTA" | Primary can be shared (one site conversion); secondary must differ per page (essays→read more; services→case study; about→philosophy). Identical both = template-shaped; surface per-page differentiation. |
 | "I'll write the actual copy later" | Correct — phase 13 is brief-writing, not copywriting. But push back on vague briefs: *"write your manifesto"* is not a brief; *"150 words on why this project exists, warm-direct voice, ref phase-1 idea + phase-2 vision"* is. |
-| "What's a section?" | Walk through 2-3 example pages from `.website-builder/library/brand-examples/` (or WebFetch a stack-appropriate template per `DESIGN-templates-catalog.md`, studied not imported). The user learns pages are stacks of named reusable parts. |
+| "What's a section?" | Walk through 2-3 example pages from `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` (or WebFetch a stack-appropriate template per `DESIGN-templates-catalog.md`, studied not imported). The user learns pages are stacks of named reusable parts. |
 | "What about pages I'll add later?" | Phase 13 briefs only pages currently in the sitemap. Future pages re-run a thin phase 13 via `wb-postlaunch:page-add`. Surface this so the user doesn't pre-emptively brief undecided pages. |
 | Multilingual brief-language drift | Write briefs in the default language only at phase 13. Per-language variants surface at phase 16. Do NOT pre-duplicate briefs per language — that's churn. |
 | "Which CMS fields are available?" | Section types map onto CMS primitives at phase 18 (Payload Blocks / Decap list+types / file-based frontmatter `sections[]`). Brief stays stack/CMS-agnostic at 13. Surface only if asked. |

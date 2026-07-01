@@ -16,7 +16,7 @@ Two public entry points (the locked module-boundary contract in
         required keys.
 
 This module is the resolver-layer + migration-CLI half of
-`Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` (the hybrid
+`DESIGN-secrets-and-keys.md` (the hybrid
 `.env` / 1Password model, decisions 29 + 44). The `.env` path is the muggle
 default; the 1Password CLI path is the opt-in power-user upgrade. Code in the
 user's generated project always reads `process.env.<NAME>` — this module ensures
@@ -43,7 +43,7 @@ the design doc is dated 2026-05-10) against https://www.1password.dev/cli/refere
   - `op --version`                           — availability probe
 
 See also:
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
+  - DESIGN-secrets-and-keys.md
   - skills/wb-bootstrap/SKILL.md (Step 3 — records secrets_backend in project.yaml)
   - scripts/wb-bootstrap.py (sibling runner — YAML emit/parse precedent reused here)
   - scripts/README.md (the module-boundary contract)
@@ -64,7 +64,7 @@ from typing import Any
 
 MODULE_NAME = "wb_keys"
 SECRETS_DESIGN_DOC = (
-    "Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md"
+    "DESIGN-secrets-and-keys.md"
 )
 STATE_DIR_NAME = ".website-builder"
 KEYS_YAML_NAME = "keys.yaml"

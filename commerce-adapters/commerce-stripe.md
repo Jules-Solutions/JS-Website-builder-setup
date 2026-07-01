@@ -202,7 +202,7 @@ For the website-builder's i18n integration:
 
 ## TWINT-for-Switzerland callout
 
-**TWINT is the non-negotiable Swiss-market payment method.** Per `commerce-adapters/README.md` § "TWINT-for-Switzerland — non-negotiable rule" + `Workstreams/website-builder/website-builder.md` decision 26 (Switzerland home market) + decision 47 (TWINT priority).
+**TWINT is the non-negotiable Swiss-market payment method.** Per `commerce-adapters/README.md` § "TWINT-for-Switzerland — non-negotiable rule" + `website-builder.md` decision 26 (Switzerland home market) + decision 47 (TWINT priority).
 
 This adapter's TWINT support classification: **Native via Stripe** — Stripe is the canonical TWINT integration. No separate TWINT account, no second aggregator. Stripe handles the TWINT-backend integration as a first-class `payment_method_type`.
 
@@ -255,7 +255,7 @@ For Swiss-audience projects on commerce adapters that don't reach TWINT (Paddle,
 
 - Canonical `payment-config.yaml` schema + TWINT contract (5-condition rule): [commerce-adapters/payment-config-schema.md § TWINT contract](payment-config-schema.md#twint-contract--non-negotiable-for-ch-audience-projects)
 - Test fixture embodying the contract: [tests/commerce-adapters/stripe/fixture/](../tests/commerce-adapters/stripe/fixture/) (Phase 4 Captain L deliverable)
-- Phase 4 DoD anchor: `Workstreams/website-builder/BUILD-strategy.md` line 202 — *"TWINT path validates on Stripe Checkout (CH-region simulation)"*
+- Phase 4 DoD anchor: `BUILD-strategy.md` line 202 — *"TWINT path validates on Stripe Checkout (CH-region simulation)"*
 
 ## Phase 24a/24b/24c integration
 
@@ -374,17 +374,17 @@ When `entry_mode = has-existing-site` AND the existing site uses Stripe Checkout
 
 ### Foundation cross-references
 
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` — plugin directory layout (`commerce-adapters/` per line 100)
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` — phase 22 (forms / transactional) + phase 24a (commerce platform) + 24b (payment provider) + 24c (commerce legal)
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5 content layers the § "Content layer mapping" table maps
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — i18n model + currency
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` — `.website-builder/` directory layout
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
+- `DESIGN-architecture.md` — plugin directory layout (`commerce-adapters/` per line 100)
+- `DESIGN-phase-contracts.md` — phase 22 (forms / transactional) + phase 24a (commerce platform) + 24b (payment provider) + 24c (commerce legal)
+- `DESIGN-content-layers.md` — the 5 content layers the § "Content layer mapping" table maps
+- `DESIGN-i18n.md` — i18n model + currency
+- `DESIGN-project-scaffold.md` — `.website-builder/` directory layout
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
 
 ### Source design docs
 
-- `Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md` — Stripe Checkout source design doc (lines 17-266)
-- `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` — payment-provider matrix + decision tree + TWINT-critical section + canonical `payment-config.yaml` schema source
+- `DESIGN-commerce-stripe-checkout.md` — Stripe Checkout source design doc (lines 17-266)
+- `DESIGN-payment-providers.md` — payment-provider matrix + decision tree + TWINT-critical section + canonical `payment-config.yaml` schema source
 
 ### Captain 0 prep packet (sibling Phase 4 files)
 
@@ -424,5 +424,5 @@ When `entry_mode = has-existing-site` AND the existing site uses Stripe Checkout
 
 ### Decision anchors
 
-- `Workstreams/website-builder/website-builder.md` decision 18 (full stack coverage), decision 26 (Switzerland home market), decision 34 (transactional flag mid-flip), decision 47 (TWINT priority), decision 54 (Cal.com booking default — sibling), decision 58 (parallel-to-platform subproject location), decision 65 (per-callsign worktree)
-- `Workstreams/website-builder/BUILD-strategy.md` Phase 4 DoD lines 187-209 (TWINT path validates on Stripe Checkout — CH-region simulation; line 202)
+- `website-builder.md` decision 18 (full stack coverage), decision 26 (Switzerland home market), decision 34 (transactional flag mid-flip), decision 47 (TWINT priority), decision 54 (Cal.com booking default — sibling), decision 58 (parallel-to-platform subproject location), decision 65 (per-callsign worktree)
+- `BUILD-strategy.md` Phase 4 DoD lines 187-209 (TWINT path validates on Stripe Checkout — CH-region simulation; line 202)

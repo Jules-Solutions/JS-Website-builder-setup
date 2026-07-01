@@ -1,6 +1,6 @@
 # Reference — context7 / WebFetch protocol (phases 11-12)
 
-> The exact external-doc invocation pattern for stack + CMS decisions, the caching convention, the freshness rule, and the verified-current findings from the 2026-05-18 authoring pass. Authoritative source is `phase-contracts/11-stack-decision.md` + `phase-contracts/12-cms-decision.md` + `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md`. context7 is the load-bearing external surface for this phase group — it is mandatory, not optional.
+> The exact external-doc invocation pattern for stack + CMS decisions, the caching convention, the freshness rule, and the verified-current findings from the 2026-05-18 authoring pass. Authoritative source is `phase-contracts/11-stack-decision.md` + `phase-contracts/12-cms-decision.md` + `DESIGN-context7-integration.md`. context7 is the load-bearing external surface for this phase group — it is mandatory, not optional.
 
 ## Why context7 is mandatory here
 

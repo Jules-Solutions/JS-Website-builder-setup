@@ -1,6 +1,6 @@
 # Component-library selection — full per-stack-class logic
 
-> Loaded on demand during phase 18 when the agent runs component-library selection. The canonical source is the per-ecosystem design docs (`Workstreams/website-builder/components/DESIGN-components-{react,tailwind,headless,vue,svelte}.md`) — read those for per-library detail (install commands, codegen patterns, limitations, failure modes). This reference is the consolidated selection-decision layer.
+> Loaded on demand during phase 18 when the agent runs component-library selection. The per-ecosystem design detail (install commands, codegen patterns, limitations, failure modes) lives in the website-builder workstream's component design docs (vault-side, not shipped); this reference is the consolidated selection-decision layer that ships with the plugin.
 
 ## The selection contract
 
@@ -32,7 +32,7 @@ IF brand-customization velocity     → Once UI        (Next-first; token-driven
 
 Most-recommended default composition: **shadcn/ui + Magic UI** (structural primitives + motion micro-components, same copy-paste Tailwind philosophy). **shadcn/ui + Aceternity UI** for portfolio/agency. **shadcn/ui + Ant Design** for marketing+admin hybrid (shadcn on marketing pages, Ant on `/admin/*`).
 
-Per-library detail: `Workstreams/website-builder/components/DESIGN-components-react.md`.
+Per-library detail: `DESIGN-components-react.md`.
 
 ## Non-React Tailwind stacks (Hugo / Astro-pure / static-HTML / WordPress-Tailwind)
 
@@ -46,7 +46,7 @@ IF behavior-primitive separation    → Park UI        (Ark UI + Panda/Tailwind;
 
 DaisyUI ships **no JS interactivity** — modals/dropdowns/tabs use CSS-only patterns (checkbox-hack, focus-within). For richer interactivity, pair with **Headless UI** (React/Vue) or **Alpine.js** / **Stimulus** (non-React). Lock the interactivity strategy at phase 17, before phase 18 writes markup. DaisyUI's a11y varies per component — run phase 21 aggressively + add ARIA manually where the default isn't enough.
 
-Per-library detail: `Workstreams/website-builder/components/DESIGN-components-tailwind.md`.
+Per-library detail: `DESIGN-components-tailwind.md`.
 
 ## Vue stacks (Nuxt / Vite+Vue / Astro+Vue islands)
 
@@ -62,7 +62,7 @@ IF interactive primitives needed    → Headless UI Vue is always a viable pair
 
 Vue ecosystem strongly prefers **single-library architecture** (no clear shadcn equivalent — `shadcn-vue` is a community port, maturity varies). Lean single-library unless the user has a specific compose reason. Up to **one** complementary library max for Vue (not two).
 
-Per-library detail: `Workstreams/website-builder/components/DESIGN-components-vue.md`.
+Per-library detail: `DESIGN-components-vue.md`.
 
 ## Svelte / SvelteKit stacks
 
@@ -76,7 +76,7 @@ IF Tailwind class-shortcuts too     → DaisyUI pairs with any of the above
 
 Use Svelte 5 runes (`$state`/`$derived`/`$effect`) for new code; verify library compatibility via context7 (some library docs still show Svelte 4 patterns). Svelte ships first-class `transition:`/`in:`/`out:`/`animate:` directives — use these for in/out motion by default; reserve Motion/GSAP for complex orchestration only.
 
-Per-library detail: `Workstreams/website-builder/components/DESIGN-components-svelte.md`.
+Per-library detail: `DESIGN-components-svelte.md`.
 
 ## Headless / unstyled primitives (total control / missing primitive / design system from scratch)
 
@@ -91,7 +91,7 @@ IF building everything from scratch + full breadth              → Radix (28+) 
 
 **Maintenance-drift note (verify at every phase-18 entry via context7 — do NOT bake either as canonical):** as of 2026-05, Radix was acquired by WorkOS and update velocity slowed for some complex components (Combobox, multi-select commonly cited). Base UI (MUI-team, full-time engineering backing) is now the more actively-maintained primitive layer, and shadcn/ui has a Base UI path in addition to its Radix path. This extends the design doc's standing "verify Base UI package name + production-readiness via context7" warning to "verify Radix maintenance status too, and surface the Radix-vs-Base-UI trade-off to the user with current context7 data." The decision is the user's; the agent's job is current, accurate trade-off data — not a frozen recommendation. Headless UI remains the Tailwind-team's small (~10-16) accessible set.
 
-Per-library detail: `Workstreams/website-builder/components/DESIGN-components-headless.md`. WAI-ARIA Authoring Practices is the spec the headless libs implement: https://www.w3.org/WAI/ARIA/apg/.
+Per-library detail: `DESIGN-components-headless.md`. WAI-ARIA Authoring Practices is the spec the headless libs implement: https://www.w3.org/WAI/ARIA/apg/.
 
 ## Composition rules (enforced — independent of library choice)
 

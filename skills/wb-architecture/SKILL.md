@@ -109,6 +109,6 @@ This phase group has **no bundled composables** — context7 is the load-bearing
 ### Authoritative substantive references (read verbatim per active phase)
 
 - `phase-contracts/10-information-architecture.md`, `phase-contracts/11-stack-decision.md`, `phase-contracts/12-cms-decision.md`
-- Per-stack design: `Workstreams/website-builder/stacks/DESIGN-stack-{framer,nextjs,wordpress}.md` (MVP) — read fully for any stack the user considers seriously.
-- Per-CMS design: `Workstreams/website-builder/cms/DESIGN-cms-{none,decap,payload}.md` (MVP) — read fully for any CMS the user considers seriously.
-- Foundation: `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` (IA pattern subset), `foundation/DESIGN-i18n.md` (Pattern A/B), `foundation/DESIGN-project-scaffold.md` (sitemap.yaml + project.yaml schema + migration recipes), `foundation/DESIGN-architecture.md` § Skills.
+- Per-stack design: `adapters/stack-{framer,nextjs,wordpress}.md` (MVP) — read fully for any stack the user considers seriously.
+- Per-CMS design: `cms-adapters/cms-{none,decap,payload}.md` (MVP) — read fully for any CMS the user considers seriously.
+- Foundation: `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` (IA pattern subset), `foundation/DESIGN-i18n.md` (Pattern A/B), `foundation/DESIGN-project-scaffold.md` (sitemap.yaml + project.yaml schema + migration recipes), `foundation/DESIGN-architecture.md` § Skills.

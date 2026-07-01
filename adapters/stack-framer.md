@@ -1,10 +1,10 @@
 # Stack adapter — Framer
 
-> Framer is a visual canvas WYSIWYG + a code-extensible runtime: React/TSX Code Components, a built-in CMS, a Plugins API, and (per Framer's 2026-05-19 developer reference) a Localization + Managed Collection REST surface. The website-builder picks Framer when the user wants a polished, design-led site they can keep editing visually after the agent leaves — and is willing to live with Framer's hosting + canvas-bound conventions. **The agent ships Code Components and seeds CMS content; the user composes pages on the canvas. The agent does NOT compose pages programmatically — that fights Framer's value prop.** Sister's "Still Humans" project (per `Workstreams/website-builder/website-builder.md` decision 10) is the canonical Framer cosplay test target.
+> Framer is a visual canvas WYSIWYG + a code-extensible runtime: React/TSX Code Components, a built-in CMS, a Plugins API, and (per Framer's 2026-05-19 developer reference) a Localization + Managed Collection REST surface. The website-builder picks Framer when the user wants a polished, design-led site they can keep editing visually after the agent leaves — and is willing to live with Framer's hosting + canvas-bound conventions. **The agent ships Code Components and seeds CMS content; the user composes pages on the canvas. The agent does NOT compose pages programmatically — that fights Framer's value prop.** Sister's "Still Humans" project (per `website-builder.md` decision 10) is the canonical Framer cosplay test target.
 >
 > Schema: this file conforms to the 14-section schema in `adapters/README.md`. Section names + order are runtime-load-bearing — the `wb-architecture` skill at phase 11 and `wb-component-build` skill at phase 18 look up sections by exact H2.
 >
-> Design-doc anchors: `Workstreams/website-builder/stacks/DESIGN-stack-framer.md`, `Workstreams/website-builder/foundation/DESIGN-content-layers.md`, `Workstreams/website-builder/foundation/DESIGN-i18n.md`, `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md`.
+> Design-doc anchors: `DESIGN-stack-framer.md`, `DESIGN-content-layers.md`, `DESIGN-i18n.md`, `DESIGN-ingestion-and-extraction.md`.
 
 ## Mental model
 
@@ -32,7 +32,7 @@ Three things to know about how Framer thinks:
 
 The muggle understanding: *the agent writes the components and seeds the content; the user assembles the pages on the canvas.* Hands stay clean on both sides.
 
-Derives from `Workstreams/website-builder/stacks/DESIGN-stack-framer.md` lines 15-34 ("Mental model").
+Derives from `DESIGN-stack-framer.md` lines 15-34 ("Mental model").
 
 ## Auth + setup
 
@@ -138,7 +138,7 @@ Translates the website-builder's project verbs into Framer's API surface:
 | Add new Code Component | `code/{ComponentName}.tsx` + `framer push` (or Plugins API code-upload — verify) |
 | Publish site | Editor "Publish" action (no public REST equivalent as of 2026-05-19) |
 
-Derives from `Workstreams/website-builder/stacks/DESIGN-stack-framer.md` lines 36-53 ("Auth + setup") + verified-current API surface (context7 + WebFetch 2026-05-19).
+Derives from `DESIGN-stack-framer.md` lines 36-53 ("Auth + setup") + verified-current API surface (context7 + WebFetch 2026-05-19).
 
 ## Migration recipe
 
@@ -642,15 +642,15 @@ For provenance: at INST authoring, context7 + WebFetch confirmed:
 
 ### Foundation design docs (vault-root-relative)
 
-- [VISION-website-builder.md](Workstreams/website-builder/VISION-website-builder.md)
-- [BUILD-strategy.md](Workstreams/website-builder/BUILD-strategy.md)
-- [DESIGN-architecture.md](Workstreams/website-builder/foundation/DESIGN-architecture.md)
-- [DESIGN-project-scaffold.md](Workstreams/website-builder/foundation/DESIGN-project-scaffold.md)
-- [DESIGN-content-layers.md](Workstreams/website-builder/foundation/DESIGN-content-layers.md)
-- [DESIGN-i18n.md](Workstreams/website-builder/foundation/DESIGN-i18n.md)
-- [DESIGN-ingestion-and-extraction.md](Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md)
-- [DESIGN-phase-contracts.md](Workstreams/website-builder/foundation/DESIGN-phase-contracts.md)
-- [DESIGN-stack-framer.md](Workstreams/website-builder/stacks/DESIGN-stack-framer.md) — primary design-doc source for this adapter
+- `VISION-website-builder.md`
+- `BUILD-strategy.md`
+- `DESIGN-architecture.md`
+- `DESIGN-project-scaffold.md`
+- `DESIGN-content-layers.md`
+- `DESIGN-i18n.md`
+- `DESIGN-ingestion-and-extraction.md`
+- `DESIGN-phase-contracts.md`
+- `DESIGN-stack-framer.md` — primary design-doc source for this adapter
 
 ### Plugin shared anchors (read-only — referenced from this adapter)
 
@@ -689,4 +689,4 @@ For provenance: at INST authoring, context7 + WebFetch confirmed:
 
 ### Sister project — cosplay test target
 
-"Still Humans" — per [website-builder.md](Workstreams/website-builder/website-builder.md) locked decision 10. The canonical Framer cosplay test once the v1 plugin ships.
+"Still Humans" — per `website-builder.md` locked decision 10. The canonical Framer cosplay test once the v1 plugin ships.

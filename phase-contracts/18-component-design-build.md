@@ -9,15 +9,15 @@ next_phase: 19
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/components/DESIGN-components-react.md
-  - Workstreams/website-builder/components/DESIGN-components-tailwind.md
-  - Workstreams/website-builder/components/DESIGN-components-headless.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
+  - DESIGN-components-react.md
+  - DESIGN-components-tailwind.md
+  - DESIGN-components-headless.md
+  - DESIGN-handoff-protocol.md
+  - DESIGN-context7-integration.md
 library_clones_at_entry:
   - resource: shadcn-components
     when: component_library == "shadcn"
@@ -119,7 +119,7 @@ Override is not available on these gates — they are correctness prerequisites 
 - **`Edit` / `Write`** — the primary tools. The agent writes component code in the user's chosen stack's conventions and edits across review rounds. This is the most code-generation-heavy phase in the pipeline.
 - **`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`** — heavily used. Per `DESIGN-context7-integration.md`, phase 18 is one of the most context7-dependent phases because component-library + framework APIs drift fast. The agent verifies the *current* state of the chosen library (registry/CLI install command, theming-integration shape, primitive composition pattern) and the framework (Server vs Client component rules for Next App Router, Astro island directives) before writing code, rather than trusting training data. Cached into `.website-builder/library/docs/` per the clone-into-project pattern (decision 42) because phase 18 queries the same library dozens of times.
 - **The design-skill flavor (loaded skill, secondary here)** — UI/UX Pro Max's component element library (button/modal/navbar/card/table/form/chart with style-aware variants) is consulted as a secondary reference to keep components consistent with the phase-17 aesthetic. Per `DESIGN-skill-uiuxpromax.md`, complementary flavors (Emil Kowalski / Framer Motion) layer in for animation-heavy components.
-- **Reference-data load** — `.website-builder/library/component-patterns/` (canonical specs for the ~20 most common component types) and the chosen `component-libraries/{stack}.md` capability matrix. Per `DESIGN-resource-curation.md`, patterns are studied; the chosen library's reference docs auto-clone into `.website-builder/library/docs/` at phase-18 entry.
+- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/component-patterns/` (canonical specs for the ~20 most common component types) and the chosen `component-libraries/{stack}.md` capability matrix. Per `DESIGN-resource-curation.md`, patterns are studied; the chosen library's reference docs auto-clone into `.website-builder/library/docs/` at phase-18 entry.
 - **`AskUserQuestion`** — for the component-library selection (default + alternatives + trade-offs), per-component review confirmation, and the per-component brief-vs-direct-codegen choice.
 - **The JSON handoff protocol** — see the dedicated sub-section below. Opt-in per component.
 
@@ -186,15 +186,15 @@ Building HeroBlock. Options:
 
 Foundation + component docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 18 — the seed for this contract.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Component breakdown / `component-libraries/` / phase-18 default behavior (decision 35: agent writes code by default; brief-emit opt-in) / § context7 integration.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `components.yaml` + `project.yaml.component_library` + `briefs/` + `outputs/` locations.
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — Layer 2 (structural specs / components.yaml). Phase 18 fills Layer 2.
-- `Workstreams/website-builder/components/DESIGN-components-react.md` — shadcn/ui (default), Mantine, Aceternity, Magic UI, Once UI, Chakra, NextUI/HeroUI, Material UI / Joy UI, Ant Design: capability matrix, selection logic, per-library codegen patterns, composition + migration.
-- `Workstreams/website-builder/components/DESIGN-components-tailwind.md` — DaisyUI (S-tier non-React Tailwind pick), Tailwind UI ($299, surface cost), Park UI: matrix, selection, codegen.
-- `Workstreams/website-builder/components/DESIGN-components-headless.md` — Radix Primitives (28+, underpins shadcn), Headless UI (10, Tailwind-team), Base UI (MUI-team, verify maturity): when total control is warranted.
-- `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` — the bidirectional JSON brief: schema (`brand_context`/`request`/`output_format`/`iteration_history`/`instructions_for_external_tool`), the two flows, adapter fixtures per tool, the human-freelancer fixture, failure modes.
-- `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` — the resolve→query pattern, per-stack library-id manifest, caching, fallback-on-resolution-failure.
+- `DESIGN-phase-contracts.md` § 18 — the seed for this contract.
+- `DESIGN-architecture.md` § Component breakdown / `component-libraries/` / phase-18 default behavior (decision 35: agent writes code by default; brief-emit opt-in) / § context7 integration.
+- `DESIGN-project-scaffold.md` § `components.yaml` + `project.yaml.component_library` + `briefs/` + `outputs/` locations.
+- `DESIGN-content-layers.md` — Layer 2 (structural specs / components.yaml). Phase 18 fills Layer 2.
+- `DESIGN-components-react.md` — shadcn/ui (default), Mantine, Aceternity, Magic UI, Once UI, Chakra, NextUI/HeroUI, Material UI / Joy UI, Ant Design: capability matrix, selection logic, per-library codegen patterns, composition + migration.
+- `DESIGN-components-tailwind.md` — DaisyUI (S-tier non-React Tailwind pick), Tailwind UI ($299, surface cost), Park UI: matrix, selection, codegen.
+- `DESIGN-components-headless.md` — Radix Primitives (28+, underpins shadcn), Headless UI (10, Tailwind-team), Base UI (MUI-team, verify maturity): when total control is warranted.
+- `DESIGN-handoff-protocol.md` — the bidirectional JSON brief: schema (`brand_context`/`request`/`output_format`/`iteration_history`/`instructions_for_external_tool`), the two flows, adapter fixtures per tool, the human-freelancer fixture, failure modes.
+- `DESIGN-context7-integration.md` — the resolve→query pattern, per-stack library-id manifest, caching, fallback-on-resolution-failure.
 
 context7 (mandatory at this phase — citations current as of the freshness date):
 

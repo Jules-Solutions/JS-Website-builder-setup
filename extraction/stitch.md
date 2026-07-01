@@ -2,7 +2,7 @@
 
 > AI-driven extraction of a design system from any URL or screenshot into a portable open-spec DESIGN.md (color palette, type scale, spacing, component-shape recognition). **MVP-primary extraction tool per locked decision 55** of the website-builder workstream. **Stack-agnostic** — adapters consume the normalized output identically.
 >
-> Anchor: `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"Google Stitch (primary URL extractor)" (lines 126-162) + `phase-contracts/06.5-artifact-ingestion.md`.
+> Anchor: `DESIGN-ingestion-and-extraction.md` §"Google Stitch (primary URL extractor)" (lines 126-162) + `phase-contracts/06.5-artifact-ingestion.md`.
 > External: https://stitch.withgoogle.com
 >
 > **Phase-5 runtime wiring (2026-06-12):** extended with the end-to-end agent-executable recipe (§ "Runtime recipe — URL → DESIGN.md → integrated project state"), the verified ecosystem state of every invocation path (§ "Two invocation paths" + § "Ecosystem verification"), and the load-bearing finding that no programmatic surface does arbitrary-URL extraction. End-to-end asserted by `tests/extraction/stitch/`.
@@ -225,7 +225,7 @@ extraction:
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — full extraction model
+- `DESIGN-ingestion-and-extraction.md` — full extraction model
 - `phase-contracts/06.5-artifact-ingestion.md` — invocation contract + 8-step flow
 - `extraction/divmagic.md` — element-precision peer for targeted extracts
 - `extraction/playwright-walk.md` — paired walker for dynamic-state sites

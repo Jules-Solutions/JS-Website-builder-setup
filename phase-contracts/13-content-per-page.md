@@ -9,12 +9,12 @@ next_phase: 14
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/foundation/DESIGN-i18n.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
+  - DESIGN-i18n.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
 library_clones_at_entry:
   - resource: component-patterns
     as: component-patterns
@@ -75,7 +75,7 @@ Override is available on the purpose-clarity gate via explicit user confirmation
 - **Read** — agent reads `.website-builder/inbox/INVENTORY.md` from phase 6 to surface available source content per page; reads `.website-builder/project.yaml.requirements` for audience / conversion / competitor positioning; reads `.website-builder/brand.yaml.voice` for voice anchoring in brief drafts.
 - **Write** — the agent writes one `content/pages/{slug}.md` file per page in the sitemap; updates `.website-builder/content/sections.yaml` with any new section types; writes the Content Design JSON skeleton to `.website-builder/content/strings/${default_language}.json`.
 - **Edit** — the agent iterates on brief content across rounds (user reviews, agent refines, user confirms).
-- **Reference-data load** — agent reads `Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md` to surface relevant template-as-inspiration for each page-type (per phase 11's stack); `.website-builder/library/awesome-design-md/` for page-archetype examples; `.website-builder/library/brand-examples/` for voice-consistency-in-page-briefs reference.
+- **Reference-data load** — agent reads `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` to surface relevant template-as-inspiration for each page-type (per phase 11's stack); `.website-builder/library/awesome-design-md/` for page-archetype examples; `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` for voice-consistency-in-page-briefs reference.
 - **WebFetch** — sparingly, when the user wants to compare a competitor's page-of-same-type for inspiration.
 
 The phase-group skill `wb-content` (per canonical 11-skill scheme) loads at the start of phase 13 and stays loaded through phase 16. The skill carries the discipline that links phases 13-16 together: every brief that phase 13 produces gets a wireframe (phase 14), section-level content (phase 15), and finalized prose (phase 16), all in the same files.
@@ -181,7 +181,7 @@ sections:
 
 **"I'll write the actual copy later."** Phase 13 is *brief-writing*, not *copywriting*. The agent confirms — *yes, the brief is the spec for phase 16; you don't write final copy here* — but pushes back when the brief itself is vague. *"Write your manifesto"* is not a brief; *"150 words explaining why this project exists in warm-direct voice, referenced to phase 1 idea and phase 2 vision"* is.
 
-**"What's a section?"** Surfaces when the user has never thought about pages as section-composed. The agent walks through 2-3 example pages from reference (`.website-builder/library/brand-examples/` if populated; otherwise context7 / WebFetch for stack-appropriate templates per `DESIGN-templates-catalog.md`'s framing: *templates as inspiration, never imported*). The user gradually recognizes that every page is a stack of named, reusable parts.
+**"What's a section?"** Surfaces when the user has never thought about pages as section-composed. The agent walks through 2-3 example pages from reference (`${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` if populated; otherwise context7 / WebFetch for stack-appropriate templates per `DESIGN-templates-catalog.md`'s framing: *templates as inspiration, never imported*). The user gradually recognizes that every page is a stack of named, reusable parts.
 
 **Section type proliferation.** Common when the user iterates rapidly — each page invents a new section type. The agent surfaces the inverse — *"this section has the same shape as `philosophy` on the about page; same type, different content"* — and merges duplicates. The healthy section count for a typical 5-15 page marketing site is 8-15 distinct section types; if section types exceed page count, the agent forces de-duplication.
 
@@ -195,27 +195,27 @@ sections:
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 2 (structural specs) + Layer 3 (Content Design JSON) + Layer 4 (page-level prose). Phase 13 is where Layer 3 enters the project as a declared schema; Layer 2 (sections.yaml + components.yaml) gets populated; Layer 4 placeholders get drafted.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `content/pages/{slug}.md` + `content/sections.yaml` — the exact schemas this phase writes to.
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — Pattern A vs Pattern B for per-language page prose (relevant when project is multilingual).
-- `Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md` — templates as inspiration sources (never imported); referenced for page-archetype-by-page-type.
+- `DESIGN-content-layers.md` § Layer 2 (structural specs) + Layer 3 (Content Design JSON) + Layer 4 (page-level prose). Phase 13 is where Layer 3 enters the project as a declared schema; Layer 2 (sections.yaml + components.yaml) gets populated; Layer 4 placeholders get drafted.
+- `DESIGN-project-scaffold.md` § `content/pages/{slug}.md` + `content/sections.yaml` — the exact schemas this phase writes to.
+- `DESIGN-i18n.md` — Pattern A vs Pattern B for per-language page prose (relevant when project is multilingual).
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` — templates as inspiration sources (never imported); referenced for page-archetype-by-page-type.
 
 Content Design JSON canonical source:
 
 - **[How content designers can (and should) use JSON files](https://uxcontent.com/content-design-json/)** — Prasaja Mukti, UX Content Collective, June 10, 2025. The canonical methodology source. Core principles: copy as structured version-controlled data; categorical structure (component-level, feature-specific, system messaging, dynamic); variables (user, contextual, system-status, data); per-language folder structure mirrors single source-of-truth. Cited in this contract because phase 13 is where the methodology enters the project.
-- Pairing source: `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 3.
+- Pairing source: `DESIGN-content-layers.md` § Layer 3.
 
 Per-page-type inspiration corpus:
 
 - `.website-builder/library/awesome-design-md/` (cloned from VoltAgent/awesome-design-md at phase 17 if not earlier) — 60+ DESIGN.md exemplars surfacing how mature brands shape page-types.
-- `.website-builder/library/brand-examples/` — 5-8 complete brand systems showing voice + tokens + component patterns; relevant references for phase-13 brief language.
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` — 5-8 complete brand systems showing voice + tokens + component patterns; relevant references for phase-13 brief language.
 - Per-stack template catalog (per `DESIGN-templates-catalog.md`) — for the stack picked at phase 11, the agent surfaces curated templates as inspiration when the user asks for examples.
 
 Per-CMS structural mappings (relevant at phase 13 because section types lock here and consume CMS shape at phase 18):
 
-- `Workstreams/website-builder/cms/DESIGN-cms-payload.md` § Pages collection with Blocks field — Payload's `blocks` array maps directly onto `sections[]` from this phase.
-- `Workstreams/website-builder/cms/DESIGN-cms-decap.md` § list + types widget — Decap's typed-union maps onto `sections[]`.
-- `Workstreams/website-builder/cms/DESIGN-cms-none.md` § frontmatter section array — file-based markdown's `sections[]` in frontmatter is the direct shape.
+- `DESIGN-cms-payload.md` § Pages collection with Blocks field — Payload's `blocks` array maps directly onto `sections[]` from this phase.
+- `DESIGN-cms-decap.md` § list + types widget — Decap's typed-union maps onto `sections[]`.
+- `DESIGN-cms-none.md` § frontmatter section array — file-based markdown's `sections[]` in frontmatter is the direct shape.
 
 WebSearch / WebFetch (recommended at this phase):
 

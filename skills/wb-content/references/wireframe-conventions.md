@@ -1,6 +1,6 @@
 # Phase 14 — Wireframe Conventions
 
-Detailed patterns for the phase-14 wireframe-per-page workflow. Source of truth: `Projects/Jules.Solutions/Subprojects/website-builder/phase-contracts/14-wireframe-per-page.md` + `Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md`.
+Detailed patterns for the phase-14 wireframe-per-page workflow. Source of truth: `Projects/Jules.Solutions/Subprojects/website-builder/phase-contracts/14-wireframe-per-page.md` + `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md`.
 
 ## Why text-based wireframes (not visual mockups)
 

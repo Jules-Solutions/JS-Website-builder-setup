@@ -1,6 +1,6 @@
 # Adapter Fixture — Human Freelancer
 
-> Per-tool handoff fixture for a **human freelancer**. The same brief format used for AI tools works for a person — this is "mom's pattern" made first-class: she hires a freelancer for a section and wants on-brand work back. Canonical design anchor: `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` § "Human-freelancer fixture". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
+> Per-tool handoff fixture for a **human freelancer**. The same brief format used for AI tools works for a person — this is "mom's pattern" made first-class: she hires a freelancer for a section and wants on-brand work back. Canonical design anchor: `DESIGN-handoff-protocol.md` § "Human-freelancer fixture". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
 >
 > Not an AI tool — there are no "tool behaviours" to verify, but the packaging discipline below is what keeps a freelancer's output on-brand.
 
@@ -49,5 +49,5 @@ No sample *output* is shipped for this fixture — a freelancer's deliverable is
 
 - `handoff-spec/component-request-v1.md` — the brief contract (the portable spec)
 - `handoff-spec/component-output-v1.md` — the return contract (Form 1 / 2 / 3 — freelancer output ingests the same way)
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` § "Bonus surface: human freelancer handoff" — design-doc anchor
+- `DESIGN-ingestion-and-extraction.md` § "Bonus surface: human freelancer handoff" — design-doc anchor
 - `extraction/ai-output.md` — the parser that ingests the output

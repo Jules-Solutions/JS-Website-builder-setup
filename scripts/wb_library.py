@@ -3,7 +3,7 @@
 scripts/wb_library.py — the website-builder plugin's resource-curation library
 module + auto-clone runtime.
 
-Owned by Phase 5 Captain P (`Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md`).
+Owned by Phase 5 Captain P (`DESIGN-resource-curation.md`).
 Two public entry points, locked by `scripts/README.md` § Module boundary:
 
   run(argv, *, project_root) -> int
@@ -50,8 +50,8 @@ cloned here and never land in `.website-builder/library/`.
 
 See also:
   - scripts/README.md — the CLI + module-boundary contract + library_clones_at_entry schema
-  - Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md — design authority
-  - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md — catalogue keys resolved here
+  - DESIGN-resource-curation.md — design authority
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md — catalogue keys resolved here
   - scripts/wb-bootstrap.py — sibling runner; YAML emit/parse + cross-OS write patterns reused
   - tests/library/test_wb_library.py — the module's test surface
 """

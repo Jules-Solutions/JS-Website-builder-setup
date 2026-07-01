@@ -227,14 +227,14 @@ If multiple Phase 3 Captains run in parallel against the plugin repo, each Capta
 
 ## See also
 
-- `Workstreams/website-builder/BUILD-strategy.md` Phase 3 — DoD + dispatch model (lines 164-184)
-- `Workstreams/website-builder/stacks/DESIGN-stack-framer.md` — Captain F's primary design-doc source
-- `Workstreams/website-builder/stacks/DESIGN-stack-nextjs.md` — Captain G's primary design-doc source
-- `Workstreams/website-builder/stacks/DESIGN-stack-wordpress.md` — Captain H's primary design-doc source
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` — plugin directory layout (the canonical `adapters/`/`i18n/`/`extraction/`/`handoff-spec/` structure)
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5 content layers the §4 table maps
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — i18n model + per-stack hooks
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
+- `BUILD-strategy.md` Phase 3 — DoD + dispatch model (lines 164-184)
+- `DESIGN-stack-framer.md` — Captain F's primary design-doc source
+- `DESIGN-stack-nextjs.md` — Captain G's primary design-doc source
+- `DESIGN-stack-wordpress.md` — Captain H's primary design-doc source
+- `DESIGN-architecture.md` — plugin directory layout (the canonical `adapters/`/`i18n/`/`extraction/`/`handoff-spec/` structure)
+- `DESIGN-content-layers.md` — the 5 content layers the §4 table maps
+- `DESIGN-i18n.md` — i18n model + per-stack hooks
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
 - `skills/wb-architecture/SKILL.md` + `references/stack-matrix.md` — phase 11 consumer of adapter files
 - `skills/wb-component-build/SKILL.md` + `references/per-stack-codegen.md` — phase 18 consumer of adapter files
 - `phase-contracts/06.5-artifact-ingestion.md` — phase 6.5 contract

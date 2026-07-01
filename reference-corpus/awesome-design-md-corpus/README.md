@@ -42,5 +42,5 @@ At **phase 17 (design system)**, when the user's aesthetic direction maps onto a
 ## See also
 
 - `../design-systems/` — foundational design *systems* (Material/Apple/Carbon/Tailwind/Radix).
-- `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` line 273 — the catalogue entry for the upstream.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` §333 — the spec this dir satisfies.
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` line 273 — the catalogue entry for the upstream.
+- `DESIGN-architecture.md` §333 — the spec this dir satisfies.

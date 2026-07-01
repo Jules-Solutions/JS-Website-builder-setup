@@ -1,6 +1,6 @@
 # Phase 7 — Media asset audit + rights playbook reference
 
-> Loaded when running phase 7. Usability + rights verdict definitions, the reverse-image-search provenance playbook, the inherited-liability framing, the rights-acknowledgment decision-doc schema. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/07-media-asset-audit.md` + `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § media/.
+> Loaded when running phase 7. Usability + rights verdict definitions, the reverse-image-search provenance playbook, the inherited-liability framing, the rights-acknowledgment decision-doc schema. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/07-media-asset-audit.md` + `DESIGN-project-scaffold.md` § media/.
 
 ## The two verdicts per asset
 

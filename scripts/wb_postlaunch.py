@@ -43,7 +43,7 @@ Idempotent: re-run re-materializes config.yaml + the skill subset cleanly. It
 NEVER touches user-authored content (content/ media/ decisions/) — it owns only
 the post-launch/ subtree.
 
-Per locked decisions in Workstreams/website-builder/website-builder.md:
+Per locked decisions in website-builder.md:
   28 — post-launch maintainer template (the killer template)
   37 — phases 31-34 once vs maintainer ongoing
   40 — translation preference default = 1 (auto-translate inline)

@@ -13,7 +13,7 @@ version: 0.1.0
 > - `phase-contracts/29-hosting-deployment.md`
 > - `phase-contracts/30-analytics-search-submission.md`
 >
-> Design context: `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md` (the decision-50 provider rankings + cost reality), `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` (registrar/DNS/host tokens — user-supplied at use, never persisted), `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` (the phase-29 wizard + materialization), `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills (how phase-group skills layer on the freelancer agent).
+> Design context: `DESIGN-deploy-providers.md` (the decision-50 provider rankings + cost reality), `DESIGN-secrets-and-keys.md` (registrar/DNS/host tokens — user-supplied at use, never persisted), `DESIGN-post-launch-template.md` (the phase-29 wizard + materialization), `DESIGN-architecture.md` § Skills (how phase-group skills layer on the freelancer agent).
 
 ## What this skill does
 
@@ -71,7 +71,7 @@ Gating (refuse to call deployed): any page 4xx/5xx or non-rendering section (non
 
 > The "killer template" install. Per locked decisions 28 / 37 / 45 / 49 + `DESIGN-post-launch-template.md`. Run this as part of phase 29 step 6 — declaring deploy done without it is a non-overridable gate violation ("post-launch template not materialized"). The wizard customizes the maintainer to *this* site; the materializer copies it into `.website-builder/post-launch/`.
 
-**Read first:** `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` § Wizard-driven customization + § Wizard config output. The provider option lists below are grounded but **drift** — re-verify current free-tiers/pricing via WebSearch at deploy time (decision 75) before surfacing them; never present stale pricing as fact.
+**Read first:** `DESIGN-post-launch-template.md` § Wizard-driven customization + § Wizard config output. The provider option lists below are grounded but **drift** — re-verify current free-tiers/pricing via WebSearch at deploy time (decision 75) before surfacing them; never present stale pricing as fact.
 
 **Step A — run the 7-section wizard via `AskUserQuestion`** (one section at a time; surface options, let the user pick or skip):
 

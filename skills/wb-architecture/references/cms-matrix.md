@@ -1,6 +1,6 @@
 # Reference — CMS matrix (phase 12)
 
-> Per-CMS prose for the three MVP CMS options + stack-built-in defaults, the i18n strategy table, the Decap-maintenance-mode caveat, and the expansion-CMS substitution table. Authoritative source is `Workstreams/website-builder/cms/DESIGN-cms-{none,decap,payload}.md` + `phase-contracts/12-cms-decision.md` — read those fully for any CMS the user seriously considers. This file is the fast-load summary.
+> Per-CMS prose for the three MVP CMS options + stack-built-in defaults, the i18n strategy table, the Decap-maintenance-mode caveat, and the expansion-CMS substitution table. Authoritative source is `cms-adapters/cms-{none,decap,payload}.md` + `phase-contracts/12-cms-decision.md` — read those fully for any CMS the user seriously considers. This file is the fast-load summary.
 
 ## The agent's job at phase 12: challenge defaults
 
@@ -62,7 +62,7 @@ For multilingual sites, write `cms_i18n_strategy`:
 
 ## Expansion CMS options (post-MVP — expansion phase 10)
 
-Fully designed in `Workstreams/website-builder/cms/`, accessible to users who know them, not first-class in MVP. Mention only when surfaced by the user.
+Fully designed in the website-builder workstream (vault-side), accessible to users who know them, not first-class in MVP. Mention only when surfaced by the user.
 
 | Expansion CMS | What it is | Closest MVP substitute |
 |---|---|---|

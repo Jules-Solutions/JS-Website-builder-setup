@@ -2,7 +2,7 @@
 
 > The HTML metadata that signals language alternates to search engines. **Stack-agnostic intro + required behavior shared by all stacks; per-stack emission sections authored by the Phase 3 stack-adapter Captains.**
 >
-> Anchor: `Workstreams/website-builder/foundation/DESIGN-i18n.md` §"hreflang tags" (lines 240-253).
+> Anchor: `DESIGN-i18n.md` §"hreflang tags" (lines 240-253).
 > External spec: https://developers.google.com/search/docs/specialty/international/localized-versions
 
 ## Overview
@@ -420,7 +420,7 @@ The agent submits sitemap.xml (auto-generated via `app/sitemap.ts`) to Google Se
 
 - `adapters/stack-nextjs.md` §"i18n integration" — the per-stack setup this section consumes (routing config, default-language pattern)
 - `i18n/language-switcher.md#next-js--shadcn` — paired switcher component (uses the same locale set)
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` §"hreflang tags" — the design-doc anchor
+- `DESIGN-i18n.md` §"hreflang tags" — the design-doc anchor
 
 ### WordPress
 
@@ -625,7 +625,7 @@ Phase 26 (SEO audit) re-verifies post-deploy:
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` §"hreflang tags" — design-doc anchor
+- `DESIGN-i18n.md` §"hreflang tags" — design-doc anchor
 - `i18n/language-switcher.md` — visible UI counterpart to hreflang metadata
 - `i18n/strings-schema.md` — strings layer (not directly related to hreflang but adjacent)
 - `i18n/rtl.md` — RTL languages emit hreflang the same way as LTR

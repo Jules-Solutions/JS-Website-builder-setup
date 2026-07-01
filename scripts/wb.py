@@ -31,7 +31,7 @@ scripts/wb-bootstrap.sh). The launcher resolves a Python interpreter +
 CLAUDE_PLUGIN_ROOT and execs this runner. This file is pure-stdlib (argparse)
 so it runs under any resolved interpreter without third-party deps.
 
-Per locked decisions in `Workstreams/website-builder/website-builder.md`:
+Per locked decisions in `website-builder.md`:
   42 — library runtime owned by Captain P
   29 — keys/secrets runtime owned by Captain Q
   48 — the `wb {library|keys|skills|maintain} <verb>` surface

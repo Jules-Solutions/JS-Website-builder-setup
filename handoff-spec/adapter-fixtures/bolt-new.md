@@ -1,6 +1,6 @@
 # Adapter Fixture — Bolt.new
 
-> Per-tool handoff fixture for **Bolt.new** (bolt.new by StackBlitz). Like Lovable, a whole-app builder — scope the brief down to a single component or you get a project scaffold. Cleaner, more modular code than Lovable, with direct file/terminal access. Canonical design anchor: `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
+> Per-tool handoff fixture for **Bolt.new** (bolt.new by StackBlitz). Like Lovable, a whole-app builder — scope the brief down to a single component or you get a project scaffold. Cleaner, more modular code than Lovable, with direct file/terminal access. Canonical design anchor: `DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
 >
 > Tool behaviour verified 2026-06-14 (see "Sources"). Re-verify on a cadence.
 

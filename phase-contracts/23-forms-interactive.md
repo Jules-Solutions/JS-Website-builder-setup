@@ -9,11 +9,11 @@ next_phase: 24
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-secrets-and-keys.md
+  - DESIGN-context7-integration.md
 ---
 
 # Phase 23 — Forms + interactive logic
@@ -136,12 +136,12 @@ Per locked decisions 29 + 44 and `cross-cutting/DESIGN-secrets-and-keys.md`, for
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 23 — the seed for this contract; § Phase-skip authorization ("inapplicable phase" — a form-less site).
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Integration with Claude Code primitives (Playwright + Bash + AskUserQuestion) / § context7 integration.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `audit/` conventions; `keys.yaml` location.
-- `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` — **the secrets authority for this phase**. The hybrid `.env` / 1Password model (decisions 29, 44); the `keys.yaml` declarative registry; the resolver always producing env vars; per-stack secret-loading recipes; the explicit list naming phase 23 (forms) as a key-touching phase; the anti-patterns the agent refuses; production-env sync at phase 29.
-- `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` — phase 23 invokes context7 for the form library + provider integration (`react-hook-form` + `zod`, `formspree setup`, the stack's form-action pattern).
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — Layer 3 (`strings.json`): the phase-16 form-state microcopy phase 23 wires the handlers to.
+- `DESIGN-phase-contracts.md` § 23 — the seed for this contract; § Phase-skip authorization ("inapplicable phase" — a form-less site).
+- `DESIGN-architecture.md` § Integration with Claude Code primitives (Playwright + Bash + AskUserQuestion) / § context7 integration.
+- `DESIGN-project-scaffold.md` § `audit/` conventions; `keys.yaml` location.
+- `DESIGN-secrets-and-keys.md` — **the secrets authority for this phase**. The hybrid `.env` / 1Password model (decisions 29, 44); the `keys.yaml` declarative registry; the resolver always producing env vars; per-stack secret-loading recipes; the explicit list naming phase 23 (forms) as a key-touching phase; the anti-patterns the agent refuses; production-env sync at phase 29.
+- `DESIGN-context7-integration.md` — phase 23 invokes context7 for the form library + provider integration (`react-hook-form` + `zod`, `formspree setup`, the stack's form-action pattern).
+- `DESIGN-content-layers.md` — Layer 3 (`strings.json`): the phase-16 form-state microcopy phase 23 wires the handlers to.
 
 Form providers + spam protection (mandatory at this phase — current as of the freshness date):
 

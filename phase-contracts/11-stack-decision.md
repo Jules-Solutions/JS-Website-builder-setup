@@ -9,17 +9,17 @@ next_phase: 12
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/stacks/DESIGN-stack-framer.md
-  - Workstreams/website-builder/stacks/DESIGN-stack-nextjs.md
-  - Workstreams/website-builder/stacks/DESIGN-stack-wordpress.md
-  - Workstreams/website-builder/stacks/DESIGN-stack-astro.md
-  - Workstreams/website-builder/stacks/DESIGN-stack-hugo.md
-  - Workstreams/website-builder/stacks/DESIGN-stack-sveltekit.md
-  - Workstreams/website-builder/stacks/DESIGN-stack-webflow.md
-  - Workstreams/website-builder/stacks/DESIGN-stack-static-html.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-stack-framer.md
+  - DESIGN-stack-nextjs.md
+  - DESIGN-stack-wordpress.md
+  - DESIGN-stack-astro.md
+  - DESIGN-stack-hugo.md
+  - DESIGN-stack-sveltekit.md
+  - DESIGN-stack-webflow.md
+  - DESIGN-stack-static-html.md
 library_clones_at_entry:
   - resource: astro-content-collections
     when: stack == "astro"
@@ -66,7 +66,7 @@ Framer is a canvas-first visual design tool with a built-in CMS, a Custom Compon
 
 Framer's sweet spot is brand-led marketing sites where the user wants visual control after launch but doesn't want to learn a code editor. Solo creators, small teams, designer-led businesses. Sister's "Still Humans" Framer project is the canonical cosplay target for the MVP cycle. Trade-offs: Framer Publish hosts on Framer's infrastructure (no Vercel or Cloudflare option), the canvas is not version-controlled the way code is, and complex page logic beyond what Custom Components support quickly becomes awkward. The agent surfaces all of these honestly at decision time.
 
-Full per-stack design at `Workstreams/website-builder/stacks/DESIGN-stack-framer.md`. The agent invokes `mcp__context7__resolve-library-id` for "Framer" plus `WebFetch` against framer.com/developers at this phase to confirm the current Server API surface, Custom Components SDK, and Framer CMS capabilities — these evolve quarterly.
+Full per-stack design at `DESIGN-stack-framer.md`. The agent invokes `mcp__context7__resolve-library-id` for "Framer" plus `WebFetch` against framer.com/developers at this phase to confirm the current Server API surface, Custom Components SDK, and Framer CMS capabilities — these evolve quarterly.
 
 ### Next.js
 
@@ -76,7 +76,7 @@ Next.js's sweet spot is users who want a real codebase they (or a developer they
 
 Note for migrators on Next.js 15+: `fetch()` is no-store by default, which is a breaking change from Next.js 14's `force-cache` default. The agent uses this fact to surface that data-fetching patterns differ from older training data; context7 lookups in this phase and again at phase 18 keep the agent current. Reference: [Next.js auto no-cache default](https://github.com/vercel/next.js/blob/canary/packages/next/src/server/lib/patch-fetch.ts).
 
-Full per-stack design at `Workstreams/website-builder/stacks/DESIGN-stack-nextjs.md`. The agent invokes `mcp__context7__query-docs` against `/vercel/next.js` for current App Router + RSC + rendering mode patterns. Caches to `.website-builder/library/docs/nextjs.md`.
+Full per-stack design at `DESIGN-stack-nextjs.md`. The agent invokes `mcp__context7__query-docs` against `/vercel/next.js` for current App Router + RSC + rendering mode patterns. Caches to `.website-builder/library/docs/nextjs.md`.
 
 ### WordPress
 
@@ -84,7 +84,7 @@ WordPress runs roughly 40 percent of the web. The website-builder picks WordPres
 
 WordPress's sweet spot is content-heavy sites with non-technical editors who need to publish often and don't want to learn a CMS abstraction. Editorial teams, professional services, sites that will outlive the developer-relationship. Trade-offs vs Framer and Next.js: WordPress needs a host (managed-WP at Kinsta / WP Engine / SiteGround / Cloudways, or VPS / cloud), maintenance discipline (plugin updates, core updates, security patches, backups), and the PHP-plus-MySQL operational footprint is heavier than the alternatives. Trade-offs vs Next.js specifically: each page request goes through WP's full PHP bootstrap (mitigated by caching but never as fast as static export), and the modern frontend story is awkward unless the user goes headless (WP backend + Next.js frontend) — which then makes Next.js the actual stack with WP as CMS layer.
 
-Full per-stack design at `Workstreams/website-builder/stacks/DESIGN-stack-wordpress.md`. The agent invokes `WebFetch` against developer.wordpress.org for current `theme.json` schema, REST API surface, and Block Editor (Gutenberg) capabilities — these also evolve.
+Full per-stack design at `DESIGN-stack-wordpress.md`. The agent invokes `WebFetch` against developer.wordpress.org for current `theme.json` schema, REST API surface, and Block Editor (Gutenberg) capabilities — these also evolve.
 
 ### Choosing between the three (decision logic)
 
@@ -100,13 +100,13 @@ The agent surfaces tradeoffs with concrete language ("if you pick Framer, you ca
 
 ## Expansion stacks (post-MVP, expansion phase 10)
 
-The five stacks below are fully designed in `Workstreams/website-builder/stacks/` and accessible to users who already know them, but they are **not first-class in the MVP**. Per locked decision 52, they ship in expansion phase 10 of the platform roadmap. The agent mentions them only when the user names one specifically or when an MVP stack is clearly the wrong fit. For v1, the agent steers toward one of the three MVP stacks above.
+The five stacks below are fully designed in the website-builder workstream (vault-side design; not shipped as MVP adapters) and accessible to users who already know them, but they are **not first-class in the MVP**. Per locked decision 52, they ship in expansion phase 10 of the platform roadmap. The agent mentions them only when the user names one specifically or when an MVP stack is clearly the wrong fit. For v1, the agent steers toward one of the three MVP stacks above.
 
-- **Astro** — content-focused meta-framework, zero JavaScript by default, component islands for opt-in interactivity. The sweet-spot fit for fast content sites (blog, marketing, docs, portfolio). For MVP, the closest substitute is Next.js with the static-export config. Full design at `Workstreams/website-builder/stacks/DESIGN-stack-astro.md`.
-- **Hugo** — Go-based static site generator; the fastest in the world (rebuilds 50k-page sites in seconds). Sweet-spot fit for very large content-heavy sites where build time matters. For MVP, the closest substitute is Next.js static export. Full design at `Workstreams/website-builder/stacks/DESIGN-stack-hugo.md`.
-- **SvelteKit** — Svelte's meta-framework; smallest bundles among the SSR-capable stacks (no virtual DOM, no runtime). Sweet-spot fit for users who want Next.js-class flexibility with simpler component syntax and smaller payloads. For MVP, the closest substitute is Next.js. Full design at `Workstreams/website-builder/stacks/DESIGN-stack-sveltekit.md`.
-- **Webflow** — visual canvas + CMS + hosting in one, similar in spirit to Framer but with deeper CSS-class controls and a Logic flow system. Sweet-spot fit for designer-led teams that want hosted infrastructure. For MVP, the closest substitute is Framer. Full design at `Workstreams/website-builder/stacks/DESIGN-stack-webflow.md`.
-- **Plain static HTML** — no framework, no build pipeline, no Node runtime. Just HTML / CSS / vanilla JavaScript files. Sweet-spot fit for tiny sites (1-5 pages) where the user wants maximum code transparency and deployability-anywhere. For MVP, the closest substitute is Next.js static export or — if the user wants the absolute simplest path — wait for expansion phase 10. Full design at `Workstreams/website-builder/stacks/DESIGN-stack-static-html.md`.
+- **Astro** — content-focused meta-framework, zero JavaScript by default, component islands for opt-in interactivity. The sweet-spot fit for fast content sites (blog, marketing, docs, portfolio). For MVP, the closest substitute is Next.js with the static-export config. Full design at `DESIGN-stack-astro.md`.
+- **Hugo** — Go-based static site generator; the fastest in the world (rebuilds 50k-page sites in seconds). Sweet-spot fit for very large content-heavy sites where build time matters. For MVP, the closest substitute is Next.js static export. Full design at `DESIGN-stack-hugo.md`.
+- **SvelteKit** — Svelte's meta-framework; smallest bundles among the SSR-capable stacks (no virtual DOM, no runtime). Sweet-spot fit for users who want Next.js-class flexibility with simpler component syntax and smaller payloads. For MVP, the closest substitute is Next.js. Full design at `DESIGN-stack-sveltekit.md`.
+- **Webflow** — visual canvas + CMS + hosting in one, similar in spirit to Framer but with deeper CSS-class controls and a Logic flow system. Sweet-spot fit for designer-led teams that want hosted infrastructure. For MVP, the closest substitute is Framer. Full design at `DESIGN-stack-webflow.md`.
+- **Plain static HTML** — no framework, no build pipeline, no Node runtime. Just HTML / CSS / vanilla JavaScript files. Sweet-spot fit for tiny sites (1-5 pages) where the user wants maximum code transparency and deployability-anywhere. For MVP, the closest substitute is Next.js static export or — if the user wants the absolute simplest path — wait for expansion phase 10. Full design at `DESIGN-stack-static-html.md`.
 
 If the user insists on an expansion stack for v1, the agent logs the decision in `.website-builder/decisions/stack-expansion-${stack}.md`, surfaces that the in-MVP support level is "design exists, runtime adapters not yet shipped," and either proceeds with degraded support (the user accepts the risk) or routes to an MVP stack with a documented future migration intent. The agent does not pretend MVP support exists when it doesn't.
 
@@ -147,7 +147,7 @@ Override is available on the stack mismatch and expansion-stack gates via explic
 ## Tools and skills used
 
 - **AskUserQuestion** — the primary tool. The agent presents the three MVP stacks, walks through the five decision questions, asks the two transactional-decision questions verbatim, and surfaces the expansion-stack framing when relevant.
-- **`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`** — invoked for each stack the user is seriously considering. Required for `/vercel/next.js` if Next.js is on the table; recommended for the others. The agent caches fetched docs to `.website-builder/library/docs/${stack}.md` for re-read at phases 17 / 18 / 22 / 28-30. See [`Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md`](../../../Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md) for the invocation pattern.
+- **`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`** — invoked for each stack the user is seriously considering. Required for `/vercel/next.js` if Next.js is on the table; recommended for the others. The agent caches fetched docs to `.website-builder/library/docs/${stack}.md` for re-read at phases 17 / 18 / 22 / 28-30. See [`DESIGN-context7-integration.md`](../../../DESIGN-context7-integration.md) for the invocation pattern.
 - **`WebFetch`** — used when context7 lacks fresh coverage. The agent fetches framer.com/developers, developer.wordpress.org, and similar canonical-source docs to confirm current capabilities. URLs are recorded in the reference-materials section of this contract and re-fetched at later phases if stale.
 - **`WebSearch`** — used sparingly. The agent may search "Next.js 15 [feature] 2026" or similar when context7 results need supplementing for very recent capabilities.
 - **Reference-data load** — the agent reads the per-stack design docs (`stacks/DESIGN-stack-*.md` in the workstream) for capability matrices, auth models, output mappings, deploy notes, and known limitations. These are the source of truth, not the agent's training data.
@@ -203,20 +203,20 @@ If the user picked an expansion stack, the agent writes `.website-builder/decisi
 
 Per-stack design docs (full reads for any stack the user considers seriously):
 
-- `Workstreams/website-builder/stacks/DESIGN-stack-framer.md` — MVP
-- `Workstreams/website-builder/stacks/DESIGN-stack-nextjs.md` — MVP
-- `Workstreams/website-builder/stacks/DESIGN-stack-wordpress.md` — MVP
-- `Workstreams/website-builder/stacks/DESIGN-stack-astro.md` — expansion phase 10
-- `Workstreams/website-builder/stacks/DESIGN-stack-hugo.md` — expansion phase 10
-- `Workstreams/website-builder/stacks/DESIGN-stack-sveltekit.md` — expansion phase 10
-- `Workstreams/website-builder/stacks/DESIGN-stack-webflow.md` — expansion phase 10
-- `Workstreams/website-builder/stacks/DESIGN-stack-static-html.md` — expansion phase 10
+- `DESIGN-stack-framer.md` — MVP
+- `DESIGN-stack-nextjs.md` — MVP
+- `DESIGN-stack-wordpress.md` — MVP
+- `DESIGN-stack-astro.md` — expansion phase 10
+- `DESIGN-stack-hugo.md` — expansion phase 10
+- `DESIGN-stack-sveltekit.md` — expansion phase 10
+- `DESIGN-stack-webflow.md` — expansion phase 10
+- `DESIGN-stack-static-html.md` — expansion phase 10
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § migration recipes — the per-stack mapping from `.website-builder/` to deployed code.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Component breakdown — how the chosen stack interacts with the plugin's adapter layer.
-- `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` — context7 invocation pattern for stack docs.
+- `DESIGN-project-scaffold.md` § migration recipes — the per-stack mapping from `.website-builder/` to deployed code.
+- `DESIGN-architecture.md` § Component breakdown — how the chosen stack interacts with the plugin's adapter layer.
+- `DESIGN-context7-integration.md` — context7 invocation pattern for stack docs.
 
 Context7 lookups (mandatory for the MVP stack the user picks; recommended for the others when surfaced as alternatives):
 

@@ -2,7 +2,7 @@
 
 > The plugin's built-in HTML/JSX/Vue/Svelte parser for **entry mode `has-ai-output`** + the **phase-18 JSON-handoff round-trip**. Takes raw code (typically from ChatGPT / Claude.ai / v0 / Lovable / Cursor / Bolt / a human freelancer) and extracts design tokens + content/strings + component shapes + external dependencies. **Load-bearing in MVP** (per phase-6.5 contract). **Stack-agnostic** — output normalizes to the same `.website-builder/` layers regardless of input language.
 >
-> Anchor: `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"AI-output parser" (lines 184-201).
+> Anchor: `DESIGN-ingestion-and-extraction.md` §"AI-output parser" (lines 184-201).
 
 ## What it does
 
@@ -138,7 +138,7 @@ extraction:
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"AI-output parser" — design-doc anchor
+- `DESIGN-ingestion-and-extraction.md` §"AI-output parser" — design-doc anchor
 - `phase-contracts/06.5-artifact-ingestion.md` — invocation contract + 8-step flow
 - `handoff-spec/component-request-v1.md` — the brief shape that drives the round-trip
 - `handoff-spec/component-output-v1.md` — the ingestion contract the AI-output parser implements

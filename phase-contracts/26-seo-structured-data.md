@@ -9,9 +9,9 @@ next_phase: 27
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
 library_clones_at_entry:
   - resource: seo-checklists
     as: seo-checklists
@@ -79,7 +79,7 @@ The agent refuses to advance when:
 - **Validation tooling** — Google Rich Results Test (Google-specific rich-result eligibility) and the schema.org Markup Validator (generic schema validity). The agent validates every page's JSON-LD before marking the page done; via `WebFetch`/`Bash` against the validator endpoints or the public test tools.
 - **`Playwright` MCP** — to confirm the metadata actually renders into the served HTML `<head>` (SSR/SSG correctness — a meta tag that only appears after client hydration is invisible to many crawlers; the agent checks the server-rendered source).
 - **`Read`** — `sitemap.yaml` (the page set + types — drives schema.org type per page), `project.yaml.requirements` (audience/intent — drives title/description targeting), the finalized `content/pages/*.md` (the real content the metadata + structured data must mirror), `brand.yaml.voice` (descriptions in voice).
-- **Reference-data load** — `.website-builder/library/seo-checklists/` (per `DESIGN-phase-contracts.md` seed) and `foundation/DESIGN-ecosystem-catalog.md` for schema.org corpus reference data.
+- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/seo-checklists/` (per `DESIGN-phase-contracts.md` seed) and `foundation/DESIGN-ecosystem-catalog.md` for schema.org corpus reference data.
 
 No subagent spawn. `wb-prelaunch` phase-group skill carries phases 24-27; the structured data emitted here is re-verified rendering-correct in phase 27's cross-browser pass and submitted to Search Console/Bing in phase 30.
 
@@ -116,9 +116,9 @@ The `SEO-REPORT.md` is the required artifact.
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 26 (seed)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — schema.org corpus reference data:** `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (schema.org corpus + SEO checklist source list)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 26 (seed)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — schema.org corpus reference data:** `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources (schema.org corpus + SEO checklist source list)
 - **Phase 16 (the finalized content the metadata mirrors + the voice):** `phase-contracts/16-copywriting.md` § What Claude must establish — descriptions are written from real content in the phase-5 voice; the 2026 AI-discovery context note (LLMs as first brand interpreter) directly informs this phase
 - **Phase 9/10 (the page set + types driving schema.org type selection):** `sitemap.yaml` page-type field
 - **Phase 30 (where sitemap.xml is submitted):** `phase-contracts/30-analytics-search-submission.md` § What Claude must establish

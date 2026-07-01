@@ -2,7 +2,7 @@
 
 > Runtime artifact the website-builder agent loads when `project.yaml.stack` is `nextjs`. The `wb-architecture` skill consumes this at phase 11 (stack decision); `wb-component-build` at phase 18 (component build); the phase-6.5 re-runnable ingestion at any project lifecycle point. Authored against the canonical 14-section schema in `adapters/README.md`.
 >
-> Primary design-doc source: `Workstreams/website-builder/stacks/DESIGN-stack-nextjs.md`. Pairing source: `Workstreams/website-builder/components/DESIGN-components-react.md` (shadcn/ui as default). i18n source: `Workstreams/website-builder/foundation/DESIGN-i18n.md`.
+> Primary design-doc source: `DESIGN-stack-nextjs.md`. Pairing source: `DESIGN-components-react.md` (shadcn/ui as default). i18n source: `DESIGN-i18n.md`.
 
 ## Mental model
 
@@ -485,7 +485,7 @@ export function HeroBlock() {
 
 ## Phase 6.5 ingestion
 
-Phase 6.5 fires when entry mode is `has-existing-site` on a Next.js project, `has-ai-output` from v0 / Cursor / ChatGPT (output is Next.js + shadcn + Tailwind by default), or at any project lifecycle point when the user pastes a new artifact. See `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` for the cross-stack phase-6.5 mechanism.
+Phase 6.5 fires when entry mode is `has-existing-site` on a Next.js project, `has-ai-output` from v0 / Cursor / ChatGPT (output is Next.js + shadcn + Tailwind by default), or at any project lifecycle point when the user pastes a new artifact. See `DESIGN-ingestion-and-extraction.md` for the cross-stack phase-6.5 mechanism.
 
 **Primary MCP:** the **Playwright MCP** (foundation-bundled — see §"Auth + setup" → `### MCP servers` → Playwright MCP) drives the deployed-site walk in step 3 of the walk procedure below. No fallback path — Playwright MCP is Tier-1 infrastructure for this stack adapter; absence escalates per `.claude/rules/tool-dependency-discipline.md`.
 
@@ -557,7 +557,7 @@ The MVP default per BUILD-strategy.md Phase 4 (decision 54) is **Stripe Checkout
 | **Square** | US-centric POS-integrated commerce | `pnpm add square` |
 | **Klarna** | Buy-now-pay-later for consumer commerce | Via Stripe (Klarna BNPL enabled in Dashboard) OR direct Klarna integration |
 
-Decision tree per `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` payment-providers section.
+Decision tree per `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` payment-providers section.
 
 ### Phase 24c — Commerce-specific legal
 
@@ -595,7 +595,7 @@ Phase 12 (CMS decision) picks per project complexity. The MVP triplet (locked de
 
 **i18n strategy locked at phase 12** for multilingual sites (per `wb-architecture/SKILL.md` line 87): Decap → `structure: multiple_files` config; Payload → field-level `localized: true` + `localization.fallback: true`. None → per-locale MDX files at `content/pages/{lang}/{slug}.mdx` (the default migration recipe in §"Migration recipe").
 
-Per-CMS deep recipes: `Workstreams/website-builder/cms/DESIGN-cms-{none,decap,payload}.md` (full coverage authored separately).
+Per-CMS deep recipes: `cms-adapters/cms-{none,decap,payload}.md`.
 
 ## Component library pairing
 
@@ -716,7 +716,7 @@ If the user customizes a shadcn primitive (e.g., a `Button` variant the upstream
 
 ### Alternative React libraries (when not shadcn)
 
-Per `Workstreams/website-builder/components/DESIGN-components-react.md` capability matrix:
+Per `DESIGN-components-react.md` capability matrix:
 
 - **Mantine** — when user wants batteries-included; forms-heavy site; least DIY
 - **Aceternity UI** — animation-heavy portfolio / agency
@@ -958,17 +958,17 @@ The agent cites URL + fetch date in any cached-doc file.
 
 ### Foundation design docs (vault-root-relative per `vault-workstreams.md` link standard)
 
-- [DESIGN-stack-nextjs](Workstreams/website-builder/stacks/DESIGN-stack-nextjs.md) — primary source for this adapter
-- [DESIGN-content-layers](Workstreams/website-builder/foundation/DESIGN-content-layers.md) — 5-layer content stack (§4 row labels source)
-- [DESIGN-i18n](Workstreams/website-builder/foundation/DESIGN-i18n.md) — i18n model (Pattern A/B, routing strategies)
-- [DESIGN-ingestion-and-extraction](Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md) — phase 6.5 mechanism
-- [DESIGN-architecture](Workstreams/website-builder/foundation/DESIGN-architecture.md) — agent profile + skills + phase contracts
-- [DESIGN-components-react](Workstreams/website-builder/components/DESIGN-components-react.md) — full React component-library capability matrix; shadcn deep dive
-- [DESIGN-project-scaffold](Workstreams/website-builder/foundation/DESIGN-project-scaffold.md) — `.website-builder/` layout
-- [DESIGN-phase-contracts](Workstreams/website-builder/foundation/DESIGN-phase-contracts.md) — pipeline phases this adapter is consumed at
-- [DESIGN-ecosystem-catalog](Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md) — payment-providers, animation-libraries cross-references
-- [BUILD-strategy](Workstreams/website-builder/BUILD-strategy.md) Phase 3 — the DoD this adapter satisfies
-- [VISION-website-builder](Workstreams/website-builder/VISION-website-builder.md) — strategic anchor
+- `DESIGN-stack-nextjs` — primary source for this adapter
+- `DESIGN-content-layers` — 5-layer content stack (§4 row labels source)
+- `DESIGN-i18n` — i18n model (Pattern A/B, routing strategies)
+- `DESIGN-ingestion-and-extraction` — phase 6.5 mechanism
+- `DESIGN-architecture` — agent profile + skills + phase contracts
+- `DESIGN-components-react` — full React component-library capability matrix; shadcn deep dive
+- `DESIGN-project-scaffold` — `.website-builder/` layout
+- `DESIGN-phase-contracts` — pipeline phases this adapter is consumed at
+- [DESIGN-ecosystem-catalog](${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md) — payment-providers, animation-libraries cross-references
+- `BUILD-strategy` Phase 3 — the DoD this adapter satisfies
+- `VISION-website-builder` — strategic anchor
 
 ### Plugin internal cross-references (vault-root-relative paths to the plugin worktree)
 

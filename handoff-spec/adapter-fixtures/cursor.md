@@ -1,6 +1,6 @@
 # Adapter Fixture — Cursor
 
-> Per-tool handoff fixture for **Cursor** (the AI code editor / IDE). Unlike the chat tools, Cursor operates inside your project — it wants the brief as a file or via chat, and it writes output directly to files. Canonical design anchor: `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
+> Per-tool handoff fixture for **Cursor** (the AI code editor / IDE). Unlike the chat tools, Cursor operates inside your project — it wants the brief as a file or via chat, and it writes output directly to files. Canonical design anchor: `DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
 >
 > Tool behaviour verified 2026-06-14 (see "Sources"). Re-verify on a cadence.
 

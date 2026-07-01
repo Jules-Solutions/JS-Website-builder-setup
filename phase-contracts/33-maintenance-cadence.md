@@ -9,9 +9,9 @@ next_phase: 34
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-post-launch-template.md
 ---
 
 # Phase 33 — Maintenance cadence
@@ -98,12 +98,12 @@ The `maintenance.md` (or the logged skip with surfaced rot-cost) is the artifact
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 33 (seed — `Gating: none`; common failure = no plan = site rots in 6 months, agent surfaces this risk)
-- **Design doc — post-launch maintainer (the content/deps/monitoring skills that execute this routine + the wizard that pre-decided the cadence, decisions 45/49):** `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` § Maintenance skill bundle (`wb-maintain-content` / `wb-maintain-deps` / `wb-maintain-monitoring`) + § Wizard-driven customization (the phase-29 cadence/backup inputs phase 33 documents) — **referenced, not authored here**
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 33 (seed — `Gating: none`; common failure = no plan = site rots in 6 months, agent surfaces this risk)
+- **Design doc — post-launch maintainer (the content/deps/monitoring skills that execute this routine + the wizard that pre-decided the cadence, decisions 45/49):** `DESIGN-post-launch-template.md` § Maintenance skill bundle (`wb-maintain-content` / `wb-maintain-deps` / `wb-maintain-monitoring`) + § Wizard-driven customization (the phase-29 cadence/backup inputs phase 33 documents) — **referenced, not authored here**
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
 - **Phase 29 (the wizard that pre-decided the cadence + the deploy this maintains):** `phase-contracts/29-hosting-deployment.md` § What Claude must establish (the post-launch wizard + `config.yaml`)
 - **Phase 32 (the prior post-launch phase; the compounding skip-cost):** `phase-contracts/32-iteration-roadmap.md` § Skip authorization
 - **Phase 34 (the next + last phase — monitoring/backup, which *does* gate):** `phase-contracts/34-monitoring-backup.md`
-- **Locked decisions 45 + 49** (the deploy wizard pre-decides the cadence; the 8-skill maintainer owns ongoing) — STATE doc: `Workstreams/website-builder/website-builder.md`
+- **Locked decisions 45 + 49** (the deploy wizard pre-decides the cadence; the 8-skill maintainer owns ongoing) — STATE doc: `website-builder.md`
 
 No mandatory external research for this phase (per the INST). Freshness date for this contract: **2026-05-18**.

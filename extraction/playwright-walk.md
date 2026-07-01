@@ -2,7 +2,7 @@
 
 > Real-browser walking of deployed sites. **Paired with Stitch / divmagic when static URL extraction misses dynamic state** — hover effects, scroll-triggered animations, mobile-emulation variants, auth-walled content. **Stack-agnostic** output (screenshots + DOM dumps that feed back into Stitch / AI-output parser). Foundation pack — Playwright MCP is already in the agent's stack.
 >
-> Anchor: `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"Playwright walker" (lines 203-210).
+> Anchor: `DESIGN-ingestion-and-extraction.md` §"Playwright walker" (lines 203-210).
 
 ## What it does
 
@@ -162,7 +162,7 @@ extraction:
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"Playwright walker" — design-doc anchor
+- `DESIGN-ingestion-and-extraction.md` §"Playwright walker" — design-doc anchor
 - `phase-contracts/06.5-artifact-ingestion.md` — invocation contract
 - `extraction/stitch.md` — primary extractor; Playwright feeds Stitch's screenshot mode
 - `extraction/ai-output.md` — secondary extractor; Playwright feeds the DOM-dump path

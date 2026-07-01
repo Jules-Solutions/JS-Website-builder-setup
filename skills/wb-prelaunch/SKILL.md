@@ -10,7 +10,7 @@ version: 0.1.0
 >
 > **Design-doc primacy.** This skill is a procedural router. The substantive contracts live in the phase-contract MDs and the design docs cited below — read those verbatim at the phase the user is in. Do not paraphrase them from this skill; point the agent at them.
 >
-> Skill anatomy + how this skill integrates with the freelancer agent profile + hooks: `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills ("one per phase group"; skills layer, do not override; the phase contract MD is the instruction body). Key handling for every keyed integration in this group (analytics/CRM/mailing keys at 24, commerce secrets at 24a/24b, DNS/deploy tokens forward): `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` — `keys.yaml` holds *references* only, secrets live in `.env`/1Password, code reads `process.env.{KEY}`, never inline a secret (the publishable Stripe key is *not* a secret but still flows through the env mechanism for uniformity).
+> Skill anatomy + how this skill integrates with the freelancer agent profile + hooks: `DESIGN-architecture.md` § Skills ("one per phase group"; skills layer, do not override; the phase contract MD is the instruction body). Key handling for every keyed integration in this group (analytics/CRM/mailing keys at 24, commerce secrets at 24a/24b, DNS/deploy tokens forward): `DESIGN-secrets-and-keys.md` — `keys.yaml` holds *references* only, secrets live in `.env`/1Password, code reads `process.env.{KEY}`, never inline a secret (the publishable Stripe key is *not* a secret but still flows through the env mechanism for uniformity).
 
 ## What this skill drives
 
@@ -51,8 +51,8 @@ Re-read `project.yaml.requirements` (phase 3) and wire every non-commerce integr
 
 This is the heaviest part of the group and the part with mandatory external research. Load `references/commerce-branch.md` for the full Stripe Checkout / Cal.com / TWINT / SCA recipe map, and read the per-phase design docs **in full** before standing commerce up:
 
-- 24a — `Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md` and/or `commerce/DESIGN-booking-calcom.md`
-- 24b — `Workstreams/website-builder/commerce/DESIGN-payment-providers.md`
+- 24a — `DESIGN-commerce-stripe-checkout.md` and/or `commerce/DESIGN-booking-calcom.md`
+- 24b — `DESIGN-payment-providers.md`
 - 24c — jurisdiction legal: load `references/jurisdiction-legal.md`
 
 MVP scope is locked (decision 54): **Stripe Checkout** (payments) + **Cal.com** (bookings) are the only first-class platforms; the nine expansion platforms (Shopify, Lemon Squeezy, Snipcart, Paddle, Gumroad, Sellfy, Saleor, WooCommerce, Shopify Hydrogen) are named-as-expansion-paths only, picked only with an explicit logged decision and degraded-support acceptance. **TWINT-via-Stripe is the default for any Swiss-audience site** (decision 26) — CHF-only, native via Stripe, no separate account. The three non-overridable commerce gates: (1) no commerce-ready claim without a **rehearsed test purchase/booking** observed succeeding in test mode; (2) any webhook handler that acts on `checkout.session.completed` (or the Cal.com payment confirmation) **without verifying the signature** against the raw body is refused; (3) an EU/EEA/UK/Swiss card flow where the **3DS/SCA challenge does not fire** in a regulatory-test-card transaction is not deployable.

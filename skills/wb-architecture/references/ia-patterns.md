@@ -1,6 +1,6 @@
 # Reference — Information architecture patterns (phase 10)
 
-> Navigation archetypes per zone, the Hick's-Law ceiling rationale, mobile-pattern selection, breadcrumb/SEO rules, the single-page degenerate case, and the annotated `navigation:` block schema. Authoritative source is `phase-contracts/10-information-architecture.md` + `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` (IA pattern subset) + `foundation/DESIGN-i18n.md` + `foundation/DESIGN-project-scaffold.md` § sitemap.yaml. This file is the fast-load summary.
+> Navigation archetypes per zone, the Hick's-Law ceiling rationale, mobile-pattern selection, breadcrumb/SEO rules, the single-page degenerate case, and the annotated `navigation:` block schema. Authoritative source is `phase-contracts/10-information-architecture.md` + `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` (IA pattern subset) + `foundation/DESIGN-i18n.md` + `foundation/DESIGN-project-scaffold.md` § sitemap.yaml. This file is the fast-load summary.
 
 ## The core IA failure and the agent's job
 
@@ -105,9 +105,9 @@ navigation:
 
 ## Reference materials cited by the contract
 
-- `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` — accepted IA patterns; nav-pattern subset from the inspiration corpus (Vercel Templates / Cruip / Awwwards / Astro Themes) referenced again at phase 11+ once stack is chosen.
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — confirms multilingual sites require a utility-nav language switcher.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § sitemap.yaml — the schema this phase writes into.
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` — accepted IA patterns; nav-pattern subset from the inspiration corpus (Vercel Templates / Cruip / Awwwards / Astro Themes) referenced again at phase 11+ once stack is chosen.
+- `DESIGN-i18n.md` — confirms multilingual sites require a utility-nav language switcher.
+- `DESIGN-project-scaffold.md` § sitemap.yaml — the schema this phase writes into.
 - `.website-builder/library/component-patterns/navigation.md` (populated as the agent learns) — canonical nav component archetypes, referenced again at phase 18.
 - `.website-builder/library/seo-checklists/ia.md` — SEO-driven IA constraints (URL depth, sitemap.xml conventions, breadcrumb schema.org markup).
 - Hick's Law — the soft 5-7 primary-nav ceiling rationale. WCAG 2.2 §2.4 Navigable — skip-to-content link, breadcrumb consistency, consistent navigation across pages; phase 21 (a11y audit) verifies.

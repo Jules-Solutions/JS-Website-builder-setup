@@ -1,6 +1,6 @@
 # Content Design JSON — The Microcopy-as-Data Methodology
 
-The canonical microcopy methodology phases 13-16 implement. Source: Prasaja Mukti, "How content designers can (and should) use JSON files", UX Content Collective, June 10, 2025 — [uxcontent.com/content-design-json](https://uxcontent.com/content-design-json/). Pairing design doc: `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 3. Methodology verified current as of 2026-05-18 via WebFetch + WebSearch ([Content design in 2026 — UXCC](https://uxcontent.com/content-design-in-2026/)).
+The canonical microcopy methodology phases 13-16 implement. Source: Prasaja Mukti, "How content designers can (and should) use JSON files", UX Content Collective, June 10, 2025 — [uxcontent.com/content-design-json](https://uxcontent.com/content-design-json/). Pairing design doc: `DESIGN-content-layers.md` § Layer 3. Methodology verified current as of 2026-05-18 via WebFetch + WebSearch ([Content design in 2026 — UXCC](https://uxcontent.com/content-design-in-2026/)).
 
 ## The core problem it solves
 

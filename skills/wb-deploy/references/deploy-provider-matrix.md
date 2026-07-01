@@ -1,6 +1,6 @@
 # Deploy Provider Matrix — decision 50, per-stack hosts, deploy mechanisms, secret parity, DNS records
 
-> Reference for phases 28 + 29. The substantive source of truth is `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md` (read it in full for phase 29) and locked decision 50 in `Workstreams/website-builder/website-builder.md`. This file is the procedural condensation the skill loads on demand.
+> Reference for phases 28 + 29. The substantive source of truth is `DESIGN-deploy-providers.md` (read it in full for phase 29) and locked decision 50 in `website-builder.md`. This file is the procedural condensation the skill loads on demand.
 >
 > External CLI surface confirmed fresh 2026-05-18 via context7 `/vercel/vercel` and `/cloudflare/wrangler-action`, and WebSearch on Framer Publish custom-domain DNS. Host CLIs evolve — re-validate at session start when phase 29 is active.
 

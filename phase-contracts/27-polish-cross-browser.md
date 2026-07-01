@@ -9,8 +9,8 @@ next_phase: 28
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
 ---
 
 # Phase 27 — Polish + cross-browser/cross-device QA
@@ -98,8 +98,8 @@ The `QA-REPORT.md` with the populated matrix grid + Safari checklist is the requ
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 27 (seed) — explicit Safari-specific-bug-list callout
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 27 (seed) — explicit Safari-specific-bug-list callout
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
 - **Phase 20 / 21 / 22 (the dedicated passes phase 27 integrates, does not replace):** `DESIGN-phase-contracts.md` §§ 20-22 — responsive snapshots, a11y audit, performance budget; phase 27 must not regress these
 - **Phase 24 / 25 / 26 (the pre-launch deliverables phase 27 re-verifies on the matrix):** `phase-contracts/24-integrations.md` (Safari/ITP caveats), `phase-contracts/25-legal-pages.md` (consent network-level proof re-run on WebKit), `phase-contracts/26-seo-structured-data.md` (server-rendered metadata/JSON-LD per engine)
 - **Phase 16 voice baseline (polish includes voice-consistent microcopy in error/empty states surfaced during the walk):** `phase-contracts/16-copywriting.md`

@@ -12,12 +12,16 @@ Wave-5 — exercise the Wave-3b / Wave-4 surfaces end-to-end (Captain verify-1):
      `library_clones_at_entry` corpus key (02 -> brand-examples/design-systems;
      13 -> component-patterns).
 
-  C. FU-2 ground-truth — the bundled-clone target paths
-     (`.website-builder/library/<slug>/`) line up with what the FU-2-repointed skills/
-     files now point at (the General repointed 6 skill files reference/<slug>/ ->
-     .website-builder/library/<slug>/ in commit a29750d). Slugs checked: design-systems,
-     awesome-design-md, component-patterns, seo-checklists, brand-examples. A mismatch
-     is REPORTED (this Captain does not edit skills/).
+  C. FU-2 ground-truth (reconciled by Decision 91 — "ship the menu, fetch the
+     meals", supersedes Decision 88 + the original FU-2 library repoint). Bundled
+     corpora (design-systems / brand-examples / component-patterns / seo-checklists)
+     are now READ from the guaranteed-present bundled path
+     ${CLAUDE_PLUGIN_ROOT}/reference-corpus/<slug>/ — a runtime read-instruction
+     (in skills/ or phase-contracts/) points there. awesome-design-md stays a
+     genuinely-cloned-at-runtime resource read from .website-builder/library/
+     awesome-design-md/ (bundled subset ships as reference-corpus/awesome-design-md-
+     corpus/). The Decision-42 autoclone machinery is kept (bundled corpora still
+     materialize at library/<slug>/ at phase entry — harmless, now redundant).
 
 Run:
   cd tests && uv run --with pyyaml --with pytest pytest orchestration/test_e2e_surfaces.py -v
@@ -54,6 +58,16 @@ GREENFIELD = {
 FU2_SLUGS = ("design-systems", "awesome-design-md", "component-patterns",
              "seo-checklists", "brand-examples")
 
+# Decision 91 (supersedes Decision 88 + the original FU-2 library repoint):
+# bundled corpora are READ from ${CLAUDE_PLUGIN_ROOT}/reference-corpus/<slug>/
+# (guaranteed present on any install), not from the runtime clone. awesome-design-md
+# stays a genuinely-cloned-at-runtime resource (the full VoltAgent corpus, network-
+# cloned at phase 17) read from .website-builder/library/awesome-design-md/; its
+# bundled 14-exemplar subset ships as reference-corpus/awesome-design-md-corpus/.
+BUNDLED_READ_SLUGS = ("design-systems", "brand-examples",
+                      "component-patterns", "seo-checklists")
+RUNTIME_READ_SLUGS = ("awesome-design-md",)
+
 
 def _write_project(root: Path, phase: int, **overrides) -> Path:
     fields: dict[str, object] = dict(GREENFIELD)
@@ -86,15 +100,6 @@ def _wb(root: Path, *args: str) -> subprocess.CompletedProcess:
     )
 
 
-def _catalogue_default_subdir(slug: str) -> bool:
-    """True if at least one catalogue key resolves its default-subdir to `slug`
-    (i.e. the runtime clone target for that resource is `.website-builder/library/slug/`)."""
-    return any(
-        default_sub == slug
-        for (_src, _rtype, default_sub) in wb_library.CATALOGUE_CLONE_KEYS.values()
-    )
-
-
 def _skills_reference_slug(slug: str) -> list[str]:
     """Skill files that point at `.website-builder/library/<slug>/`."""
     needle = f".website-builder/library/{slug}/"
@@ -105,6 +110,27 @@ def _skills_reference_slug(slug: str) -> list[str]:
                 hits.append(md.relative_to(PLUGIN_ROOT).as_posix())
         except OSError:
             continue
+    return hits
+
+
+# The agent's runtime read-instructions live in two surfaces: the phase-group
+# skills and the phase contracts. Decision 91 points bundled-corpus reads at the
+# bundled path from whichever surface instructs that phase.
+READ_INSTRUCTION_DIRS = (SKILLS_DIR, PLUGIN_ROOT / "phase-contracts")
+
+
+def _files_reference_bundled(slug: str) -> list[str]:
+    """Runtime read-instruction files (skills/ or phase-contracts/) that point at
+    the guaranteed-present bundled path ${CLAUDE_PLUGIN_ROOT}/reference-corpus/<slug>/."""
+    needle = f"reference-corpus/{slug}/"
+    hits: list[str] = []
+    for base in READ_INSTRUCTION_DIRS:
+        for md in base.rglob("*.md"):
+            try:
+                if needle in md.read_text(encoding="utf-8"):
+                    hits.append(md.relative_to(PLUGIN_ROOT).as_posix())
+            except OSError:
+                continue
     return hits
 
 
@@ -229,17 +255,34 @@ def _corpus_dirname(slug: str) -> str:
 
 
 class TestFU2GroundTruth:
-    def test_each_fu2_slug_is_a_catalogue_target_and_skill_pointer(self):
-        """For every FU-2 slug: (1) a catalogue key clones to library/<slug>/, and
-        (2) at least one skill points at library/<slug>/. Mismatch => the runtime
-        clone path and the skill pointer disagree (FU-2 regression)."""
+    def test_bundled_slugs_read_from_the_shipped_corpus(self):
+        """Decision 91: each bundled FU-2 slug is READ from the guaranteed-present
+        bundled path ${CLAUDE_PLUGIN_ROOT}/reference-corpus/<slug>/ — a runtime
+        read-instruction (a skill or a phase contract) points there and the shipped
+        corpus dir exists. This is the portability fix: the agent no longer depends
+        on a runtime clone having materialized before it can read the corpus."""
         mismatches: list[str] = []
-        for slug in FU2_SLUGS:
-            if not _catalogue_default_subdir(slug):
-                mismatches.append(f"{slug}: no catalogue key targets library/{slug}/")
-            if not _skills_reference_slug(slug):
-                mismatches.append(f"{slug}: no skill points at .website-builder/library/{slug}/")
-        assert not mismatches, "FU-2 slug mismatch:\n  " + "\n  ".join(mismatches)
+        for slug in BUNDLED_READ_SLUGS:
+            if not (REFERENCE_CORPUS / slug).is_dir():
+                mismatches.append(f"{slug}: shipped corpus dir missing")
+            if not _files_reference_bundled(slug):
+                mismatches.append(
+                    f"{slug}: no read-instruction points at reference-corpus/{slug}/"
+                )
+        assert not mismatches, "bundled-read mismatch:\n  " + "\n  ".join(mismatches)
+
+    def test_runtime_slug_reads_from_the_library_clone(self):
+        """awesome-design-md stays a genuinely-cloned-at-runtime resource: a skill
+        points at .website-builder/library/awesome-design-md/ (the full VoltAgent
+        corpus, cloned at phase 17), and its bundled subset ships as
+        reference-corpus/awesome-design-md-corpus/."""
+        for slug in RUNTIME_READ_SLUGS:
+            assert _skills_reference_slug(slug), (
+                f"no skill points at .website-builder/library/{slug}/"
+            )
+            assert (REFERENCE_CORPUS / _corpus_dirname(slug)).is_dir(), (
+                f"bundled subset missing for {slug}"
+            )
 
     def test_corpus_dirs_ship_for_the_bundled_fu2_slugs(self):
         # design-systems / component-patterns / seo-checklists / brand-examples are
@@ -249,9 +292,12 @@ class TestFU2GroundTruth:
             assert corpus.is_dir(), f"shipped corpus dir missing for {slug}: {corpus}"
             assert any(corpus.iterdir()), f"shipped corpus {corpus} is empty"
 
-    def test_bundled_fu2_slugs_materialize_at_skill_pointer_path(self, tmp_path: Path):
-        """Drive the contributing phases; assert the bundled corpora land at exactly the
-        `.website-builder/library/<slug>/` path the skills point at."""
+    def test_bundled_corpora_still_autoclone_to_library(self, tmp_path: Path):
+        """Decision 91 keeps the Decision-42 autoclone machinery: bundled corpora still
+        materialize at .website-builder/library/<slug>/ at phase entry (harmless — the
+        agent now READS them from reference-corpus/). Removing this now-redundant clone
+        so library/ is reserved for genuinely-cloned resources is a follow-up for the
+        General (surfaced in the catalogue/de-vault RPT)."""
         root = _write_project(tmp_path, 2)
         wb_library.autoclone_for_state(root, trigger="phase-entry", phase=2)   # brand-examples, design-systems
         wb_library.autoclone_for_state(root, trigger="phase-entry", phase=13)  # component-patterns
@@ -259,4 +305,3 @@ class TestFU2GroundTruth:
         lib = root / ".website-builder" / "library"
         for slug in ("brand-examples", "design-systems", "component-patterns", "seo-checklists"):
             assert (lib / slug).is_dir(), f"bundled slug {slug} did not land at library/{slug}/"
-            assert _skills_reference_slug(slug), f"no skill points at library/{slug}/"

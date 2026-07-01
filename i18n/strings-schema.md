@@ -2,7 +2,7 @@
 
 > The Content Design JSON (CDJSON) format the website-builder uses for all microcopy + UI strings. **Stack-agnostic** — every adapter reads the same per-language files. Per-stack consumption recipes live in `adapters/stack-{name}.md#i18n-recipe`.
 >
-> Anchor design docs: `Workstreams/website-builder/foundation/DESIGN-content-layers.md` Layer 3; `Workstreams/website-builder/foundation/DESIGN-i18n.md`.
+> Anchor design docs: `DESIGN-content-layers.md` Layer 3; `DESIGN-i18n.md`.
 > Methodology source: https://uxcontent.com/content-design-json/ (Prasaja Mukti).
 
 ## File location
@@ -185,8 +185,8 @@ Validation failures surface to the user with diagnostic + suggested fix.
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` Layer 3 — full content-stack context
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — full i18n model (routing, fallback, RTL, translation workflow)
+- `DESIGN-content-layers.md` Layer 3 — full content-stack context
+- `DESIGN-i18n.md` — full i18n model (routing, fallback, RTL, translation workflow)
 - `i18n/language-switcher.md` — per-stack switcher implementation
 - `i18n/hreflang.md` — per-stack hreflang emission
 - `i18n/rtl.md` — RTL layout discipline

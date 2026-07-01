@@ -4,13 +4,13 @@
 
 The chain is linear: `24 → 24a → 24b → 24c → 25`. The agent never advances with a sub-phase half-stood-up.
 
-**Commerce secrets handling (read before 24a/24b):** `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` § The hybrid mechanism + § Provider key configuration UX. `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `CALCOM_API_KEY` are registered in `.website-builder/keys.yaml` as **references only** (`source: env` → `.env`; `source: onepassword` → `op://` ref); the actual secret lives in `.env` (gitignored, muggle default) or 1Password (opt-in), never committed. `STRIPE_PUBLISHABLE_KEY` is *not* a secret (designed for client code) but still flows through the env mechanism for uniformity. Code reads `process.env.{KEY}` — uniform regardless of source. Test keys (`sk_test_*`/`pk_test_*`) local; live keys (`sk_live_*`/`pk_live_*`) flipped only at phase 29 with explicit confirmation and environment-specific separation. Never log a secret, never inline one, never the same key both environments.
+**Commerce secrets handling (read before 24a/24b):** `DESIGN-secrets-and-keys.md` § The hybrid mechanism + § Provider key configuration UX. `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `CALCOM_API_KEY` are registered in `.website-builder/keys.yaml` as **references only** (`source: env` → `.env`; `source: onepassword` → `op://` ref); the actual secret lives in `.env` (gitignored, muggle default) or 1Password (opt-in), never committed. `STRIPE_PUBLISHABLE_KEY` is *not* a secret (designed for client code) but still flows through the env mechanism for uniformity. Code reads `process.env.{KEY}` — uniform regardless of source. Test keys (`sk_test_*`/`pk_test_*`) local; live keys (`sk_live_*`/`pk_live_*`) flipped only at phase 29 with explicit confirmation and environment-specific separation. Never log a secret, never inline one, never the same key both environments.
 
 ---
 
 ## Phase 24a — Commerce platform setup
 
-**Read in full first:** `Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md` (payments path) and/or `Workstreams/website-builder/commerce/DESIGN-booking-calcom.md` (bookings path), plus the contract `phase-contracts/24a-commerce-platform.md`.
+**Read in full first:** `DESIGN-commerce-stripe-checkout.md` (payments path) and/or `DESIGN-booking-calcom.md` (bookings path), plus the contract `phase-contracts/24a-commerce-platform.md`.
 
 ### Pick the MVP platform from `project.yaml.transactional_kind`
 
@@ -72,7 +72,7 @@ Overridable (with logged cost): currency/region mismatch, expansion-platform cho
 
 ## Phase 24b — Payment provider wiring
 
-**Read in full first:** `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` (the per-audience decision tree, the comparison matrix, the TWINT-by-platform table, the Swiss pause-and-report rule) + contract `phase-contracts/24b-payment-provider.md`.
+**Read in full first:** `DESIGN-payment-providers.md` (the per-audience decision tree, the comparison matrix, the TWINT-by-platform table, the Swiss pause-and-report rule) + contract `phase-contracts/24b-payment-provider.md`.
 
 MVP provider is **Stripe** (decision 54). The four expansion providers (Mollie — EU/cheaper iDeal, no TWINT; PayPal — brand-trust, high in DE ~70%, no TWINT; Square — US/UK/AU/CA POS, no TWINT; Klarna — BNPL >$100 AOV, via Stripe) are named-only, added alongside Stripe only with a logged decision and their own test transactions.
 

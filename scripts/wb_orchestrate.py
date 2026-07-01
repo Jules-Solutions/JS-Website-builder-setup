@@ -3,7 +3,7 @@
 scripts/wb_orchestrate.py — the website-builder plugin's orchestration spine.
 
 The keystone of the orchestration-spine remediation program
-(`Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md`). Reaching
+(`DESIGN-orchestration-spine.md`). Reaching
 a phase should *deterministically* load its resources, inject its discipline,
 consult the active stack/CMS/commerce adapter, validate state, and surface the
 right tools — regardless of whether the agent remembers to. The markdown stays the
@@ -58,7 +58,7 @@ broken action never breaks the orchestrator; the handlers add their own outer
 crash guard on top (a broken spine must never block the user's Edit/Write).
 
 See also:
-  - Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md (the contract)
+  - DESIGN-orchestration-spine.md (the contract)
   - scripts/wb_markdown.py (extract_h2_section / parse_frontmatter — consumed here)
   - scripts/wb_library.py (autoclone_for_state + _find_phase_contract + load_project_yaml)
   - hooks-handlers/post_tool_use.py (PostToolUse caller — JSON additionalContext)

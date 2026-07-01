@@ -2,7 +2,7 @@
 
 > The visible UI control that lets users pick their language. **Stack-agnostic intro + required behavior shared by all stacks; per-stack implementation sections authored by the Phase 3 stack-adapter Captains.**
 >
-> Anchor: `Workstreams/website-builder/foundation/DESIGN-i18n.md` §"Language switcher component" (lines 218-238).
+> Anchor: `DESIGN-i18n.md` §"Language switcher component" (lines 218-238).
 
 ## Overview
 
@@ -576,7 +576,7 @@ Per-stack section above documents how the rewrite is implemented in that stack.
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` §"Language switcher component" — design-doc anchor
+- `DESIGN-i18n.md` §"Language switcher component" — design-doc anchor
 - `i18n/strings-schema.md` — `strings.nav.language_switcher_label` source
 - `i18n/hreflang.md` — per-stack hreflang emission paired with switcher
 - `i18n/rtl.md` — RTL languages in the switcher (mirror order)

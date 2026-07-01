@@ -6,7 +6,7 @@ Wave-2 module (orchestration-spine remediation). Lights up the spine's
 import-guarded **action 5** (DESIGN-orchestration-spine.md § 4.3, fired at phase 8)
 and is surfaced as a session-start summary (hooks-handlers/session_start.py). The
 consumer contract lives in
-`Workstreams/website-builder/cross-cutting/DESIGN-image-gen-consumer.md`.
+`DESIGN-image-gen-consumer.md`.
 
 Public surface (the resolver-as-entry-point pattern — mirrors wb_keys.resolve_keys):
 
@@ -42,8 +42,8 @@ Interface rules (mirrors the locked wb_keys.py module contract):
     soft-imports THIS module, never the reverse). Sister module: wb_videogen.py.
 
 See also:
-  - Workstreams/website-builder/cross-cutting/DESIGN-image-gen-consumer.md
-  - Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md § 4.3 (action 5)
+  - DESIGN-image-gen-consumer.md
+  - DESIGN-orchestration-spine.md § 4.3 (action 5)
   - scripts/wb_keys.py (the locked module template + the .env / keys.yaml read model)
   - scripts/wb_videogen.py (sister consumer — same shape, video + audio modalities)
   - scripts/wb_orchestrate.py (_action_imagegen — the action-5 call-site)
@@ -82,7 +82,7 @@ PATH_CONSUMER = "consumer-fallback"
 PATH_GAP = "gap"
 
 IMAGEGEN_DESIGN_DOC = (
-    "Workstreams/website-builder/cross-cutting/DESIGN-image-gen-consumer.md"
+    "DESIGN-image-gen-consumer.md"
 )
 
 

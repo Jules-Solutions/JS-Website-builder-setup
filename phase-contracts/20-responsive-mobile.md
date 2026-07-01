@@ -9,10 +9,10 @@ next_phase: 21
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-context7-integration.md
 ---
 
 # Phase 20 — Responsive / mobile pass
@@ -104,10 +104,10 @@ The overrides + the snapshot record are the required outputs. "Responsive" witho
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 20 — the seed for this contract.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Integration with Claude Code primitives (Playwright MCP usage) / § context7 integration.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `audit/` directory conventions; the per-page wireframe + responsive-directive location (`content/pages/{slug}.md`).
-- `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` — phase 20 invokes context7 for stack responsive primitives (Tailwind container queries, CSS logical properties browser support).
+- `DESIGN-phase-contracts.md` § 20 — the seed for this contract.
+- `DESIGN-architecture.md` § Integration with Claude Code primitives (Playwright MCP usage) / § context7 integration.
+- `DESIGN-project-scaffold.md` § `audit/` directory conventions; the per-page wireframe + responsive-directive location (`content/pages/{slug}.md`).
+- `DESIGN-context7-integration.md` — phase 20 invokes context7 for stack responsive primitives (Tailwind container queries, CSS logical properties browser support).
 
 The phase-14 wireframe directives (`content/pages/{slug}.md` § Wireframe → Mobile reflow directives) are the contract phase 20 verifies against — phase 14 is the upstream authority for *what* the responsive behavior should be; phase 20 is where it is *verified true*.
 

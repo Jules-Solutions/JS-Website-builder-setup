@@ -126,9 +126,9 @@ Each skill carries its own runbook + time-box. Read the skill before acting; the
 
 ## Reference
 
-- The template + the launch-once-vs-ongoing split: `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md`
+- The template + the launch-once-vs-ongoing split: `DESIGN-post-launch-template.md`
 - Your config schema: `.website-builder/post-launch/config.yaml` (materialized from `config-template.yaml`)
 - Runbooks: `.website-builder/post-launch/runbooks/`
-- Deploy provider patterns (re-deploy via {chosen_provider}): `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md`
-- Secrets handling (rotation + compromise response): `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md`
+- Deploy provider patterns (re-deploy via {chosen_provider}): `DESIGN-deploy-providers.md`
+- Secrets handling (rotation + compromise response): `DESIGN-secrets-and-keys.md`
 - The full builder you escalate to: `agents/website-builder.md`

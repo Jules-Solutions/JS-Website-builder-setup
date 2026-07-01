@@ -9,11 +9,11 @@ next_phase: 11
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md
-  - Workstreams/website-builder/foundation/DESIGN-i18n.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
+  - DESIGN-i18n.md
 ---
 
 # Phase 10 — Information architecture / nav strategy
@@ -63,9 +63,9 @@ Override is available for any gating rule via explicit user confirmation. The ag
 
 ## Tools and skills used
 
-- **AskUserQuestion** — the primary tool. Each of the 8 decisions above surfaces as one or more `AskUserQuestion` interactions. The agent presents the trade-offs concretely (with examples from reference sites in `.website-builder/library/brand-examples/` and `reference-corpus/inspiration/`) and lets the user pick.
+- **AskUserQuestion** — the primary tool. Each of the 8 decisions above surfaces as one or more `AskUserQuestion` interactions. The agent presents the trade-offs concretely (with examples from reference sites in `${CLAUDE_PLUGIN_ROOT}/reference-corpus/brand-examples/` and `reference-corpus/inspiration/`) and lets the user pick.
 - **Read** — agent reads `.website-builder/sitemap.yaml` to enumerate pages, parent relationships, and page-types.
-- **Reference-data load** — `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` for accepted IA patterns; `.website-builder/library/component-patterns/navigation.md` (when populated) for nav component archetypes; `.website-builder/library/seo-checklists/ia.md` for SEO-driven IA constraints (URL depth, breadcrumb schema, navigational page-naming for crawlability).
+- **Reference-data load** — `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` for accepted IA patterns; `.website-builder/library/component-patterns/navigation.md` (when populated) for nav component archetypes; `.website-builder/library/seo-checklists/ia.md` for SEO-driven IA constraints (URL depth, breadcrumb schema, navigational page-naming for crawlability).
 - **WebFetch** (occasional) — the agent may load a competitor or reference URL from phase 2 and walk its nav structure with the user, naming what works and what doesn't.
 
 No `Write` / `Edit` on code files in this phase — those tools are gated until phase 18.
@@ -153,9 +153,9 @@ The agent does not write the navigation component code in this phase; that's pha
 
 ## Reference materials
 
-- **`Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md`** — the catalog references nav patterns from the inspiration corpus (Vercel Templates / Cruip / Awwwards / Astro Themes) at phase 11+ once stack is chosen. Phase 10 reads the structural-pattern subset.
-- **`Workstreams/website-builder/foundation/DESIGN-i18n.md`** — confirms that a multilingual site requires a language switcher in the utility nav and that the IA spec must accommodate it even though the languages decision lives in phase 11/12.
-- **`Workstreams/website-builder/foundation/DESIGN-project-scaffold.md`** § `sitemap.yaml` — the schema this phase writes into.
+- **`${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md`** — the catalog references nav patterns from the inspiration corpus (Vercel Templates / Cruip / Awwwards / Astro Themes) at phase 11+ once stack is chosen. Phase 10 reads the structural-pattern subset.
+- **`DESIGN-i18n.md`** — confirms that a multilingual site requires a language switcher in the utility nav and that the IA spec must accommodate it even though the languages decision lives in phase 11/12.
+- **`DESIGN-project-scaffold.md`** § `sitemap.yaml` — the schema this phase writes into.
 - **`.website-builder/library/component-patterns/navigation.md`** (populated as the agent learns) — canonical nav component archetypes referenced again at phase 18.
 - **`.website-builder/library/seo-checklists/ia.md`** — SEO-driven IA constraints (URL depth, sitemap.xml conventions, breadcrumb schema.org markup).
 - **Hick's Law** — applied as the soft 5-7 ceiling for primary-nav count. The agent cites it when surfacing the trade-off; the user can override but should know the underlying reason.

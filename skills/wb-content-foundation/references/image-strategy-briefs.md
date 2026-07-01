@@ -1,6 +1,6 @@
 # Phase 8 — Image strategy + generation-brief reference
 
-> Loaded when running phase 8. The three consumer paths + selection logic, the `brand_context` schema, per-image brief recipes, 2026 AI-image model-fit + prompt-pattern guidance, and the photographer-vs-AI-vs-stock trade-off framing. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/08-image-strategy.md` + `Workstreams/website-builder/cross-cutting/DESIGN-image-gen-consumer.md` (READ IN FULL per Lock 4). Decision 56.
+> Loaded when running phase 8. The three consumer paths + selection logic, the `brand_context` schema, per-image brief recipes, 2026 AI-image model-fit + prompt-pattern guidance, and the photographer-vs-AI-vs-stock trade-off framing. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/08-image-strategy.md` + `DESIGN-image-gen-consumer.md` (READ IN FULL per Lock 4). Decision 56.
 
 ## What phase 8 produces
 

@@ -29,5 +29,5 @@ Every file in this dir is **original reference prose** written for the website-b
 ## See also
 
 - `../brand-examples/` — complete *brand* systems (voice + tokens + components) vs. these foundational *design* systems.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` §329 — the spec this dir satisfies.
+- `DESIGN-architecture.md` §329 — the spec this dir satisfies.
 - `skills/wb-design-system/references/oklch-token-system.md` — the plugin's OKLCH token mechanics.

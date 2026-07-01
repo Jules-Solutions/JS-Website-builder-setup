@@ -9,9 +9,9 @@ next_phase: 31
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-deploy-providers.md
 ---
 
 # Phase 30 — Analytics installation + search engine submission
@@ -94,9 +94,9 @@ The `POST-DEPLOY-REPORT.md` with the observed-pageview evidence + both consoles'
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 30 (seed — explicitly no gate, operational; common failure = GA4 not firing on Safari due to ITP, agent flags + tests on mobile)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — deploy/provider context (analytics provider state, the live site this verifies):** `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md` § Phase contracts that invoke this concern (phase 30 = "verify deploy live; submit sitemap to GSC + Bing")
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 30 (seed — explicitly no gate, operational; common failure = GA4 not firing on Safari due to ITP, agent flags + tests on mobile)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — deploy/provider context (analytics provider state, the live site this verifies):** `DESIGN-deploy-providers.md` § Phase contracts that invoke this concern (phase 30 = "verify deploy live; submit sitemap to GSC + Bing")
 - **Phase 24 (the analytics this phase verifies fires):** `phase-contracts/24-integrations.md` § What Claude must establish — analytics class, the cookie-consent dependency it flagged for phase 25
 - **Phase 25 (the consent gate whose live behavior phase 30 re-confirms):** `phase-contracts/25-legal-pages.md` § Cookie-consent sub-section
 - **Phase 26 (the sitemap.xml this phase submits):** `phase-contracts/26-seo-structured-data.md` § What Claude must establish — sitemap generation, the canonical-URL/host the submission must match

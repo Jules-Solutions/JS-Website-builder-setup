@@ -1,6 +1,6 @@
 # Secrets + forms (phase 23)
 
-> The phase-23 secrets authority + form-provider matrix. Derived from `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` (locked decisions 29 + 44) and `phase-contracts/23-forms-interactive.md` § Secrets handling. Provider patterns verified via WebSearch (Formspree / Resend / Mailgun / Cloudflare Turnstile) 2026-05-18. On conflict, the design doc + contract win.
+> The phase-23 secrets authority + form-provider matrix. Derived from `DESIGN-secrets-and-keys.md` (locked decisions 29 + 44) and `phase-contracts/23-forms-interactive.md` § Secrets handling. Provider patterns verified via WebSearch (Formspree / Resend / Mailgun / Cloudflare Turnstile) 2026-05-18. On conflict, the design doc + contract win.
 
 ## The discipline (one line)
 
@@ -93,4 +93,4 @@ Pick the canonical current provider doc via context7 / WebFetch at phase-23 entr
 - Resend server-side-only key + modern transactional API: WebSearch resend.com + Courier "best email API 2026", 2026-05-18.
 - Mailgun private-key server-side + HTTP Basic Auth (`api:KEY`): WebSearch Mailgun docs + AeroLeads guide, 2026-05-18.
 - Cloudflare Turnstile as 2026 default + server-side token verification: WebSearch (per the phase-23 contract's verified sources), 2026-05-18.
-- Hybrid `.env`/1Password keys protocol, `keys.yaml` references-only, anti-patterns: `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` (locked decisions 29, 44), 2026-05-10.
+- Hybrid `.env`/1Password keys protocol, `keys.yaml` references-only, anti-patterns: `DESIGN-secrets-and-keys.md` (locked decisions 29, 44), 2026-05-10.

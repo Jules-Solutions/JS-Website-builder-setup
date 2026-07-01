@@ -69,8 +69,8 @@ Run the 8-step flow (full detail + the conflict-resolution patterns in `referenc
 
 **Extractor selection** (per decision 55 — Stitch is MVP-primary; AI-output parser + JSON-handoff ingestor are also load-bearing in MVP):
 
-- URL / deployed site → **Stitch** (primary). Browser-in-loop is the MVP path (user runs https://stitch.withgoogle.com, pastes the DESIGN.md back). When `STITCH_API_KEY` or a Stitch MCP is present, use the programmatic path. Check at 6.5 entry: key/MCP present → programmatic; absent → browser-in-loop. Verified live via context7 2026-05-18: `/google-labs-code/stitch-sdk` (SDK), `/davideast/stitch-mcp` (MCP), `/gemini-cli-extensions/stitch` (Gemini CLI extension), `/obinnaokechukwu/stitch-mcp` (Go proxy). Detail in `references/ingestion-conflict-resolution.md` + `${CLAUDE_PLUGIN_ROOT}/extraction/stitch.md` + design doc `Workstreams/website-builder/extraction/DESIGN-extraction-stitch.md` (read the patched 2026-05-18 version including the `patches:` note).
-- HTML / React / Vue / Svelte code → **AI-output parser** (`${CLAUDE_PLUGIN_ROOT}/extraction/ai-output.md`). Handles `has-ai-output` entry mode + the phase-18 JSON-handoff round-trip (Flow B per `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md`).
+- URL / deployed site → **Stitch** (primary). Browser-in-loop is the MVP path (user runs https://stitch.withgoogle.com, pastes the DESIGN.md back). When `STITCH_API_KEY` or a Stitch MCP is present, use the programmatic path. Check at 6.5 entry: key/MCP present → programmatic; absent → browser-in-loop. Verified live via context7 2026-05-18: `/google-labs-code/stitch-sdk` (SDK), `/davideast/stitch-mcp` (MCP), `/gemini-cli-extensions/stitch` (Gemini CLI extension), `/obinnaokechukwu/stitch-mcp` (Go proxy). Detail in `references/ingestion-conflict-resolution.md` + `${CLAUDE_PLUGIN_ROOT}/extraction/stitch.md` + design doc `DESIGN-extraction-stitch.md` (read the patched 2026-05-18 version including the `patches:` note).
+- HTML / React / Vue / Svelte code → **AI-output parser** (`${CLAUDE_PLUGIN_ROOT}/extraction/ai-output.md`). Handles `has-ai-output` entry mode + the phase-18 JSON-handoff round-trip (Flow B per `DESIGN-handoff-protocol.md`).
 - Live / auth-walled / dynamic site → **Playwright walker** (`mcp__playwright__*`) paired with Stitch.
 - Figma file → Figma design-to-json plugin *(expansion path; MVP can fall back to Stitch screenshot)*.
 - Element-precision → divmagic API *(expansion path beyond MVP)*.
@@ -89,7 +89,7 @@ Procedure: read every visual row in `inbox/INVENTORY.md` + `entity.existing_asse
 
 **Goal:** `.website-builder/media/IMAGE-PLAN.md` — every known image with a real sourcing method (`use-existing` / `license-stock` / `commission-photographer` / `ai-generate`) and a status. No image is `placeholder`.
 
-Phase 8 plans; it does **not** generate (generation happens at phase 17/18 when components exist). For `ai-generate` images, resolve the consumer path per `Workstreams/website-builder/cross-cutting/DESIGN-image-gen-consumer.md` selection logic and record it in `decisions/image-gen-path-{ts}.md`:
+Phase 8 plans; it does **not** generate (generation happens at phase 17/18 when components exist). For `ai-generate` images, resolve the consumer path per `DESIGN-image-gen-consumer.md` selection logic and record it in `decisions/image-gen-path-{ts}.md`:
 
 1. JS vault + platform image-gen reachable → platform-API path.
 2. Else user-configured provider key (`keys.yaml`) → standalone-provider-key path.
@@ -135,12 +135,12 @@ Do not embed or vendor any composable; recommend invocation only.
 
 ### Design docs (the source of truth — read directly, don't paraphrase)
 
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism, 5 entry modes, extractor composition, JSON handoff bidirectional spec, "what doesn't go through phase 6.5".
-- `Workstreams/website-builder/extraction/DESIGN-extraction-stitch.md` — Stitch DESIGN.md schema, browser-in-loop flow, SDK/MCP/CLI evolution (read the patched 2026-05-18 version + `patches:` frontmatter), limitations, failure modes.
-- `Workstreams/website-builder/cross-cutting/DESIGN-image-gen-consumer.md` — the three image-gen paths, selection logic, brand_context schema, post-processing, the phase-contract invocation table, decision 56.
-- `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` — the bidirectional brief schema (Flow A out / Flow B in), adapter fixtures, phase-18 round-trip that phase 6.5 ingests.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills — how phase-group skills layer on the always-loaded freelancer agent profile.
-- `Workstreams/website-builder/website-builder.md` — STATE doc decisions ledger: **15** (entry-mode + re-runnable 6.5), **16** (extraction tools), **24** (JSON handoff protocol), **36** (6.5 conflict default = halt + force decision), **56** (cross-workstream consumer-fallback in v1).
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism, 5 entry modes, extractor composition, JSON handoff bidirectional spec, "what doesn't go through phase 6.5".
+- `DESIGN-extraction-stitch.md` — Stitch DESIGN.md schema, browser-in-loop flow, SDK/MCP/CLI evolution (read the patched 2026-05-18 version + `patches:` frontmatter), limitations, failure modes.
+- `DESIGN-image-gen-consumer.md` — the three image-gen paths, selection logic, brand_context schema, post-processing, the phase-contract invocation table, decision 56.
+- `DESIGN-handoff-protocol.md` — the bidirectional brief schema (Flow A out / Flow B in), adapter fixtures, phase-18 round-trip that phase 6.5 ingests.
+- `DESIGN-architecture.md` § Skills — how phase-group skills layer on the always-loaded freelancer agent profile.
+- `website-builder.md` — STATE doc decisions ledger: **15** (entry-mode + re-runnable 6.5), **16** (extraction tools), **24** (JSON handoff protocol), **36** (6.5 conflict default = halt + force decision), **56** (cross-workstream consumer-fallback in v1).
 
 ### Phase contracts (the substantive instruction set — read the active one verbatim)
 

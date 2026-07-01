@@ -67,7 +67,7 @@ Every `commerce-adapters/booking-<name>.md` MUST contain all 15 sections below a
 
 ## TWINT-for-Switzerland — non-negotiable rule
 
-Per Commander direction + `Workstreams/website-builder/website-builder.md` decision 26 (Switzerland is Jules's home market) + decision 54 (Cal.com is the Phase 4 booking default) + `DESIGN-payment-providers.md` lines 222-274 (TWINT critical, ~3.5M+ Swiss users, ~35%+ of Swiss e-commerce share, CHF-only):
+Per Commander direction + `website-builder.md` decision 26 (Switzerland is Jules's home market) + decision 54 (Cal.com is the Phase 4 booking default) + `DESIGN-payment-providers.md` lines 222-274 (TWINT critical, ~3.5M+ Swiss users, ~35%+ of Swiss e-commerce share, CHF-only):
 
 **TWINT is the non-negotiable Swiss-market payment method. Every commerce + booking adapter MUST:**
 
@@ -269,16 +269,16 @@ This is the same pattern as Phase 3's `i18n/strings-schema.md` (CDJSON schema au
 
 ## See also
 
-- `Workstreams/website-builder/BUILD-strategy.md` Phase 4 — DoD + dispatch model (lines 187-209)
-- `Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md` — Captain L's commerce primary design-doc source
-- `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` — Captain L's payment-provider matrix + canonical `payment-config.yaml` schema source
-- `Workstreams/website-builder/commerce/DESIGN-booking-calcom.md` — Captain L's booking primary design-doc source
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` — plugin directory layout (`commerce-adapters/` per line 100)
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5 content layers the §7 table maps
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — i18n model + currency
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` — phase 22 (forms / transactional) + phase 24a (commerce platform) + 24b (payment provider) + 24c (commerce legal)
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
-- `Workstreams/website-builder/website-builder.md` — decision 26 (Switzerland home market) + decision 47 (TWINT priority) + decision 54 (Cal.com booking default)
+- `BUILD-strategy.md` Phase 4 — DoD + dispatch model (lines 187-209)
+- `DESIGN-commerce-stripe-checkout.md` — Captain L's commerce primary design-doc source
+- `DESIGN-payment-providers.md` — Captain L's payment-provider matrix + canonical `payment-config.yaml` schema source
+- `DESIGN-booking-calcom.md` — Captain L's booking primary design-doc source
+- `DESIGN-architecture.md` — plugin directory layout (`commerce-adapters/` per line 100)
+- `DESIGN-content-layers.md` — the 5 content layers the §7 table maps
+- `DESIGN-i18n.md` — i18n model + currency
+- `DESIGN-phase-contracts.md` — phase 22 (forms / transactional) + phase 24a (commerce platform) + 24b (payment provider) + 24c (commerce legal)
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
+- `website-builder.md` — decision 26 (Switzerland home market) + decision 47 (TWINT priority) + decision 54 (Cal.com booking default)
 - `cms-adapters/README.md` — CMS adapter schema (sibling Phase 4 Captain 0 prep file); commerce + CMS pair via the `## Commerce integration (if transactional=true)` H2 on each side
 - `commerce-adapters/payment-config-schema.md` — canonical `payment-config.yaml` schema (sibling Phase 4 Captain 0 prep file; read-only for Captain L)
 - `adapters/README.md` — Phase 3 stack adapters; commerce + stack pair via stack adapter's § "Commerce integration (if transactional=true)" H2 and commerce adapter's § "Stack pairings" H2

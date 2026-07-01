@@ -2,7 +2,7 @@
 
 > Runtime artifact the website-builder agent loads when `project.yaml.cms` is `payload`. The `wb-architecture` skill consumes this at phase 12 (CMS decision); `wb-component-build` at phase 18 (component build); the phase-22 i18n + forms integration; the phase-24a/b/c commerce branching; the phase-6.5 re-runnable ingestion at any project lifecycle point. Authored against the canonical 12-section schema in `cms-adapters/README.md`.
 >
-> Primary design-doc source: `Workstreams/website-builder/cms/DESIGN-cms-payload.md`. Pairing source: `adapters/stack-nextjs.md` (Captain G's Phase 3 work — the canonical pairing). i18n source: `Workstreams/website-builder/foundation/DESIGN-i18n.md`. Sibling reference site: `Workstreams/website-starter/` (SynSol + AWin Payload build — already shipped 17 blocks + token system + theme-generated CSS pattern).
+> Primary design-doc source: `DESIGN-cms-payload.md`. Pairing source: `adapters/stack-nextjs.md` (Captain G's Phase 3 work — the canonical pairing). i18n source: `DESIGN-i18n.md`. Sibling reference site: the `website-starter` workstream (vault-side — SynSol + AWin Payload build; already shipped 17 blocks + token system + theme-generated CSS pattern).
 
 ## Mental model
 
@@ -1219,33 +1219,33 @@ These MCPs are already audited in detail in `adapters/stack-nextjs.md` § "Auth 
 
 **Foundation design docs (vault-root-relative per link standard):**
 
-- [DESIGN-cms-payload.md](Workstreams/website-builder/cms/DESIGN-cms-payload.md) — primary design-doc source for this adapter (~649 lines)
-- [DESIGN-content-layers.md](Workstreams/website-builder/foundation/DESIGN-content-layers.md) — 5-layer content stack the §6 table maps
-- [DESIGN-i18n.md](Workstreams/website-builder/foundation/DESIGN-i18n.md) — i18n model + Decisions 38-41
-- [DESIGN-architecture.md](Workstreams/website-builder/foundation/DESIGN-architecture.md) — plugin directory layout (`cms-adapters/` per line 115)
-- [DESIGN-phase-contracts.md](Workstreams/website-builder/foundation/DESIGN-phase-contracts.md) — phase 12 (CMS decision) + phase 18 (component build) + phase 22 (forms/i18n) + phase 24a/b/c (commerce)
-- [DESIGN-project-scaffold.md](Workstreams/website-builder/foundation/DESIGN-project-scaffold.md) — `.website-builder/` layout the seeds mirror
-- [DESIGN-ingestion-and-extraction.md](Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md) — phase 6.5 mechanism
-- [adapters/README.md](Workstreams/website-builder/adapters/README.md) — stack adapter contract; `## Content layer mapping` row labels MUST match
-- [adapters/stack-nextjs.md](Workstreams/website-builder/adapters/stack-nextjs.md) — Captain G's Phase 3 work; the canonical pairing
-- [cms-adapters/README.md](Workstreams/website-builder/cms-adapters/README.md) — the 12-section schema contract this file follows
-- [commerce-adapters/README.md](Workstreams/website-builder/commerce-adapters/README.md) — commerce/booking schema contract (sibling Phase 4 prep)
-- [commerce-adapters/payment-config-schema.md](Workstreams/website-builder/commerce-adapters/payment-config-schema.md) — canonical `payment-config.yaml` schema for TWINT-via-Stripe-on-CHF
-- [i18n/strings-schema.md](Workstreams/website-builder/i18n/strings-schema.md) — stack-agnostic CDJSON contract
-- [i18n/language-switcher.md](Workstreams/website-builder/i18n/language-switcher.md) — switcher per-stack
-- [i18n/hreflang.md](Workstreams/website-builder/i18n/hreflang.md) — hreflang per-stack
-- [i18n/rtl.md](Workstreams/website-builder/i18n/rtl.md) — RTL discipline
-- [handoff-spec/component-request-v1.md](Workstreams/website-builder/handoff-spec/component-request-v1.md) — Layer 5 brief schema
-- [handoff-spec/component-output-v1.md](Workstreams/website-builder/handoff-spec/component-output-v1.md) — Layer 5 output ingestion contract
-- [tests/cms-adapters/README.md](Workstreams/website-builder/tests/cms-adapters/README.md) — Phase 4 fixture convention this adapter's fixture follows
-- [tests/cms-adapters/payload/README.md](Workstreams/website-builder/tests/cms-adapters/payload/README.md) — this adapter's test fixture
-- [BUILD-strategy.md](Workstreams/website-builder/BUILD-strategy.md) Phase 4 — DoD + dispatch model
-- [skills/wb-architecture/SKILL.md](Workstreams/website-builder/skills/wb-architecture/SKILL.md) — phase 12 consumer
-- [skills/wb-component-build/SKILL.md](Workstreams/website-builder/skills/wb-component-build/SKILL.md) — phase 18 consumer
+- `DESIGN-cms-payload.md` — primary design-doc source for this adapter (~649 lines)
+- `DESIGN-content-layers.md` — 5-layer content stack the §6 table maps
+- `DESIGN-i18n.md` — i18n model + Decisions 38-41
+- `DESIGN-architecture.md` — plugin directory layout (`cms-adapters/` per line 115)
+- `DESIGN-phase-contracts.md` — phase 12 (CMS decision) + phase 18 (component build) + phase 22 (forms/i18n) + phase 24a/b/c (commerce)
+- `DESIGN-project-scaffold.md` — `.website-builder/` layout the seeds mirror
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
+- `adapters/README.md` — stack adapter contract; `## Content layer mapping` row labels MUST match
+- `adapters/stack-nextjs.md` — Captain G's Phase 3 work; the canonical pairing
+- `cms-adapters/README.md` — the 12-section schema contract this file follows
+- `commerce-adapters/README.md` — commerce/booking schema contract (sibling Phase 4 prep)
+- `commerce-adapters/payment-config-schema.md` — canonical `payment-config.yaml` schema for TWINT-via-Stripe-on-CHF
+- `i18n/strings-schema.md` — stack-agnostic CDJSON contract
+- `i18n/language-switcher.md` — switcher per-stack
+- `i18n/hreflang.md` — hreflang per-stack
+- `i18n/rtl.md` — RTL discipline
+- `handoff-spec/component-request-v1.md` — Layer 5 brief schema
+- `handoff-spec/component-output-v1.md` — Layer 5 output ingestion contract
+- `tests/cms-adapters/README.md` — Phase 4 fixture convention this adapter's fixture follows
+- `tests/cms-adapters/payload/README.md` — this adapter's test fixture
+- `BUILD-strategy.md` Phase 4 — DoD + dispatch model
+- `skills/wb-architecture/SKILL.md` — phase 12 consumer
+- `skills/wb-component-build/SKILL.md` — phase 18 consumer
 
 **Sibling workstream — Payload reference site (the production proof):**
 
-- [Workstreams/website-starter/](Workstreams/website-starter/) — STATE doc + DESIGN-component-library.md; SynSol + AWin Payload-based reference site. 12 collections, 6 globals, 13-15 blocks (Hero 4-variant, FeaturesGrid 3-variant, ProcessSteps, Testimonials 3-variant, TeamGrid, LogoGrid, Contact, FormWizard, BlogArchive). Brand-config.json → BrandTokens-global → theme.generated.css pattern. Deployed via Vercel.
+- The `website-starter` workstream (vault-side; not shipped) — STATE doc + DESIGN-component-library.md; SynSol + AWin Payload-based reference site. 12 collections, 6 globals, 13-15 blocks (Hero 4-variant, FeaturesGrid 3-variant, ProcessSteps, Testimonials 3-variant, TeamGrid, LogoGrid, Contact, FormWizard, BlogArchive). Brand-config.json → BrandTokens-global → theme.generated.css pattern. Deployed via Vercel.
 
 **Payload external references:**
 
@@ -1293,7 +1293,7 @@ These MCPs are already audited in detail in `adapters/stack-nextjs.md` § "Auth 
 
 **Strategic / coordination references:**
 
-- Locked decision 53 (MVP CMS triplet: none / Decap / Payload): `Workstreams/website-builder/website-builder.md` decisions ledger
-- Locked decision 39 (Pages-per-language Pattern A default): `Workstreams/website-builder/foundation/DESIGN-i18n.md`
-- Locked decision 65 (per-Captain worktree isolation): `Workstreams/website-builder/website-builder.md`
-- Phase 4 dispatch model: `Workstreams/website-builder/BUILD-strategy.md` Phase 4
+- Locked decision 53 (MVP CMS triplet: none / Decap / Payload): `website-builder.md` decisions ledger
+- Locked decision 39 (Pages-per-language Pattern A default): `DESIGN-i18n.md`
+- Locked decision 65 (per-Captain worktree isolation): `website-builder.md`
+- Phase 4 dispatch model: `BUILD-strategy.md` Phase 4

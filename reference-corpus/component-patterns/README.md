@@ -36,5 +36,5 @@ Every file is **original reference prose** written for the website-builder plugi
 - `../design-systems/` — foundational *design systems* (token taxonomies + principles) vs. these per-*component* specs.
 - `../brand-examples/` — complete brand systems whose `## Component patterns` sections show these components dressed in a specific brand.
 - `../voice-archetypes/` — the verbal-identity side; component microcopy slots (CTA labels, form errors) inherit voice from the chosen archetype.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` §331 — the spec this dir satisfies.
+- `DESIGN-architecture.md` §331 — the spec this dir satisfies.
 - WAI-ARIA Authoring Practices Guide: https://www.w3.org/WAI/ARIA/apg/patterns/ — the canonical source for the interactive patterns.

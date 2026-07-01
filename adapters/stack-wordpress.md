@@ -3,7 +3,7 @@
 > The muggle-friendly server-side MVP stack. Picked when the user wants an audience-familiar admin UI, the largest plugin ecosystem on earth, paid managed hosting that handles backups/SSL/updates, and a content-heavy site managed long-term by non-technical editors. The agent ships a **custom block theme** (Full Site Editing) plus **custom Gutenberg blocks** (one per `sections.yaml` section type), seeds pages + media via the WordPress REST API, layers **Polylang** (default) or **WPML** for i18n, and adds **WooCommerce** when `transactional=true`. Per locked decision 52 (MVP build-now) + BUILD-strategy.md Phase 3 (the WordPress lane in the parallel-stack Captain dispatch).
 >
 > **Schema contract:** this file follows the canonical 14-H2 schema in `adapters/README.md`. Section names + order are non-negotiable — phase-11 / phase-17 / phase-18 / phase-24a / phase-28-30 / phase-6.5 skill lookups bind to exact H2 names.
-> **Source-of-truth:** `Workstreams/website-builder/stacks/DESIGN-stack-wordpress.md` is the design-doc anchor; this adapter is the runtime extraction the skills consume.
+> **Source-of-truth:** `DESIGN-stack-wordpress.md` is the design-doc anchor; this adapter is the runtime extraction the skills consume.
 
 ## Mental model
 
@@ -776,7 +776,7 @@ Block CSS can use **Tailwind v4 + DaisyUI** as the styling layer. DaisyUI is pur
 - Custom blocks need rich pre-styled UI (buttons, cards, alerts, navbars, modals) without writing every utility class;
 - User accepts the per-block Tailwind build (PostCSS + `@wordpress/scripts` integration via `wp-scripts build`).
 
-Per `Workstreams/website-builder/components/DESIGN-components-tailwind.md`, the DaisyUI custom theme accepts `oklch()` colors directly — `brand.yaml.tokens` map cleanly. context7 ID at phase 17/18: `/saadeghi/daisyui` for current setup syntax; `/tailwindlabs/tailwindcss.com` for Tailwind v4 config.
+Per `DESIGN-components-tailwind.md`, the DaisyUI custom theme accepts `oklch()` colors directly — `brand.yaml.tokens` map cleanly. context7 ID at phase 17/18: `/saadeghi/daisyui` for current setup syntax; `/tailwindlabs/tailwindcss.com` for Tailwind v4 config.
 
 **Trade-off:** mixing DaisyUI classes inside Gutenberg blocks adds a Tailwind build step the user didn't have before. For muggle-budget WP sites where simple theme.json-styled blocks suffice, skip DaisyUI; theme.json + custom CSS in `style.css` is enough.
 
@@ -808,7 +808,7 @@ Without MCPs, phase 18 codegen lands `block.json` + `render.php` + `edit.tsx` di
 ### Cross-reference
 
 - `skills/wb-component-build/references/per-stack-codegen.md#wordpress` — phase-18 codegen patterns + per-block scaffold flow + theme.json token-mapping recipe (the read-only Phase-2.B anchor).
-- `Workstreams/website-builder/components/DESIGN-components-tailwind.md` — DaisyUI + Tailwind UI + Park UI selection logic.
+- `DESIGN-components-tailwind.md` — DaisyUI + Tailwind UI + Park UI selection logic.
 
 ## Deploy
 
@@ -1053,17 +1053,17 @@ Cache fetched docs to `.website-builder/library/docs/wordpress-{surface}.md` (e.
 
 ### Foundation design docs (vault-root-relative)
 
-- [VISION-website-builder.md](Workstreams/website-builder/VISION-website-builder.md)
-- [BUILD-strategy.md](Workstreams/website-builder/BUILD-strategy.md) — Phase 3 DoD + dispatch model (lines 164-184)
-- [DESIGN-architecture.md](Workstreams/website-builder/foundation/DESIGN-architecture.md) — plugin directory layout + skill / agent / hook surfaces (lines 160-260)
-- [DESIGN-content-layers.md](Workstreams/website-builder/foundation/DESIGN-content-layers.md) — the 5-layer content stack the §4 table maps
-- [DESIGN-i18n.md](Workstreams/website-builder/foundation/DESIGN-i18n.md) — i18n model the §5 section consumes
-- [DESIGN-ingestion-and-extraction.md](Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md) — phase 6.5 mechanism + extractor pairing
-- [DESIGN-phase-contracts.md](Workstreams/website-builder/foundation/DESIGN-phase-contracts.md) — phase contracts the adapter binds against
-- [DESIGN-project-scaffold.md](Workstreams/website-builder/foundation/DESIGN-project-scaffold.md) — `.website-builder/` directory layout + migration recipes
-- [DESIGN-stack-wordpress.md](Workstreams/website-builder/stacks/DESIGN-stack-wordpress.md) — primary source (this adapter is the runtime extraction)
-- [DESIGN-components-tailwind.md](Workstreams/website-builder/components/DESIGN-components-tailwind.md) — DaisyUI selection logic + Tailwind v4 setup
-- [DESIGN-ecosystem-catalog.md](Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md) — full component-library tier list
+- `VISION-website-builder.md`
+- `BUILD-strategy.md` — Phase 3 DoD + dispatch model (lines 164-184)
+- `DESIGN-architecture.md` — plugin directory layout + skill / agent / hook surfaces (lines 160-260)
+- `DESIGN-content-layers.md` — the 5-layer content stack the §4 table maps
+- `DESIGN-i18n.md` — i18n model the §5 section consumes
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism + extractor pairing
+- `DESIGN-phase-contracts.md` — phase contracts the adapter binds against
+- `DESIGN-project-scaffold.md` — `.website-builder/` directory layout + migration recipes
+- `DESIGN-stack-wordpress.md` — primary source (this adapter is the runtime extraction)
+- `DESIGN-components-tailwind.md` — DaisyUI selection logic + Tailwind v4 setup
+- [DESIGN-ecosystem-catalog.md](${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md) — full component-library tier list
 
 ### Cross-stack plugin anchors (read-only — Captain H references; does not modify)
 

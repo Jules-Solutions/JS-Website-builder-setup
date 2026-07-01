@@ -6,7 +6,7 @@
 >
 > **v0.1 ships ONE manifest: `ui-ux-pro-max.md` (Captain M).** Per locked decision 55, only the UI/UX Pro Max flavor ships in v0.1; the other five flavors (Impeccable / Emil Kowalski / Taste / Framer Motion / 21st.dev Magic) are Phase 10 expansion and follow this same schema when authored.
 >
-> **Anchors:** `Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md` (the canonical manifest-schema authority — § "Composition manifest schema" lines 96-154), `Workstreams/website-builder/skills/DESIGN-skill-uiuxpromax.md` (Captain M's per-skill source), `Workstreams/website-builder/foundation/DESIGN-architecture.md` § "Skill bundle" (line 283), `Workstreams/website-builder/BUILD-strategy.md` Phase 5 (lines 209-230), STATE doc decisions 32 / 33 / 55 / 59 / 65 / 77 / 78.
+> **Anchors:** `DESIGN-skill-distribution.md` (the canonical manifest-schema authority — § "Composition manifest schema" lines 96-154), `DESIGN-skill-uiuxpromax.md` (Captain M's per-skill source), `DESIGN-architecture.md` § "Skill bundle" (line 283), `BUILD-strategy.md` Phase 5 (lines 209-230), STATE doc decisions 32 / 33 / 55 / 59 / 65 / 77 / 78.
 
 ---
 
@@ -148,15 +148,15 @@ Per decisions 65 (worktree isolation) + 77 (validated multi-Captain wave pattern
 
 ## See also
 
-- `Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md` — the canonical manifest-schema authority (frontmatter + body + install-skills.sh)
-- `Workstreams/website-builder/skills/DESIGN-skill-uiuxpromax.md` — Captain M's per-skill content source
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § "Skill bundle" (line 283) — bundle's place in the plugin
-- `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § "Design-skill flavor bundle" — the 6-flavor catalogue
+- `DESIGN-skill-distribution.md` — the canonical manifest-schema authority (frontmatter + body + install-skills.sh)
+- `DESIGN-skill-uiuxpromax.md` — Captain M's per-skill content source
+- `DESIGN-architecture.md` § "Skill bundle" (line 283) — bundle's place in the plugin
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § "Design-skill flavor bundle" — the 6-flavor catalogue
 - `scripts/README.md` — sibling Captain-0 contract (`wb` CLI + module boundary; the authoritative READ-ONLY list)
 - `tests/README.md` § Phase 5 — where the `tests/skills-bundle/` manifest-validation fixture lands
 - `scripts/install-skills.sh` — the Phase-1 cross-OS install script M's `## Install` section must stay consistent with
 - `.claude/rules/modular-build-convention.md` — single-responsibility discipline
-- STATE doc decisions 32 / 33 / 55 / 59 / 65 / 77 / 78 — `Workstreams/website-builder/website-builder.md`
+- STATE doc decisions 32 / 33 / 55 / 59 / 65 / 77 / 78 — `website-builder.md`
 - Phase 10 (later) — the other five flavor manifests (Impeccable / Emil Kowalski / Taste / Framer Motion / 21st.dev Magic) follow this same schema
 
 ## Provenance

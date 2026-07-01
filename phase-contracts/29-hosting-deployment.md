@@ -9,11 +9,11 @@ next_phase: 30
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-deploy-providers.md
+  - DESIGN-secrets-and-keys.md
+  - DESIGN-post-launch-template.md
 ---
 
 # Phase 29 — Hosting deployment
@@ -127,16 +127,16 @@ The `DEPLOY-REPORT.md` with the per-page live grid + the production-parity table
 
 ## Reference materials
 
-- **Design doc — deploy provider matrix + cost projections + decision-50 ranking (read in full):** `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md` § Per-stack provider pairings + § Provider deep dives + § Cost comparison summary + § Multi-environment deploys + § Phase contracts that invoke this concern (phase 29 = "deploy via chosen provider's CLI/API/MCP")
-- **Design doc — secrets to production (the parity input):** `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` § What lives in production env vs `.env` + § Phase contracts (phase 29 = "hosting provider deploy tokens; sync of secrets to production env")
-- **Design doc — post-launch maintainer template + the phase-29 wizard (read for materialization):** `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` § Wizard-driven customization (decision 45) + § Materialized location at deploy + § Phase 31-34 vs maintainer template (decision 37)
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 29 (seed) + the MVP-scope decision-50 guardrail
+- **Design doc — deploy provider matrix + cost projections + decision-50 ranking (read in full):** `DESIGN-deploy-providers.md` § Per-stack provider pairings + § Provider deep dives + § Cost comparison summary + § Multi-environment deploys + § Phase contracts that invoke this concern (phase 29 = "deploy via chosen provider's CLI/API/MCP")
+- **Design doc — secrets to production (the parity input):** `DESIGN-secrets-and-keys.md` § What lives in production env vs `.env` + § Phase contracts (phase 29 = "hosting provider deploy tokens; sync of secrets to production env")
+- **Design doc — post-launch maintainer template + the phase-29 wizard (read for materialization):** `DESIGN-post-launch-template.md` § Wizard-driven customization (decision 45) + § Materialized location at deploy + § Phase 31-34 vs maintainer template (decision 37)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 29 (seed) + the MVP-scope decision-50 guardrail
 - **Phase 28 (the domain phase 29 deploys onto):** `phase-contracts/28-domain-dns-ssl.md` § Output artifacts (the `DOMAIN-REPORT.md` domain)
 - **Phase 24 / 24b / 25 / 26 (the deferred-to-29 items + the production re-verification):** `phase-contracts/24-integrations.md` (production parity), `phase-contracts/24b-payment-provider.md` (live-key cutover deferred here), `phase-contracts/25-legal-pages.md` (consent network-proof re-run on prod), `phase-contracts/26-seo-structured-data.md` (structured data in live server HTML)
 - **External research (loaded fresh 2026-05-18 for this contract):**
   - context7 `/vercel/vercel` (1649 snippets, High reputation, benchmark 76.29) — `vercel deploy` / `vercel --prod`, git-integration, `vercel env add {KEY} production` (and `echo value | vercel env add`), framework auto-detection, `now-build`/build-command config; cached `.website-builder/library/docs/vercel.md`. Confirmed 2026-05-18.
   - Cloudflare Pages — https://developers.cloudflare.com/pages/get-started/ — C3 CLI, Direct Upload, Git integration (connect repo → auto-deploy on push); + `/cloudflare/wrangler` context7 for `wrangler pages deploy` + env vars. Confirmed 2026-05-18.
   - Framer Publish — framer.com publish docs (built-in publish, custom-domain attach) — confirmed current 2026-05-18.
-- **Locked decision 50** (deploy ranking) + **decision 49** (post-launch 8-skill split, materialized via the phase-29 wizard) — STATE doc: `Workstreams/website-builder/website-builder.md`
+- **Locked decision 50** (deploy ranking) + **decision 49** (post-launch 8-skill split, materialized via the phase-29 wizard) — STATE doc: `website-builder.md`
 
 Freshness date for this contract: **2026-05-18**. Host CLIs + git-integration surfaces evolve; the agent re-validates the Vercel/Cloudflare/Framer deploy surface via context7/WebFetch at session start when phase 29 is active and verifies the deploy by a *live walk of every page at the real domain*, never by the deploy command's exit code alone.

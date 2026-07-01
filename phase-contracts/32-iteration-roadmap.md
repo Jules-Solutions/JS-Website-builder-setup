@@ -9,9 +9,9 @@ next_phase: 33
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-post-launch-template.md
 ---
 
 # Phase 32 — Iteration roadmap
@@ -93,12 +93,12 @@ The `roadmap.md` (or the logged skip with surfaced cost) is the artifact.
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 32 (seed — `Gating: none`; common failure = muggles see v1 as the end, agent surfaces v1 is a checkpoint)
-- **Design doc — post-launch maintainer (the iterate/section-add/page-add skills the roadmap feeds, decision 49):** `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` § Maintenance skill bundle (`wb-maintain-iterate` / `wb-maintain-section-add` / `wb-maintain-page-add`) + § Phase 31-34 vs maintainer template — **referenced, not authored here**
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 32 (seed — `Gating: none`; common failure = muggles see v1 as the end, agent surfaces v1 is a checkpoint)
+- **Design doc — post-launch maintainer (the iterate/section-add/page-add skills the roadmap feeds, decision 49):** `DESIGN-post-launch-template.md` § Maintenance skill bundle (`wb-maintain-iterate` / `wb-maintain-section-add` / `wb-maintain-page-add`) + § Phase 31-34 vs maintainer template — **referenced, not authored here**
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
 - **Phase 3 (the conversion outcome v1.1 items sharpen):** `phase-contracts/03-requirements.md` § What Claude must establish
 - **Phase 31 (the prior post-launch phase; the once-at-launch framing):** `phase-contracts/31-launch-announcement.md` § Mission
 - **Phase 33 (the maintenance-cadence phase whose skip-cost compounds with this one):** `phase-contracts/33-maintenance-cadence.md`
-- **Locked decisions 37 + 49** (phases 31-34 run once; maintainer 8-skill bundle owns ongoing) — STATE doc: `Workstreams/website-builder/website-builder.md`
+- **Locked decisions 37 + 49** (phases 31-34 run once; maintainer 8-skill bundle owns ongoing) — STATE doc: `website-builder.md`
 
 No mandatory external research for this phase (per the INST — first-principles authoring; the gating concern is site-grounded specificity + voice/consistency across the batch). Freshness date for this contract: **2026-05-18**.
