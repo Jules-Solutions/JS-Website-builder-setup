@@ -1,10 +1,16 @@
 # reference-corpus/
 
-> Selectively cloneable reference docs that ship with the plugin. The agent reads from here at session-start or phase-trigger when content is load-bearing.
+> Reference docs that ship with the plugin at `${CLAUDE_PLUGIN_ROOT}/reference-corpus/<dir>/`. The orchestration spine auto-clones the relevant corpus into `.website-builder/library/<dir>/` at phase entry (a local copy, no network), where the agent reads it — no vault required.
+>
+> **The menu:** `ECOSYSTEM-CATALOG.md` (this directory) is the shipped, self-contained catalogue of every tool / library / platform / inspiration source the agent surfaces across the pipeline, each tagged with its surfacing mode (`bundled` / `clone-into-project` / `fetch-on-demand`). Read it to hand the user options; hand it to the user for inspiration.
 
 ## What this directory holds
 
-**Shipped reference content (committed; selectively cloneable into the user's project):**
+**The shipped catalogue (the menu):**
+
+- `ECOSYSTEM-CATALOG.md` — the curated, self-contained catalogue distilled from the website-builder workstream's `DESIGN-ecosystem-catalog.md` + `DESIGN-templates-catalog.md` (the authoring SSOT, vault-side). Synced from them per the catalogue-update workflow in `DESIGN-resource-curation.md`.
+
+**Shipped reference content (committed; the agent reads these directly; also selectively cloneable into the user's project):**
 
 - `design-systems/` — 5 reference docs on mature design systems (Material 3, Apple HIG, IBM Carbon, Tailwind, Radix/shadcn): token systems + principles + when-to-use. (`DESIGN-architecture.md` §329)
 - `brand-examples/` — 7 complete, original brand systems (voice + OKLCH tokens + component patterns) across distinct archetypes. (`DESIGN-architecture.md` §328)
@@ -33,8 +39,8 @@ Both modes coexist; per-resource policy lives in `seeds/` manifests (Phase 5 wor
 
 All six shipped reference dirs are populated (corpus track): `design-systems/`, `brand-examples/`, `awesome-design-md-corpus/` (`RPT-corpus-1.md`) plus `voice-archetypes/`, `component-patterns/`, `seo-checklists/` (`RPT-corpus-2.md`). The `seeds/` manifests + runtime curation logic remain Captain P (Phase 5) work, authored per:
 
-- `Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md`
-- `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md`
+- `DESIGN-resource-curation.md`
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md`
 
 ## See also
 

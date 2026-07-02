@@ -1,6 +1,6 @@
 # context7 + per-stack patterns (phases 19-23)
 
-> When and how this phase group uses context7, the per-stack library-id manifest it reads, and the resolution-failure fallback. Derived from `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` (locked decision 23) + `.claude/rules/context7.md`. On conflict, the design doc wins.
+> When and how this phase group uses context7, the per-stack library-id manifest it reads, and the resolution-failure fallback. Derived from `DESIGN-context7-integration.md` (locked decision 23) + `.claude/rules/context7.md`. On conflict, the design doc wins.
 
 ## Why context7 is load-bearing here
 
@@ -75,6 +75,6 @@ If context7 returns a suspected-stale answer (references an API the agent knows 
 
 ## Source freshness
 
-- context7 invocation pattern, per-stack manifest, per-phase usage table, caching, fallback: `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` (locked decision 23), 2026-05-10.
+- context7 invocation pattern, per-stack manifest, per-phase usage table, caching, fallback: `DESIGN-context7-integration.md` (locked decision 23), 2026-05-10.
 - The actual current API shapes this phase group depends on were independently verified via context7 2026-05-18 — see `playwright-recipes.md` + `axe-lighthouse-recipes.md` § Source freshness.
 - context7 rule: `.claude/rules/context7.md`. Tool-dependency tiers: `.claude/rules/tool-dependency-discipline.md`.

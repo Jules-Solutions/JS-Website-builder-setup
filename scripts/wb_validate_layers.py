@@ -57,8 +57,8 @@ Interface rules (mirrors the locked wb_keys.py / wb_markdown.py module contract,
     (no cycle — wb_orchestrate soft-imports THIS module, never the reverse).
 
 See also:
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md § 351-362
-  - Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md § 4.3 (action 4)
+  - DESIGN-content-layers.md § 351-362
+  - DESIGN-orchestration-spine.md § 4.3 (action 4)
   - scripts/wb_markdown.py (parse_yaml / parse_frontmatter — consumed here)
   - scripts/wb_orchestrate.py (_action_validate_layers — the action-4 call-site)
   - hooks-handlers/session_start.py (run_validate_layers — the session-start summary)
@@ -90,7 +90,7 @@ import wb_markdown  # noqa: E402  (sys.path nudge must precede)
 MODULE_NAME = "wb validate-layers"
 STATE_DIR_NAME = ".website-builder"
 CONTENT_LAYERS_DOC = (
-    "Workstreams/website-builder/foundation/DESIGN-content-layers.md"
+    "DESIGN-content-layers.md"
 )
 
 # `{strings.a.b.c}` reference (Layer 4 → Layer 3). The capture is the dotted path.

@@ -65,11 +65,11 @@ Expected output for an empty dir: a markdown context block reporting
 
 ## Design references
 
-- Architecture: `Workstreams/website-builder/foundation/DESIGN-architecture.md`
+- Architecture: `DESIGN-architecture.md`
   lines 233-238 (hooks spec), 240-249 (entry modes spec)
-- Project scaffold: `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md`
+- Project scaffold: `DESIGN-project-scaffold.md`
   (`.website-builder/` layout, `project.yaml` shape)
-- Ingestion + extraction: `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md`
+- Ingestion + extraction: `DESIGN-ingestion-and-extraction.md`
   (phase 6.5 re-runnable ingestion logic — surfaced by the SessionStart hook
   for entry modes 2-5)
 - Locked decisions: 15 (entry modes), 36 (phase 6.5 conflict default = halt +

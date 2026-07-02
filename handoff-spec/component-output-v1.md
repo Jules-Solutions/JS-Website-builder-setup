@@ -3,8 +3,8 @@
 > The v1 contract for the **external tool → agent** return — what shape the pasted-back output should follow for the agent's phase-6.5 ingestion (via the AI-output parser) to process it cleanly. Companion to `handoff-spec/component-request-v1.md`. Per locked decisions 24 + 35 + 36 (halt-and-force-decision on conflict). **Stack-agnostic** — the return format adapts to whatever the external tool produces in the requested framework.
 >
 > Canonical anchors:
-> - `Workstreams/website-builder/foundation/DESIGN-content-layers.md` Layer 5 ("Layer 5's outputs ingest into Layers 2 + 4")
-> - `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"JSON handoff protocol (bidirectional)" → "In: external tool output ingest"
+> - `DESIGN-content-layers.md` Layer 5 ("Layer 5's outputs ingest into Layers 2 + 4")
+> - `DESIGN-ingestion-and-extraction.md` §"JSON handoff protocol (bidirectional)" → "In: external tool output ingest"
 > - `skills/wb-component-build/references/json-handoff-protocol.md` §"Flow B — in"
 > - `extraction/ai-output.md` — the parser this contract drives
 
@@ -225,8 +225,8 @@ This is the connective-tissue property the Phase 3 stack adapters all build agai
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` Layer 5 — design-doc anchor for the layer-5 protocol
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"JSON handoff protocol" → "In: external tool output ingest" — design-doc anchor
+- `DESIGN-content-layers.md` Layer 5 — design-doc anchor for the layer-5 protocol
+- `DESIGN-ingestion-and-extraction.md` §"JSON handoff protocol" → "In: external tool output ingest" — design-doc anchor
 - `handoff-spec/component-request-v1.md` — the *out* counterpart
 - `skills/wb-component-build/references/json-handoff-protocol.md` — phase-18 operational doc
 - `extraction/ai-output.md` — the parser that processes `component-output-v1` outputs (load-bearing in MVP)

@@ -1,6 +1,6 @@
 # Phase 6 — Capture elicitation reference
 
-> Loaded when running phase 6 (wild content capture). The full per-category elicitation prompt catalog, the fresh-generation prompts for thin-content users, and the failure-mode reframes. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/06-wild-content-capture.md` + `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md`.
+> Loaded when running phase 6 (wild content capture). The full per-category elicitation prompt catalog, the fresh-generation prompts for thin-content users, and the failure-mode reframes. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/06-wild-content-capture.md` + `DESIGN-ingestion-and-extraction.md`.
 
 ## The 6-category elicitation routine
 

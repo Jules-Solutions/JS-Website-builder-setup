@@ -15,7 +15,7 @@ default (matching `tests/smoke_test.py::TestBootstrapSkill`'s invocation
 pattern: `[sys.executable, str(self.runner)]` + `cwd=tempdir`). Reads
 `Path.cwd()` to find the project. Flags below permit override for CLI usage.
 
-Per locked decisions in `Workstreams/website-builder/website-builder.md`:
+Per locked decisions in `website-builder.md`:
   15 — 5 canonical entry modes
   29 — secrets backend choice (.env / 1Password / deferred)
   32 — install-skills.sh for upstream design-skill fetch
@@ -28,9 +28,9 @@ Idempotent: re-run on an already-bootstrapped project is a clean no-op (or
 "already bootstrapped" notice). See SKILL.md `## Failure modes` sub-case 1.
 
 See also:
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-skill-distribution.md
+  - DESIGN-secrets-and-keys.md
   - skills/wb-bootstrap/SKILL.md
   - tests/smoke_test.py::TestBootstrapSkill
   - tests/detector.py (entry-mode detection — reused by this runner)
@@ -150,7 +150,7 @@ def log_err(msg: str) -> None:
 
 # ---------- YAML emit / parse ----------
 #
-# Per `Workstreams/website-builder/RPT-phase-1-captain-d.md`, a Phase 5 follow-up
+# Per `RPT-phase-1-captain-d.md`, a Phase 5 follow-up
 # is to swap awk+grep for a proper YAML library. For this Phase 2 CL-1 runner,
 # we use PyYAML when available (it's a tests/ runtime dep already, used by
 # smoke_test.py + the run-tests.sh `uv run --with pyyaml` invocation). When
@@ -421,7 +421,7 @@ def build_readme(*, entry_mode: str, secrets_backend: str) -> str:
 
         | File | What it holds |
         |---|---|
-        | `project.yaml` | The canonical project state — entry mode, current phase, stack, CMS, languages, secrets backend. Schema in `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md`. Human-readable AND human-editable, but mind the schema. |
+        | `project.yaml` | The canonical project state — entry mode, current phase, stack, CMS, languages, secrets backend. Schema in `DESIGN-project-scaffold.md`. Human-readable AND human-editable, but mind the schema. |
         | `tasks.yaml` | Phase-by-phase task tracking. Owned by the agent; safe to read, don't hand-edit. |
         | `keys.yaml` | Records what API keys each phase needs + their secret-backend refs. Real values resolved at runtime, never stored here. |
         | `state.yaml` | Phase-by-phase state predicates. Owned by the agent. The SessionStart hook reads this. |
@@ -459,9 +459,9 @@ def build_readme(*, entry_mode: str, secrets_backend: str) -> str:
 
         ## Reference
 
-        - Design surface: `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md`
+        - Design surface: `DESIGN-project-scaffold.md`
         - The bootstrap skill: `skills/wb-bootstrap/SKILL.md`
-        - Secrets handling: `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md`
+        - Secrets handling: `DESIGN-secrets-and-keys.md`
         """)
 
 

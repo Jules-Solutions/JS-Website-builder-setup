@@ -1,6 +1,6 @@
 # Phase 6.5 — Artifact ingestion + conflict resolution reference
 
-> Loaded when running phase 6.5. The 8-step flow in detail, the extractor matrix, the Stitch browser-in-loop vs SDK/MCP decision, conflict-resolution patterns, the ingest-decision-log schema, and the canonical mom's-pattern walkthrough. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/06.5-artifact-ingestion.md` + `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` + `Workstreams/website-builder/extraction/DESIGN-extraction-stitch.md` (read the patched 2026-05-18 version) + `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md`. Decisions: 15, 16, 24, 36.
+> Loaded when running phase 6.5. The 8-step flow in detail, the extractor matrix, the Stitch browser-in-loop vs SDK/MCP decision, conflict-resolution patterns, the ingest-decision-log schema, and the canonical mom's-pattern walkthrough. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/06.5-artifact-ingestion.md` + `DESIGN-ingestion-and-extraction.md` + `DESIGN-extraction-stitch.md` (read the patched 2026-05-18 version) + `DESIGN-handoff-protocol.md`. Decisions: 15, 16, 24, 36.
 
 ## Why 6.5 is re-runnable
 

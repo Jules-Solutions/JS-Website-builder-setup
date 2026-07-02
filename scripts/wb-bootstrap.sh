@@ -15,8 +15,8 @@
 # Mirrors the cross-platform style of install-skills.sh (sibling script).
 #
 # See:
-#   - Workstreams/website-builder/foundation/DESIGN-architecture.md
-#   - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
+#   - DESIGN-architecture.md
+#   - DESIGN-project-scaffold.md
 #   - skills/wb-bootstrap/SKILL.md (the invoking skill)
 #   - scripts/wb-bootstrap.py (the actual runner)
 

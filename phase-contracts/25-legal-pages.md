@@ -9,9 +9,9 @@ next_phase: 26
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-secrets-and-keys.md
 ---
 
 # Phase 25 — Legal pages
@@ -129,8 +129,8 @@ The `LEGAL-REPORT.md` — including the network-level cookie-consent proof — i
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 25 (seed) — explicit DACH-imprint + EU-cookie-consent callout, pairs with phase 24c
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 25 (seed) — explicit DACH-imprint + EU-cookie-consent callout, pairs with phase 24c
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
 - **Phase 24 (the integrations whose cookies phase 25 gates):** `phase-contracts/24-integrations.md` § Gating rules — the cookie-setting-integration dependency this phase closes
 - **Phase 24c (the commerce-legal surface phase 25 composes with, if transactional):** `phase-contracts/24c-commerce-legal.md` § Output artifacts — the phase-25 dependency list 24c hands forward
 - **External research (loaded fresh 2026-05-18 for this contract):**

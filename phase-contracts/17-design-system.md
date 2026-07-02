@@ -9,14 +9,14 @@ next_phase: 18
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/skills/DESIGN-skill-uiuxpromax.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
+  - DESIGN-skill-uiuxpromax.md
+  - DESIGN-context7-integration.md
+  - DESIGN-resource-curation.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
 # library_clones_at_entry — auto-clone triggers read by wb_library.autoclone_for_state(trigger="phase-entry", phase=17).
 # Schema: scripts/README.md § library_clones_at_entry. This is the Phase-5 WORKING EXAMPLE (per the contract,
 # Captain P adds the field to phase 17 ONLY; the other 37 contracts are back-filled by a future follow-up INST).
@@ -202,11 +202,11 @@ The `tokens:` block is the only always-required artifact. The override decision 
 
 Foundation + skill docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 17 — the seed for this contract.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Stack-agnostic output design — why tokens are stack-independent and survive a stack switch; § Resource curation pattern; § context7 integration.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `brand.yaml` — the `tokens:` key schema.
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — Layer 1 (design tokens); phase 17 is where Layer 1 is established and every later layer composes against it.
-- `Workstreams/website-builder/skills/DESIGN-skill-uiuxpromax.md` — **the MVP primary design-skill flavor (locked decision 55)**. The 50+ styles, 161 palettes, 57 font pairings, 99 UX guidelines, 25 chart types it provides; the option-narrowing discipline; the composition + conflict-resolution rules with complementary flavors.
+- `DESIGN-phase-contracts.md` § 17 — the seed for this contract.
+- `DESIGN-architecture.md` § Stack-agnostic output design — why tokens are stack-independent and survive a stack switch; § Resource curation pattern; § context7 integration.
+- `DESIGN-project-scaffold.md` § `brand.yaml` — the `tokens:` key schema.
+- `DESIGN-content-layers.md` — Layer 1 (design tokens); phase 17 is where Layer 1 is established and every later layer composes against it.
+- `DESIGN-skill-uiuxpromax.md` — **the MVP primary design-skill flavor (locked decision 55)**. The 50+ styles, 161 palettes, 57 font pairings, 99 UX guidelines, 25 chart types it provides; the option-narrowing discipline; the composition + conflict-resolution rules with complementary flavors.
 
 Design-skill flavor scope (locked decision 55):
 

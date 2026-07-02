@@ -9,9 +9,9 @@ next_phase: 2
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
 ---
 
 # Phase 1 — Idea
@@ -117,10 +117,10 @@ The agent updates `.website-builder/project.yaml.current_phase` to `2` upon user
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 1 (seed for this contract)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts (the schema authority for all 38 contracts)
-- **Design doc — output location:** `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `project.yaml` (schema for the `idea:` key)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 1 (seed for this contract)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts (the schema authority for all 38 contracts)
+- **Design doc — output location:** `DESIGN-project-scaffold.md` § `project.yaml` (schema for the `idea:` key)
 - **Agent profile — anti-skip enforcement:** `${CLAUDE_PLUGIN_ROOT}/agents/website-builder.md` § Anti-skip enforcement + § Voice characteristics (this contract's gating-refusal language must match the agent's voice)
-- **VISION doc — why phase 1 exists at all:** `Workstreams/website-builder/VISION-website-builder.md` (the rationale for discipline-over-output-speed)
+- **VISION doc — why phase 1 exists at all:** `VISION-website-builder.md` (the rationale for discipline-over-output-speed)
 
 No external reference data (no `voice-archetypes/`, no `awesome-design-md-corpus/`, no Library/) is read in phase 1 — that catalogue load happens at phase 2 onward when the *how* surfaces.

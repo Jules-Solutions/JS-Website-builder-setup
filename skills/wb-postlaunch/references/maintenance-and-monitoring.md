@@ -77,7 +77,7 @@ The agent refuses to mark the project complete unless ALL hold (or the explicit 
 
 ## Hand-off (after phase 34 closes)
 
-The launch sequence is done; the maintainer template (materialized at phase 29 at `.website-builder/post-launch/`) takes over ongoing. This skill points at it and ends — it does not author or invoke the maintainer or its 8 skills (`wb-maintain-content` / `-monitoring` / `-deps` / `-content-add` / `-section-add` / `-page-add` / `-iterate` / `-escalate`). Maintainer invoked via `/wb-maintain` or `wb maintain`. Reference: `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` §§ Maintenance skill bundle + Wizard-driven customization (decisions 45/49).
+The launch sequence is done; the maintainer template (materialized at phase 29 at `.website-builder/post-launch/`) takes over ongoing. This skill points at it and ends — it does not author or invoke the maintainer or its 8 skills (`wb-maintain-content` / `-monitoring` / `-deps` / `-content-add` / `-section-add` / `-page-add` / `-iterate` / `-escalate`). Maintainer invoked via `/wb-maintain` or `wb maintain`. Reference: `DESIGN-post-launch-template.md` §§ Maintenance skill bundle + Wizard-driven customization (decisions 45/49).
 
 ## Sources (external research, loaded fresh 2026-05-18)
 

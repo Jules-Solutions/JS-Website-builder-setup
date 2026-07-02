@@ -35,5 +35,5 @@ Original reference prose written for the website-builder plugin — plugin-owned
 ## See also
 
 - `../component-patterns/` — the per-component `## Accessibility requirements` sections cover the a11y audits Lighthouse also scores; this dir is the perf + SEO half.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` §332 — the spec this dir satisfies.
+- `DESIGN-architecture.md` §332 — the spec this dir satisfies.
 - Lighthouse audit reference: https://developer.chrome.com/docs/lighthouse/ · Core Web Vitals: https://web.dev/articles/vitals

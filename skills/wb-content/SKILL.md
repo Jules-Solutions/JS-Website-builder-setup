@@ -116,10 +116,10 @@ Reference files (loaded on demand — keep this SKILL.md lean):
 
 Foundation design docs (the source of truth — read directly):
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5-layer content stack; Layer 2 (structural specs), Layer 3 (Content Design JSON), Layer 4 (page prose). The `## What layer is what concern` diagnostic table is the agent's separation reference.
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — decisions 38-41, routing strategies, Pattern A/B, the three translation patterns, ICU pluralization, RTL.
-- `Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md` — templates and reference sites are studied for layout/voice, never imported. The phase-14 option-react method and phase-16 voice calibration draw from this.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` — the exact `.website-builder/content/` schemas these phases write.
+- `DESIGN-content-layers.md` — the 5-layer content stack; Layer 2 (structural specs), Layer 3 (Content Design JSON), Layer 4 (page prose). The `## What layer is what concern` diagnostic table is the agent's separation reference.
+- `DESIGN-i18n.md` — decisions 38-41, routing strategies, Pattern A/B, the three translation patterns, ICU pluralization, RTL.
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` — templates and reference sites are studied for layout/voice, never imported. The phase-14 option-react method and phase-16 voice calibration draw from this.
+- `DESIGN-project-scaffold.md` — the exact `.website-builder/content/` schemas these phases write.
 
 External methodology sources (cited because phases 13-16 implement them):
 

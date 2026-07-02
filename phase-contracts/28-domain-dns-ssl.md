@@ -9,10 +9,10 @@ next_phase: 29
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-deploy-providers.md
+  - DESIGN-secrets-and-keys.md
 ---
 
 # Phase 28 — Domain + DNS + SSL
@@ -103,9 +103,9 @@ The `DOMAIN-REPORT.md` with observed propagation + SSL evidence is the required 
 
 ## Reference materials
 
-- **Design doc — deploy + DNS + registrar catalog (read for the registrar-selection logic + DNS-automation section):** `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md` § Domain registrars + § Domain registrar selection logic + § DNS automation + § Automatic SSL + § Phase contracts that invoke this concern (phase 28 = "registrar choice + DNS automation per adapters")
-- **Design doc — secrets handling (registrar/DNS tokens are user-supplied at use, never stored):** `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` § Phase contracts (phase 28 = "DNS provider tokens") + § Anti-patterns
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 28 (seed)
+- **Design doc — deploy + DNS + registrar catalog (read for the registrar-selection logic + DNS-automation section):** `DESIGN-deploy-providers.md` § Domain registrars + § Domain registrar selection logic + § DNS automation + § Automatic SSL + § Phase contracts that invoke this concern (phase 28 = "registrar choice + DNS automation per adapters")
+- **Design doc — secrets handling (registrar/DNS tokens are user-supplied at use, never stored):** `DESIGN-secrets-and-keys.md` § Phase contracts (phase 28 = "DNS provider tokens") + § Anti-patterns
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 28 (seed)
 - **Phase 29 (the hosting phase 28's DNS points at):** `phase-contracts/29-hosting-deployment.md` § What Claude must establish
 - **Phase 26 (the canonical URL phase 28's apex/www redirect must match):** `phase-contracts/26-seo-structured-data.md`
 - **External research (loaded fresh 2026-05-18 for this contract):**

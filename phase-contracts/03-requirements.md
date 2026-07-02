@@ -9,9 +9,9 @@ next_phase: 4
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
 ---
 
 # Phase 3 — Requirements
@@ -150,9 +150,9 @@ The agent updates `.website-builder/project.yaml.current_phase` to `4` upon user
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 3 (seed for this contract)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — competitor reference catalogue:** `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (competitor + inspiration source list)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 3 (seed for this contract)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — competitor reference catalogue:** `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources (competitor + inspiration source list)
 - **External research (loaded fresh 2026-05-18 for this contract):**
   - B2B 2026 positioning + persona framework — https://prospeo.io/s/product-positioning-b2b (positioning vectors as 1-10 axes across target market / product strength / pricing model / GTM strategy)
   - B2B 2026 buyer persona playbook — https://prospeo.io/s/b2b-buyer-persona-research (role / decision authority / evaluation criteria / information sources / proof points)

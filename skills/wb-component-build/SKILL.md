@@ -126,19 +126,19 @@ Phase contract (read verbatim at entry):
 
 Per-ecosystem component design docs (read the one(s) matching the user's stack):
 
-- `Workstreams/website-builder/components/DESIGN-components-react.md` — shadcn/ui (default), Mantine, Aceternity, Magic UI, Once UI, Chakra, NextUI/HeroUI, MUI/Joy, Ant Design: matrix, selection logic, per-library codegen, composition, migration.
-- `Workstreams/website-builder/components/DESIGN-components-tailwind.md` — DaisyUI (S-tier non-React), Tailwind UI ($299 — surface cost), Park UI.
-- `Workstreams/website-builder/components/DESIGN-components-headless.md` — Radix, Headless UI, Base UI: when total control is warranted; the don't-double-wrap rule.
-- `Workstreams/website-builder/components/DESIGN-components-vue.md` — PrimeVue, Vuetify, Element Plus, Quasar.
-- `Workstreams/website-builder/components/DESIGN-components-svelte.md` — Skeleton UI, Melt UI, Bits UI / shadcn-svelte.
+- `DESIGN-components-react.md` — shadcn/ui (default), Mantine, Aceternity, Magic UI, Once UI, Chakra, NextUI/HeroUI, MUI/Joy, Ant Design: matrix, selection logic, per-library codegen, composition, migration.
+- `DESIGN-components-tailwind.md` — DaisyUI (S-tier non-React), Tailwind UI ($299 — surface cost), Park UI.
+- `DESIGN-components-headless.md` — Radix, Headless UI, Base UI: when total control is warranted; the don't-double-wrap rule.
+- `DESIGN-components-vue.md` — PrimeVue, Vuetify, Element Plus, Quasar.
+- `DESIGN-components-svelte.md` — Skeleton UI, Melt UI, Bits UI / shadcn-svelte.
 
 Cross-cutting + stack:
 
-- `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` — the bidirectional JSON brief: schema, two flows, adapter fixtures, the human-freelancer fixture, failure modes.
-- `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` — resolve→query pattern, per-stack library-id manifest, three-layer caching, fallback-on-resolution-failure.
-- `Workstreams/website-builder/stacks/DESIGN-stack-nextjs.md` / `DESIGN-stack-framer.md` / `DESIGN-stack-wordpress.md` — per-stack phase-18 component build (MVP stacks per decision 52).
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills + § phase-18 default behavior (decision 35).
-- Locked decisions 20 / 23 / 24 / 35 / 46 — STATE doc `Workstreams/website-builder/website-builder.md`.
+- `DESIGN-handoff-protocol.md` — the bidirectional JSON brief: schema, two flows, adapter fixtures, the human-freelancer fixture, failure modes.
+- `DESIGN-context7-integration.md` — resolve→query pattern, per-stack library-id manifest, three-layer caching, fallback-on-resolution-failure.
+- `DESIGN-stack-nextjs.md` / `DESIGN-stack-framer.md` / `DESIGN-stack-wordpress.md` — per-stack phase-18 component build (MVP stacks per decision 52).
+- `DESIGN-architecture.md` § Skills + § phase-18 default behavior (decision 35).
+- Locked decisions 20 / 23 / 24 / 35 / 46 — STATE doc `website-builder.md`.
 
 ## References (load on demand)
 
@@ -148,7 +148,7 @@ Cross-cutting + stack:
 
 ## Cross-references
 
-- Architecture: `Workstreams/website-builder/foundation/DESIGN-architecture.md` (skill load order; phase-18 slot; decision 35).
+- Architecture: `DESIGN-architecture.md` (skill load order; phase-18 slot; decision 35).
 - Phase contract: `phase-contracts/18-component-design-build.md` (the substantive reference target).
 - Sibling skill: `wb-design-system` (phase 17 — token authoring; this skill consumes its output, never re-authors tokens).
 - Tool / dependency discipline: `.claude/rules/tool-dependency-discipline.md` (Tier-2 context7-failure handling).

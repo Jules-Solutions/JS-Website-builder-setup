@@ -9,10 +9,10 @@ next_phase: 10
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
 ---
 
 # Phase 9 — Sitemap
@@ -190,10 +190,10 @@ The agent updates `.website-builder/project.yaml.current_phase` to `10` upon use
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 9 (seed for this contract)
-- **Design doc — pipeline integration + stack-late-binding:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Stack-agnostic output design (why `sitemap.yaml` is stack-independent and survives a phase-11 stack change) + § Phase contracts
-- **Design doc — sitemap.yaml schema:** `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `sitemap.yaml` (the canonical structure phase 9 produces; note phase 9 establishes pages + hierarchy + purpose; `sections:` per page is deferred to phase 13, and `navigation:` zones are phase 10's job)
-- **Design doc — structural-layer placement:** `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 2 — Structural specs (sitemap.yaml is Layer 2; the agent touches it at phases 9-10; phase 13-15 add the per-page section composition; phase 18 generates code from it)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 9 (seed for this contract)
+- **Design doc — pipeline integration + stack-late-binding:** `DESIGN-architecture.md` § Stack-agnostic output design (why `sitemap.yaml` is stack-independent and survives a phase-11 stack change) + § Phase contracts
+- **Design doc — sitemap.yaml schema:** `DESIGN-project-scaffold.md` § `sitemap.yaml` (the canonical structure phase 9 produces; note phase 9 establishes pages + hierarchy + purpose; `sections:` per page is deferred to phase 13, and `navigation:` zones are phase 10's job)
+- **Design doc — structural-layer placement:** `DESIGN-content-layers.md` § Layer 2 — Structural specs (sitemap.yaml is Layer 2; the agent touches it at phases 9-10; phase 13-15 add the per-page section composition; phase 18 generates code from it)
 - **Design doc — downstream consumers:** phase 10 (nav from the tree), phase 11-12 (stack/CMS scoped to structure), phase 13 (content brief per page), phase 14 (wireframe per page), phase 19 (route per page), phase 26 (sitemap.xml generated), phase 27 (QA walks every page) — all in `DESIGN-phase-contracts.md`; note phases 10-16 are LT-2's batch — the sitemap is the hand-off artifact between this batch (LT-1) and the next (LT-2)
 - **Input — phase-3 conversion outcome:** `project.yaml.requirements.conversion_outcome` (the single test every page must pass; the 1:1-attention-ratio discipline established at phase 3 carries into phase 9 — every page either drives or supports the one conversion)
 - **Input — phase-4 jurisdiction (legal-page reservation):** `project.yaml.entity.location.jurisdiction` (DACH → imprint mandatory; EU → privacy + cookie-consent; the slugs are reserved at phase 9, content authored at phase 25)

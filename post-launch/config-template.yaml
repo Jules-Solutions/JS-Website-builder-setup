@@ -5,7 +5,7 @@
 # .website-builder/post-launch/config.yaml — placeholders ({...}) filled from
 # the project's state + the user's wizard answers.
 #
-# Schema source: Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md
+# Schema source: DESIGN-post-launch-template.md
 #   § Wizard config output. Provider option lists ground the wizard's choices;
 #   they were re-verified 2026-06-14 (decision 75) — pricing/free-tiers drift,
 #   so the wizard re-confirms current options at deploy time, never assumes.

@@ -37,17 +37,9 @@ The website-builder enforces the discipline a senior freelancer brings to a proj
 
 ## Where the design lives
 
-This repo is the codebase. Strategic positioning + the full design surface (66 docs, 50+ architectural decisions, 10-phase build plan) live in the Jules.Life vault under `Workstreams/website-builder/`:
+This repo is the codebase — the runtime plugin surface. Its authoring design SSOT (strategic positioning + the full design surface: 66 docs, 50+ architectural decisions, 10-phase build plan) lives vault-side in the `website-builder` workstream of the Jules.Life vault (not part of this distribution): VISION (positioning + anti-vision), STATE (daily log + decisions ledger), BUILD-strategy (10-phase plan), and the full `DESIGN-*` set (architecture, phase contracts, per-stack/CMS/commerce, skills, extraction, components, cross-cutting).
 
-- **VISION** — strategic positioning, market gap, anti-vision
-- **STATE** — daily log, decisions ledger, current state
-- **BUILD-strategy** — 10-phase build plan with per-phase DoD
-- **foundation/DESIGN-architecture.md** — plugin internals, hooks, skills, adapters
-- **foundation/DESIGN-phase-contracts.md** — 36+ phase pipeline outline
-- **stacks/** — per-stack adapter docs (8 stacks)
-- **cms/** — per-CMS docs (9 options)
-- **commerce/** — commerce + payment + booking (14 options)
-- **skills/**, **extraction/**, **components/**, **cross-cutting/** — full design surface
+Inside this repo, the runtime realization of that design lives in `phase-contracts/`, `adapters/`, `cms-adapters/`, `commerce-adapters/`, `skills/`, `skills-bundle/`, `extraction/`, `component-libraries/`, and the curated `reference-corpus/ECOSYSTEM-CATALOG.md`.
 
 ## License
 

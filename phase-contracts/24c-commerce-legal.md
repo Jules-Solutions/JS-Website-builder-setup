@@ -9,10 +9,10 @@ next_phase: 25
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md
-  - Workstreams/website-builder/commerce/DESIGN-payment-providers.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-commerce-stripe-checkout.md
+  - DESIGN-payment-providers.md
 ---
 
 # Phase 24c — Commerce-specific legal *(only if transactional)*
@@ -121,10 +121,10 @@ The `COMMERCE-LEGAL-REPORT.md` is the required artifact, and it explicitly lists
 
 ## Reference materials
 
-- **Design doc — Stripe Checkout commerce-legal sub-section:** `Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md` § Phase 24c — commerce-specific legal (user-as-merchant tax burden, subscription disclosures, receipt/invoice)
-- **Design doc — payment providers (MoR vs user-merchant, tax burden):** `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` § Stripe (Stripe Tax +0.5%, user is merchant of record)
-- **Design doc — Cal.com commerce-legal (paid bookings):** `Workstreams/website-builder/commerce/DESIGN-booking-calcom.md` § Phase 24c — commerce-specific legal (cancellation/no-show, service-contract T&Cs, GDPR processor disclosure)
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 24c (seed) — note the explicit pairing with phase 25 (general legal)
+- **Design doc — Stripe Checkout commerce-legal sub-section:** `DESIGN-commerce-stripe-checkout.md` § Phase 24c — commerce-specific legal (user-as-merchant tax burden, subscription disclosures, receipt/invoice)
+- **Design doc — payment providers (MoR vs user-merchant, tax burden):** `DESIGN-payment-providers.md` § Stripe (Stripe Tax +0.5%, user is merchant of record)
+- **Design doc — Cal.com commerce-legal (paid bookings):** `DESIGN-booking-calcom.md` § Phase 24c — commerce-specific legal (cancellation/no-show, service-contract T&Cs, GDPR processor disclosure)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 24c (seed) — note the explicit pairing with phase 25 (general legal)
 - **Phase 25 (the general legal surface 24c hands dependencies to):** `phase-contracts/25-legal-pages.md` § What Claude must establish
 - **Phase 24b (the SCA/methods/off-session config 24c discloses):** `phase-contracts/24b-payment-provider.md` § SCA / 3DS jurisdiction sub-section
 - **External research (loaded fresh 2026-05-18 for this contract):**
@@ -132,6 +132,6 @@ The `COMMERCE-LEGAL-REPORT.md` is the required artifact, and it explicitly lists
   - Swiss VAT (digital/e-commerce) — admin.ch / Swiss FTA canonical, corroborated via Quaderno/Avalara/Marosa/Anrok 2026 guides — 8.1% standard rate, CHF 100,000 worldwide-turnover registration threshold, mandatory fiscal representative for non-Swiss businesses, quarterly FTA returns due +60 days, deemed-supplier concept for platforms, no EU-equivalent statutory cooling-off. Confirmed 2026-05-18.
   - US sales-tax nexus — economic-nexus thresholds post-*Wayfair* (commonly $100k / 200 transactions, varies by state); discharge via Stripe Tax or MoR. Surfaced, not exhaustively templated.
 - **Config/secrets discriminator (legal copy is not secret; provider names are config):** `.claude/rules/config-conventions.md`
-- **Locked decision 54** (Stripe MVP, user-as-merchant tax model) — STATE doc: `Workstreams/website-builder/website-builder.md`
+- **Locked decision 54** (Stripe MVP, user-as-merchant tax model) — STATE doc: `website-builder.md`
 
 Freshness date for this contract: **2026-05-18**. Legal guidance changes; the agent re-fetches jurisdiction sources at session start when phase 24c is active and never relies on training-data knowledge of consumer/tax law that the fetched current source can correct.

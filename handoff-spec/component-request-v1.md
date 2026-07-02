@@ -3,8 +3,8 @@
 > The v1 contract for the **agent → external tool** brief. The agent emits a JSON file at `.website-builder/briefs/{component}-{ts}.json` matching this schema; the user pastes it into ChatGPT / Claude.ai / v0 / Cursor / Lovable / Bolt — or hands it to a human freelancer. Per locked decisions 24 (the protocol is fundamental) + 35 (default is agent-writes-code; brief-emit is opt-in per component). **Stack-agnostic** — the same brief format works for any output stack via the `output_format` block.
 >
 > Canonical anchors:
-> - `Workstreams/website-builder/foundation/DESIGN-content-layers.md` Layer 5 ("Component briefs (JSON handoff protocol)") + the full request schema example
-> - `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"JSON handoff protocol (bidirectional)"
+> - `DESIGN-content-layers.md` Layer 5 ("Component briefs (JSON handoff protocol)") + the full request schema example
+> - `DESIGN-ingestion-and-extraction.md` §"JSON handoff protocol (bidirectional)"
 > - `skills/wb-component-build/references/json-handoff-protocol.md` §"Flow A — out"
 
 ## Version + schema identifier
@@ -317,8 +317,8 @@ The **7 shipped fixtures** cover ChatGPT / Claude.ai / v0 / Cursor / Lovable / B
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` Layer 5 — design-doc anchor (full example + rationale)
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"JSON handoff protocol (bidirectional)" — design-doc anchor (out + in flows)
+- `DESIGN-content-layers.md` Layer 5 — design-doc anchor (full example + rationale)
+- `DESIGN-ingestion-and-extraction.md` §"JSON handoff protocol (bidirectional)" — design-doc anchor (out + in flows)
 - `handoff-spec/component-output-v1.md` — the *return* contract (the shape the pasted-back output should follow)
 - `skills/wb-component-build/references/json-handoff-protocol.md` — phase-18 operational doc (Flows A + B + per-tool quirks)
 - `extraction/ai-output.md` — the parser that ingests `component-output-v1` outputs back into project state

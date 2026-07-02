@@ -96,7 +96,7 @@ Refuse to advance when: score < 80 (mobile, prod); LCP ≥ 2.5s; CLS ≥ 0.1; IN
 2. **Wire the submit handler** to the real endpoint, with loading/success/error states bound to the phase-16 `strings.json` microcopy (the moment a user is most anxious is exactly where brand voice matters).
 3. **Verify the effect end-to-end** — Playwright submits test data; then confirm the *effect*: the test email arrived in the configured inbox, the test signup appears in the list, the search returned the expected filtered results. Success-state-shown ≠ submission-received.
 4. **Spam-protect public forms** — honeypot minimum; Cloudflare Turnstile is the 2026 recommended default for public lead/contact forms (low-friction, privacy-respecting, free); always verify the challenge token **server-side** before the business action — a client-only "passed" state is forgeable.
-5. **Secrets by construction.** Public endpoint IDs (Formspree form ID) are not secrets — fine in markup. API keys (Resend/Mailgun) are secrets — server-side only, env-referenced, registered in `keys.yaml` (references only) + `.env.example` (placeholder), never persisted in project state, never client-side, never `NEXT_PUBLIC_`. The full secrets pattern (the 5-step keys protocol, the anti-patterns the agent refuses, prod-sync deferred to phase 29): `references/secrets-and-forms.md` — this is the secrets authority for phase 23, derived from `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` (locked decisions 29, 44).
+5. **Secrets by construction.** Public endpoint IDs (Formspree form ID) are not secrets — fine in markup. API keys (Resend/Mailgun) are secrets — server-side only, env-referenced, registered in `keys.yaml` (references only) + `.env.example` (placeholder), never persisted in project state, never client-side, never `NEXT_PUBLIC_`. The full secrets pattern (the 5-step keys protocol, the anti-patterns the agent refuses, prod-sync deferred to phase 29): `references/secrets-and-forms.md` — this is the secrets authority for phase 23, derived from `DESIGN-secrets-and-keys.md` (locked decisions 29, 44).
 
 Refuse to advance when: any form has no configured endpoint; a form not verified end-to-end; a form secret hardcoded/client-exposed; a public form has no spam mitigation; a promised interactive feature is faked; a client token trusted without server verification. A genuinely form-less brochure site is *inapplicable* (phase runs, finds nothing, exits clean) — not skipped. Form-provider matrix + Playwright submission-verification recipe: `references/secrets-and-forms.md` + `references/playwright-recipes.md`.
 
@@ -124,10 +124,10 @@ Detailed material is in `references/` — loaded on demand to keep this file lea
 ## Cross-references
 
 - Phase contracts (authoritative): `phase-contracts/19-composition.md`, `20-responsive-mobile.md`, `21-accessibility-audit.md`, `22-performance-audit.md`, `23-forms-interactive.md`
-- Architecture (skill load model): `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills — one per phase group
-- context7 integration: `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md`
-- Secrets authority (phase 23): `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` (locked decisions 29, 44)
-- Project scaffold (`audit/` + `keys.yaml` locations): `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md`
-- Content layers (`strings.json` Layer 3, phase-16 microcopy): `Workstreams/website-builder/foundation/DESIGN-content-layers.md`
-- Locked decisions 29, 44, 50, 64 — STATE doc: `Workstreams/website-builder/website-builder.md`
+- Architecture (skill load model): `DESIGN-architecture.md` § Skills — one per phase group
+- context7 integration: `DESIGN-context7-integration.md`
+- Secrets authority (phase 23): `DESIGN-secrets-and-keys.md` (locked decisions 29, 44)
+- Project scaffold (`audit/` + `keys.yaml` locations): `DESIGN-project-scaffold.md`
+- Content layers (`strings.json` Layer 3, phase-16 microcopy): `DESIGN-content-layers.md`
+- Locked decisions 29, 44, 50, 64 — STATE doc: `website-builder.md`
 - Vault secrets / tool-dependency rules: `.claude/rules/secrets-conventions.md`, `.claude/rules/tool-dependency-discipline.md`

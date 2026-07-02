@@ -9,9 +9,9 @@ next_phase: 27
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
 library_clones_at_entry:
   - resource: seo-checklists
     as: seo-checklists
@@ -116,9 +116,9 @@ The `SEO-REPORT.md` is the required artifact.
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 26 (seed)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — schema.org corpus reference data:** `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (schema.org corpus + SEO checklist source list)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 26 (seed)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — schema.org corpus reference data:** `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources (schema.org corpus + SEO checklist source list)
 - **Phase 16 (the finalized content the metadata mirrors + the voice):** `phase-contracts/16-copywriting.md` § What Claude must establish — descriptions are written from real content in the phase-5 voice; the 2026 AI-discovery context note (LLMs as first brand interpreter) directly informs this phase
 - **Phase 9/10 (the page set + types driving schema.org type selection):** `sitemap.yaml` page-type field
 - **Phase 30 (where sitemap.xml is submitted):** `phase-contracts/30-analytics-search-submission.md` § What Claude must establish

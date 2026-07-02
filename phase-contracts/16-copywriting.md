@@ -9,11 +9,11 @@ next_phase: 17
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/foundation/DESIGN-i18n.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
+  - DESIGN-i18n.md
 library_clones_at_entry:
   - resource: component-patterns
     as: component-patterns
@@ -189,9 +189,9 @@ For multilingual sites — additionally:
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — Layer 4 (page-level prose) + Layer 3 (Content Design JSON values). Phase 16 is where Layer 4 placeholders become prose and Layer 3 keys become values. The `## Why a separate layer` rationale (localization-ready, variable copy, reuse, auditing, translation handoff) is why microcopy lives in `strings/{lang}.json` and gets voiced here.
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — the canonical source for the multilingual behavior of this phase. Decisions 38-41 are implemented here: decision 38 (prefix URL routing — affects per-language file naming), decision 39 (Pattern A pages-per-language default — shared structure, translated prose), decision 40 (Pattern 1 agent-translates-inline default; Pattern 2 translator-handoff via brief is the upgrade path; Pattern 3 user-driven external tool), decision 41 (missing-key-shows-default-language-string fallback with validation warning). The `## Translation workflow` section's caveats (idioms, brand terms, voice nuance, commercial/legal copy) are what the agent surfaces when recommending Pattern 2.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `content/pages/{slug}.md` + `content/strings/{lang}.json` + Pattern A/B file-naming — the exact output conventions.
+- `DESIGN-content-layers.md` — Layer 4 (page-level prose) + Layer 3 (Content Design JSON values). Phase 16 is where Layer 4 placeholders become prose and Layer 3 keys become values. The `## Why a separate layer` rationale (localization-ready, variable copy, reuse, auditing, translation handoff) is why microcopy lives in `strings/{lang}.json` and gets voiced here.
+- `DESIGN-i18n.md` — the canonical source for the multilingual behavior of this phase. Decisions 38-41 are implemented here: decision 38 (prefix URL routing — affects per-language file naming), decision 39 (Pattern A pages-per-language default — shared structure, translated prose), decision 40 (Pattern 1 agent-translates-inline default; Pattern 2 translator-handoff via brief is the upgrade path; Pattern 3 user-driven external tool), decision 41 (missing-key-shows-default-language-string fallback with validation warning). The `## Translation workflow` section's caveats (idioms, brand terms, voice nuance, commercial/legal copy) are what the agent surfaces when recommending Pattern 2.
+- `DESIGN-project-scaffold.md` § `content/pages/{slug}.md` + `content/strings/{lang}.json` + Pattern A/B file-naming — the exact output conventions.
 - `.website-builder/brand.yaml.voice` (phase-5 output) — the voice contract phase 16 writes against. Re-read per section for the voice cross-check.
 
 Content Design JSON methodology (the microcopy-as-system discipline):

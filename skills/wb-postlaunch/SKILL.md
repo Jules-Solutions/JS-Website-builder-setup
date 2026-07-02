@@ -8,7 +8,7 @@ version: 0.1.0
 
 > The site is live. This skill runs the four post-launch phases **once, at launch**: announce it, plan v1.1, document the maintenance routine, and stand up monitoring + backup. Then it hands the long-term work to the separate post-launch *maintainer* template.
 >
-> Design context this skill implements: `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` (decisions 28/37/45/49 — the launch-once vs ongoing split), `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills (lines 193-201), `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` §§ 31-34. Phase contracts: `phase-contracts/31-launch-announcement.md`, `32-iteration-roadmap.md`, `33-maintenance-cadence.md`, `34-monitoring-backup.md`.
+> Design context this skill implements: `DESIGN-post-launch-template.md` (decisions 28/37/45/49 — the launch-once vs ongoing split), `DESIGN-architecture.md` § Skills (lines 193-201), `DESIGN-phase-contracts.md` §§ 31-34. Phase contracts: `phase-contracts/31-launch-announcement.md`, `32-iteration-roadmap.md`, `33-maintenance-cadence.md`, `34-monitoring-backup.md`.
 
 ## The one critical distinction (read this first — decision 37 + 49)
 
@@ -107,10 +107,10 @@ At **phase 32**, when the user wants the v1.1 roadmap kept as a living changelog
 
 ## Cross-references
 
-- Design — post-launch maintainer template + the launch-once-vs-ongoing split (decisions 28/37/45/49): `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md`
-- Design — Skills anatomy + how phase-group skills layer on the agent profile: `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Skills (lines 193-201)
-- Design — pipeline *design ancestry* (seeded the contracts; NOT runtime authority): `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` §§ 31-34
+- Design — post-launch maintainer template + the launch-once-vs-ongoing split (decisions 28/37/45/49): `DESIGN-post-launch-template.md`
+- Design — Skills anatomy + how phase-group skills layer on the agent profile: `DESIGN-architecture.md` § Skills (lines 193-201)
+- Design — pipeline *design ancestry* (seeded the contracts; NOT runtime authority): `DESIGN-phase-contracts.md` §§ 31-34
 - Phase contracts (**authoritative** per-phase runtime behavior — read these, not the design ancestry above): `phase-contracts/31-launch-announcement.md`, `32-iteration-roadmap.md`, `33-maintenance-cadence.md`, `34-monitoring-backup.md`
 - Phase 29 (the deploy wizard that pre-decides cadence/monitoring/backup — read before phases 33/34): `phase-contracts/29-hosting-deployment.md`
-- Secrets handling (monitor/error-tracking tokens — user-supplied, referenced not persisted): `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md`
-- Locked decisions 28 / 37 / 45 / 49 — STATE doc: `Workstreams/website-builder/website-builder.md`
+- Secrets handling (monitor/error-tracking tokens — user-supplied, referenced not persisted): `DESIGN-secrets-and-keys.md`
+- Locked decisions 28 / 37 / 45 / 49 — STATE doc: `website-builder.md`

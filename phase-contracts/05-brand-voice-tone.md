@@ -9,11 +9,11 @@ next_phase: 6
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/foundation/DESIGN-i18n.md
-  - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-content-layers.md
+  - DESIGN-i18n.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
 library_clones_at_entry:
   - resource: voice-archetypes
     as: voice-archetypes
@@ -161,11 +161,11 @@ The agent updates `.website-builder/project.yaml.current_phase` to `6` upon user
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 5 (seed for this contract)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — voice-output layer (CDJSON):** `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 3 — Content Design JSON (microcopy + UI strings) — the voice lives in `brand.yaml.voice`; phase 16 + content phases write strings that reflect it; the methodology source for that pattern is https://uxcontent.com/content-design-json/
-- **Design doc — multi-language voice interaction:** `Workstreams/website-builder/foundation/DESIGN-i18n.md` § Translation workflow (per-language voice rendering happens at phase 16; this phase captures the language-neutral profile)
-- **Design doc — voice-archetype corpus catalogue:** `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (catalog entry for `voice-archetypes/`)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 5 (seed for this contract)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — voice-output layer (CDJSON):** `DESIGN-content-layers.md` § Layer 3 — Content Design JSON (microcopy + UI strings) — the voice lives in `brand.yaml.voice`; phase 16 + content phases write strings that reflect it; the methodology source for that pattern is https://uxcontent.com/content-design-json/
+- **Design doc — multi-language voice interaction:** `DESIGN-i18n.md` § Translation workflow (per-language voice rendering happens at phase 16; this phase captures the language-neutral profile)
+- **Design doc — voice-archetype corpus catalogue:** `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources (catalog entry for `voice-archetypes/`)
 - **Plugin corpus — voice archetypes:** `.website-builder/library/voice-archetypes/` — catalogued brand voice exemplars with public voice-guide URLs, NN4D profiles, say/never-say excerpts
 - **External methodology (loaded fresh 2026-05-18 for this contract):**
   - Nielsen Norman Group — The Four Dimensions of Tone of Voice — https://www.nngroup.com/articles/tone-of-voice-dimensions/ (the empirical scaffold this contract uses: humor / formality / respectfulness / enthusiasm, each as a 3-point scale)

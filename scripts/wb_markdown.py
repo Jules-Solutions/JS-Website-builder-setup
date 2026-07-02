@@ -10,7 +10,7 @@ YAML. One module owns these helpers; `wb_orchestrate` consumes them; `wb_library
 *adds* the primitives, it does not refactor the existing parsers).
 
 Public surface (the orchestration spine's §5.1 contract — see
-`Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md`):
+`DESIGN-orchestration-spine.md`):
 
     extract_h2_section(text, heading, *, include_heading=True, match="exact")
         -> str | None
@@ -42,7 +42,7 @@ skill markdown routinely embeds `## ` lines inside example code fences; a naive
 splitter would mis-cut the section there. See tests/markdown/test_wb_markdown.py.
 
 See also:
-  - Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md § 5.1
+  - DESIGN-orchestration-spine.md § 5.1
   - scripts/wb_keys.py (parse_yaml fallback shape this consolidates)
   - scripts/wb_library.py (_split_frontmatter the frontmatter splitter mirrors)
   - adapters/README.md (the H2-section schema extract_h2_section reads at runtime)

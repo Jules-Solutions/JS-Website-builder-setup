@@ -9,9 +9,9 @@ next_phase: 5
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
 ---
 
 # Phase 4 — Project / company info
@@ -166,10 +166,10 @@ The agent updates `.website-builder/project.yaml.current_phase` to `5` upon user
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 4 (seed for this contract)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — output location:** `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `project.yaml` (schema for the `entity:` key + the `inbox/INVENTORY.md` seed)
-- **Design doc — jurisdiction-driven downstream:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 25 (legal pages) + § 24c (commerce legal) — what the jurisdiction field controls in phases 24-25
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 4 (seed for this contract)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — output location:** `DESIGN-project-scaffold.md` § `project.yaml` (schema for the `entity:` key + the `inbox/INVENTORY.md` seed)
+- **Design doc — jurisdiction-driven downstream:** `DESIGN-phase-contracts.md` § 25 (legal pages) + § 24c (commerce legal) — what the jurisdiction field controls in phases 24-25
 - **Library / external (when the user wants jurisdiction-mapping help):**
   - DACH imprint requirements (admin.ch source) — surfaced in phase 25; phase 4 only captures the jurisdiction
   - EU GDPR + ePrivacy interplay — surfaced in phase 25

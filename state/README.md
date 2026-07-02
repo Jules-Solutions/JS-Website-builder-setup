@@ -3,7 +3,7 @@
 > Reference schema for every file and directory the website-builder plugin writes into the user's project.
 > All paths below are relative to the user's project root (the directory where the user ran `wb`).
 >
-> Canonical design reference: `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md`
+> Canonical design reference: `DESIGN-project-scaffold.md`
 
 ---
 

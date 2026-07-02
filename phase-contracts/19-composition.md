@@ -9,12 +9,12 @@ next_phase: 20
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
+  - DESIGN-context7-integration.md
 ---
 
 # Phase 19 — Composition (putting it together)
@@ -104,12 +104,12 @@ The assembled pages + a passing build are the required outputs. A decision log i
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 19 — the seed for this contract.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Stack-agnostic output design (pre-phase-11 artifacts are stack-independent; phase 19 is where the stack adapter's composition conventions apply) / § Integration with Claude Code primitives.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § page/route output conventions per stack; `sitemap.yaml` schema.
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — phase 19 is where Layers 2 (components), 3 (strings), 4 (page prose) compose into rendered pages.
-- `Workstreams/website-builder/cross-cutting/DESIGN-templates-catalog.md` — templates as composition-pattern inspiration only; never imported. Surfaced at phase 19 for "how does a reference site sequence this page" discussion.
-- `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` — phase 19 invokes context7 for stack routing/composition patterns; the resolve→query pattern + caching.
+- `DESIGN-phase-contracts.md` § 19 — the seed for this contract.
+- `DESIGN-architecture.md` § Stack-agnostic output design (pre-phase-11 artifacts are stack-independent; phase 19 is where the stack adapter's composition conventions apply) / § Integration with Claude Code primitives.
+- `DESIGN-project-scaffold.md` § page/route output conventions per stack; `sitemap.yaml` schema.
+- `DESIGN-content-layers.md` — phase 19 is where Layers 2 (components), 3 (strings), 4 (page prose) compose into rendered pages.
+- `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` — templates as composition-pattern inspiration only; never imported. Surfaced at phase 19 for "how does a reference site sequence this page" discussion.
+- `DESIGN-context7-integration.md` — phase 19 invokes context7 for stack routing/composition patterns; the resolve→query pattern + caching.
 
 context7 (at this phase — current as of the freshness date): the agent resolves + queries the chosen stack's current routing/composition docs at phase-19 entry — e.g. `/vercel/next.js` (App Router layout nesting + Server/Client component rules), `/withastro/docs` (dynamic params + island hydration directives), `/gohugoio/hugo` (content + layout pairing). Per `DESIGN-context7-integration.md` per-stack library-id manifest at `reference-corpus/seeds/{stack}.yaml`. The optional JSON handoff protocol (`DESIGN-handoff-protocol.md`) can emit a page-level brief at phase 19, though composition is usually agent-owned once components exist.
 

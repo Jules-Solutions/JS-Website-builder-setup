@@ -9,10 +9,10 @@ next_phase: 9
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-image-gen-consumer.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-image-gen-consumer.md
+  - DESIGN-project-scaffold.md
 ---
 
 # Phase 8 — Image strategy + generation plan
@@ -160,10 +160,10 @@ The agent updates `.website-builder/project.yaml.current_phase` to `9` upon user
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 8 (seed for this contract)
-- **Design doc — the image-gen consumer contract (READ IN FULL per Lock 4):** `Workstreams/website-builder/cross-cutting/DESIGN-image-gen-consumer.md` — the three execution paths (platform-API / standalone-provider-key / consumer-brief), the selection logic, the brand_context schema, versioning + storage layout, post-processing (format conversion / responsive variants / alt-text / palette-validation), the phase-contract invocation table (phase 8 sets strategy; 17/18 generate; 19 composes; 20 variants; 22 perf-checks), cost surfacing, failure modes — this is the load-bearing design doc for phase 8 per locked decision 56
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Cross-workstream platform-feature consumers (`consumers/image-gen.md`)
-- **Design doc — media/ + briefs/ layout:** `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `media/` + § `briefs/` + § `decisions/`
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 8 (seed for this contract)
+- **Design doc — the image-gen consumer contract (READ IN FULL per Lock 4):** `DESIGN-image-gen-consumer.md` — the three execution paths (platform-API / standalone-provider-key / consumer-brief), the selection logic, the brand_context schema, versioning + storage layout, post-processing (format conversion / responsive variants / alt-text / palette-validation), the phase-contract invocation table (phase 8 sets strategy; 17/18 generate; 19 composes; 20 variants; 22 perf-checks), cost surfacing, failure modes — this is the load-bearing design doc for phase 8 per locked decision 56
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Cross-workstream platform-feature consumers (`consumers/image-gen.md`)
+- **Design doc — media/ + briefs/ layout:** `DESIGN-project-scaffold.md` § `media/` + § `briefs/` + § `decisions/`
 - **External — AI image-gen current state (loaded fresh 2026-05-18 for this contract):**
   - 2026 model landscape — https://medium.com/@cliprise/ai-image-generation-in-2026-midjourney-flux-2-imagen-4-and-beyond-7934a9228e98 (Midjourney = strongest aesthetic + mature sref style-reference system; Flux 2 Pro = top photorealism/product accuracy; Imagen = explicit-color-word prompting; DALL-E 4o = broad accessibility/safety; Ideogram V3 = text-in-image)
   - Prompt-pattern fundamentals — https://www.novakit.ai/blog/ai-image-generation-tutorial (subject → action → environment → lighting → lens/camera → style; negative prompts mostly obsolete in 2026; model-specific styles: Flux wants photo params like "50mm f/1.8 Kodak Portra 400 grain", Midjourney wants style refs, Imagen wants explicit color words)
@@ -171,6 +171,6 @@ The agent updates `.website-builder/project.yaml.current_phase` to `9` upon user
   - Stock-vs-custom-vs-AI 2026 strategy — https://www.stockphotosecrets.com/stock-agency-insights/stock-photos-vs-custom-photography-in-2026-shutterstock.html (hybrid model: custom/photographer for hero+brand+trust-critical; AI for 70-80% of volume/abstract; stock for licensable-realism)
   - Website image-system planning — https://www.technosidd.com/2026/03/building-website-image-system-sourcing-stock-photos-for-every-page-type.html (treat visuals as brand infrastructure: define photo style, map page-types to image jobs, standardize aspect ratios, consistent editing recipe, source in cohesive batches)
   - 2026 trust reality — https://www.photocase.com/guide/stock-photography-or-custom-shoots-in-2026-shutterstock/ (AI-image saturation eroding trust in digital imagery; audiences increasingly drawn to visuals that feel real — why the agent pushes back on AI founder portraits)
-- **Locked decisions:** decision 56 (cross-workstream platform features absorbed via consumer-fallback in v1 — STATE doc `Workstreams/website-builder/website-builder.md`); decision 9 + 3 (image-gen scope cross-workstream; plugin works fully standalone with provider-key fallback)
+- **Locked decisions:** decision 56 (cross-workstream platform features absorbed via consumer-fallback in v1 — STATE doc `website-builder.md`); decision 9 + 3 (image-gen scope cross-workstream; plugin works fully standalone with provider-key fallback)
 - **Agent profile — anti-vision lock:** `${CLAUDE_PLUGIN_ROOT}/agents/website-builder.md` § What you do NOT do ("Generate placeholder images on a deployed site" — refuse; every planned image has a sourcing decision) + § Voice characteristics (surfaces AI-vs-photographer trade-offs as honest options, not decrees)
 - **Cross-rule:** `.claude/rules/tool-dependency-discipline.md` (image-gen provider APIs are Tier 2 third-party tools; the consumer-brief path is the documented fallback, not a silent degradation; key failures surface per Tier 2)

@@ -1,6 +1,6 @@
 # JSON handoff protocol — phase-18 emission point
 
-> Loaded on demand when the user opts into external-tool / freelancer generation for a component. Canonical source: `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` (read it for the full design contract). This reference is the phase-18 operational layer. Per locked decisions 24 (protocol is fundamental) + 35 (default is the agent writes code; brief-emit is opt-in per component).
+> Loaded on demand when the user opts into external-tool / freelancer generation for a component. Canonical source: `DESIGN-handoff-protocol.md` (read it for the full design contract). This reference is the phase-18 operational layer. Per locked decisions 24 (protocol is fundamental) + 35 (default is the agent writes code; brief-emit is opt-in per component).
 
 ## When this fires
 

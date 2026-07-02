@@ -179,18 +179,16 @@ def detect_entry_mode(root: Path) -> dict:
     Signals can overlap; we apply the spec's implicit precedence:
     has-Framer-attempt > has-existing-site (Framer is the strongest signal because
     of the cosplay test target), then has-Figma-file > has-AI-output > greenfield.
-    """
-    figma_files = find_figma_files(root)
-    if figma_files:
-        return {
-            "mode": "has-Figma-file",
-            "figma_files": figma_files,
-            "signal": (
-                f"Found {len(figma_files)} Figma file(s) at project root: "
-                + ", ".join(figma_files)
-            ),
-        }
 
+    SYNC CONTRACT (F9, website-builder audit 2026-06-15): `tests/detector.py`'s
+    detect() is the reference reimplementation of this exact precedence — this
+    hook is an independent hand-synced copy that must keep agreeing with it, per
+    that file's own module docstring. `tests/smoke_test.py`'s
+    TestDetectorHookPrecedenceParity exercises COMBINED-signal synthetic
+    projects (not just the single-signal walkthrough fixtures) specifically to
+    catch a branch-order/gating divergence between the two implementations —
+    run it after editing either file's precedence logic.
+    """
     stack_markers = find_stack_markers(root)
     framer_markers = [m for m, _ in stack_markers if m in FRAMER_ATTEMPT_MARKERS]
     if framer_markers:
@@ -210,6 +208,22 @@ def detect_entry_mode(root: Path) -> dict:
             "signal": (
                 "Detected existing-site stack markers: "
                 + ", ".join(label for _, label in stack_markers)
+            ),
+        }
+
+    # Figma is checked AFTER framer/stack, and only when NO other stack signal
+    # is present, so a project with e.g. both a stray .fig export AND a real
+    # stack config (or Framer metadata) isn't misclassified as has-Figma-file.
+    # Mirrors detector.py's `figma_files and not (stack_from_config or
+    # framework_from_pkg)` gate — see the sync-contract note above.
+    figma_files = find_figma_files(root)
+    if figma_files:
+        return {
+            "mode": "has-Figma-file",
+            "figma_files": figma_files,
+            "signal": (
+                f"Found {len(figma_files)} Figma file(s) at project root: "
+                + ", ".join(figma_files)
             ),
         }
 

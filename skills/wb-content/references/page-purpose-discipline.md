@@ -1,6 +1,6 @@
 # Phase 13 — Page-Purpose Discipline
 
-Detailed patterns for the phase-13 content-per-page workflow. The SKILL.md summarizes; this file carries the recovery scripts and the conversion-anchoring detail. Source of truth: `Projects/Jules.Solutions/Subprojects/website-builder/phase-contracts/13-content-per-page.md` + `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 2/4.
+Detailed patterns for the phase-13 content-per-page workflow. The SKILL.md summarizes; this file carries the recovery scripts and the conversion-anchoring detail. Source of truth: `Projects/Jules.Solutions/Subprojects/website-builder/phase-contracts/13-content-per-page.md` + `DESIGN-content-layers.md` § Layer 2/4.
 
 ## The audience-page-purpose triangle
 

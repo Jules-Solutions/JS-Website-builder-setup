@@ -7,13 +7,17 @@
 #   ./tests/run-tests.sh --verbose        # extra-verbose output
 #   ./tests/run-tests.sh --no-uv          # use system pytest instead of uv
 #
-# Phase 1 / Captain E scope: entry-mode detection + bootstrap initialization
-# smoke tests. End-to-end tests (real CC against a fixture) are Phase 7-8 scope.
+# Originally scoped as Phase 1 / Captain E: entry-mode detection + bootstrap
+# initialization smoke tests. End-to-end tests (real CC against a fixture) are
+# Phase 7-8 scope.
 #
 # Tier 1 tests (reference detector + fixture completeness) ALWAYS pass when
-# fixtures + spec are aligned. Tier 2 tests (Captain C's hook + Captain D's
-# skill integration) are SKIPPED until those Captains' branches merge to dev.
-# A Tier 2 skip is not a failure — it's the expected state pre-merge.
+# fixtures + spec are aligned. Tier 2 tests (the SessionStart hook + the
+# wb-bootstrap skill integration, plus every Tier-2 class added by later
+# phases) now run — not skip — on dev: their branches merged long ago. A Tier
+# 2 test only self-skips if its target script is genuinely absent from the
+# checkout (e.g. a fresh worktree mid-build); that is no longer the expected
+# steady state on dev, just a defensive fallback.
 
 set -e
 

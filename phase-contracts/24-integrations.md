@@ -9,10 +9,10 @@ next_phase: 25
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-secrets-and-keys.md
+  - DESIGN-deploy-providers.md
 ---
 
 # Phase 24 — Integrations *(non-commerce)*
@@ -116,10 +116,10 @@ The `INTEGRATIONS-REPORT.md` is the required artifact. The agent writes the cook
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 24 (seed for this contract) + the pipeline-overview branch diagram (24 → 24a/25 fork)
-- **Design doc — pipeline integration + the conditional fork:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — key handling for every integration:** `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` § The hybrid mechanism + § Provider key configuration UX + § Phase contracts that invoke this concern (phase 24 listed there)
-- **Design doc — production deploy target (parity is checked against this):** `Workstreams/website-builder/cross-cutting/DESIGN-deploy-providers.md` § Phase contracts that invoke this concern (phase 24 listed there — "some hosting features may load-bear integrations")
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 24 (seed for this contract) + the pipeline-overview branch diagram (24 → 24a/25 fork)
+- **Design doc — pipeline integration + the conditional fork:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — key handling for every integration:** `DESIGN-secrets-and-keys.md` § The hybrid mechanism + § Provider key configuration UX + § Phase contracts that invoke this concern (phase 24 listed there)
+- **Design doc — production deploy target (parity is checked against this):** `DESIGN-deploy-providers.md` § Phase contracts that invoke this concern (phase 24 listed there — "some hosting features may load-bear integrations")
 - **Phase 11 transactional decision (the fork's source of truth):** `phase-contracts/11-stack-decision.md` § Transactional decision — the two seed questions, the edge cases (free booking = non-transactional-ish but routes to 24a only when a time-commitment needs payment rails; the agent applies the same line here), and decision 34's mid-project-change cost
 - **Phase 3 requirements (the integration contract):** `phase-contracts/03-requirements.md` § What Claude must establish — the conversion outcome the integrations serve
 - **Phase 22 / 23 (the budget + forms this phase composes on):** `phase-contracts/16-copywriting.md` voice baseline; phase-22 Lighthouse budget and phase-23 forms reports are the constraints integrations must not regress

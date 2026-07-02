@@ -13,8 +13,8 @@
 # user's project's .website-builder/ directory and only fetches what's missing.
 #
 # See:
-#   - Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md
-#   - Workstreams/website-builder/skills-bundle/ui-ux-pro-max.md  (composition manifest;
+#   - DESIGN-skill-distribution.md
+#   - ui-ux-pro-max.md  (composition manifest;
 #     authored in Phase 5 — for v0.1 this script uses inline metadata; the manifest read
 #     path lands when Phase 5 ships skills-bundle/ content).
 #   - .claude/rules/tool-dependency-discipline.md (Tier 2 third-party-failure handling)
@@ -277,7 +277,7 @@ ships and it will replace this stub with the real fetch.
 
 ## See also
 
-- \`Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md\` — the
+- \`DESIGN-skill-distribution.md\` — the
   hybrid skill-distribution design (composition manifests + setup script).
 - \`.claude/temp/ctx7-docs/claude-code-plugin-spec.md\` — Claude Code skill spec
   reference.
@@ -403,7 +403,7 @@ Idempotent: re-running detects existing installs via .website-builder/skills-ins
 and only fetches what's missing.
 
 See:
-  - Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md
+  - DESIGN-skill-distribution.md
   - skills/wb-bootstrap/SKILL.md (the invoking skill)
 EOF
 }

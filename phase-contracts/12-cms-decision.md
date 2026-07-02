@@ -9,14 +9,14 @@ next_phase: 13
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
-  - Workstreams/website-builder/foundation/DESIGN-i18n.md
-  - Workstreams/website-builder/cms/DESIGN-cms-none.md
-  - Workstreams/website-builder/cms/DESIGN-cms-decap.md
-  - Workstreams/website-builder/cms/DESIGN-cms-payload.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
+  - DESIGN-i18n.md
+  - DESIGN-cms-none.md
+  - DESIGN-cms-decap.md
+  - DESIGN-cms-payload.md
 library_clones_at_entry:
   - resource: payload-docs
     when: cms == "payload"
@@ -74,7 +74,7 @@ This is the right answer for sites with one editor, low edit cadence (weekly or 
 
 The agent's value here is making git-based editing feel like a CMS. The agent generates a `.vscode/` workspace with the right extensions configured, a YAML schema attached to frontmatter for inline validation, a pre-commit hook that runs Zod schema checks across all content files, and a `package.json` helper script for quick commits. The user gets CMS-quality discipline without a CMS. Trade-offs surfaced to the user honestly: no multi-editor real-time collab, no visual editing, editor must open a code editor, no scheduled publishing built-in.
 
-The `none` choice pairs cleanly with the MVP static-export-of-Next.js path. Astro and Hugo and the other expansion stacks are even more natural fits but ship later. Full design at `Workstreams/website-builder/cms/DESIGN-cms-none.md`.
+The `none` choice pairs cleanly with the MVP static-export-of-Next.js path. Astro and Hugo and the other expansion stacks are even more natural fits but ship later. Full design at `DESIGN-cms-none.md`.
 
 ### Decap — git-backed admin
 
@@ -84,7 +84,7 @@ The agent picks Decap when the user wants a CMS-shaped editor surface on a stati
 
 The agent surfaces a structural fact at decision time: Decap is in maintenance mode upstream since the Netlify rename. Active forks exist (Sveltia CMS, Static CMS) as drop-in replacements. Decap still works and the agent supports it, but the user should know the project's velocity is lower than Payload's or Strapi's. The Sveltia / Static CMS forks are surfaced as upgrade paths.
 
-The agent invokes context7 for `decapcms.org/docs` (or `WebFetch` if not present in context7 at sufficient quality) at this phase to confirm current config-schema, OAuth backend options, and i18n configuration (`structure: multiple_files` is the Pattern A default per locked decision 39). Full design at `Workstreams/website-builder/cms/DESIGN-cms-decap.md`.
+The agent invokes context7 for `decapcms.org/docs` (or `WebFetch` if not present in context7 at sufficient quality) at this phase to confirm current config-schema, OAuth backend options, and i18n configuration (`structure: multiple_files` is the Pattern A default per locked decision 39). Full design at `DESIGN-cms-decap.md`.
 
 ### Payload — schema-as-code on Next.js
 
@@ -96,7 +96,7 @@ The cost is real and surfaced at decision time. Payload needs a Node runtime (Ve
 
 Two specific notes the agent surfaces: (1) Payload v3 is Next.js-native — pairing it with Astro or SvelteKit means running it as a separate headless backend, which is doable but loses the single-deploy ergonomics; (2) the Blocks field has a localization choice — localizing the entire `layout` field gives different per-locale layouts (matches `DESIGN-i18n.md` Pattern B); localizing the text fields *inside* each block keeps shared layout with translated prose (matches Pattern A, the default per locked decision 39). The agent walks through this trade-off with the user.
 
-The agent invokes context7 with `/payloadcms/payload` at this phase. Library benchmark 82.1, High reputation, v3.84.0 latest as of 2026-05-18. Cached to `.website-builder/library/docs/payload.md`. Full design at `Workstreams/website-builder/cms/DESIGN-cms-payload.md`.
+The agent invokes context7 with `/payloadcms/payload` at this phase. Library benchmark 82.1, High reputation, v3.84.0 latest as of 2026-05-18. Cached to `.website-builder/library/docs/payload.md`. Full design at `DESIGN-cms-payload.md`.
 
 ### Stack-built-in defaults (natural pairings)
 
@@ -108,7 +108,7 @@ These two pairings exist outside the `none` / Decap / Payload MVP triplet becaus
 
 ## Expansion CMS options (post-MVP, expansion phase 10)
 
-The six CMSes below are fully designed in `Workstreams/website-builder/cms/` and accessible to users who already know them. They ship in expansion phase 10 of the platform roadmap. The agent mentions them only when surfaced by the user; for v1, the agent steers toward the MVP options above.
+The six CMSes below are fully designed in the website-builder workstream (vault-side design; not shipped as MVP adapters) and accessible to users who already know them. They ship in expansion phase 10 of the platform roadmap. The agent mentions them only when surfaced by the user; for v1, the agent steers toward the MVP options above.
 
 - **Strapi** — UI-first content modeling (editors build content types via the admin, not via TypeScript). Sweet-spot fit for muggle-friendly teams who want a CMS admin without writing schema code. MVP closest substitute: Payload (for Next.js stacks) or stack-built-in (Framer / WordPress).
 - **Sanity** — structured content + portable JSON + GROQ queries + hosted Content Lake. Sweet-spot fit for content with heavy cross-references and real-time collaborative editing. MVP closest substitute: Payload.
@@ -137,7 +137,7 @@ Override is available on the YAGNI-direction gates via explicit user confirmatio
 - **`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`** — invoked for Payload (`/payloadcms/payload`) when on the table; recommended for Decap (`decap-cms` via context7 if available, else `WebFetch` decapcms.org/docs); WordPress-specific lookups when WordPress is the stack. Cached docs land in `.website-builder/library/docs/${cms}.md`.
 - **WebFetch** — used for Decap docs when context7 lacks coverage; for current Framer CMS feature list at framer.com; for current WordPress REST + theme.json + Gutenberg block schema; for active-fork docs (Sveltia / Static CMS) when the user asks about Decap alternatives.
 - **WebSearch** — sparingly. Used for "Payload v3 deploy Vercel build command 2026" or similar very-recent-pattern lookups.
-- **Reference-data load** — agent reads per-CMS design docs at `Workstreams/website-builder/cms/DESIGN-cms-*.md` (full reads for the three MVP options) and the migration-recipe section of `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` for the chosen stack-CMS pairing.
+- **Reference-data load** — agent reads per-CMS adapter docs at `cms-adapters/cms-*.md` (full reads for the three MVP options) and the migration-recipe section of `DESIGN-project-scaffold.md` for the chosen stack-CMS pairing.
 - **Read** — agent reads `.website-builder/project.yaml.stack`, `.transactional`, `.languages`, and `.sitemap.yaml` to anchor the CMS pick in the project's actual shape.
 
 No `Write` / `Edit` on code files in this phase — those tools are gated until phase 18.
@@ -185,21 +185,21 @@ If the user picked an expansion CMS, the agent writes `.website-builder/decision
 
 Per-CMS design docs (full reads for any CMS the user considers seriously):
 
-- `Workstreams/website-builder/cms/DESIGN-cms-none.md` — MVP
-- `Workstreams/website-builder/cms/DESIGN-cms-decap.md` — MVP
-- `Workstreams/website-builder/cms/DESIGN-cms-payload.md` — MVP
-- `Workstreams/website-builder/cms/DESIGN-cms-strapi.md` — expansion phase 10
-- `Workstreams/website-builder/cms/DESIGN-cms-sanity.md` — expansion phase 10
-- `Workstreams/website-builder/cms/DESIGN-cms-tinacms.md` — expansion phase 10
-- `Workstreams/website-builder/cms/DESIGN-cms-directus.md` — expansion phase 10
-- `Workstreams/website-builder/cms/DESIGN-cms-keystone.md` — expansion phase 10
-- `Workstreams/website-builder/cms/DESIGN-cms-ghost.md` — expansion phase 10
+- `DESIGN-cms-none.md` — MVP
+- `DESIGN-cms-decap.md` — MVP
+- `DESIGN-cms-payload.md` — MVP
+- `DESIGN-cms-strapi.md` — expansion phase 10
+- `DESIGN-cms-sanity.md` — expansion phase 10
+- `DESIGN-cms-tinacms.md` — expansion phase 10
+- `DESIGN-cms-directus.md` — expansion phase 10
+- `DESIGN-cms-keystone.md` — expansion phase 10
+- `DESIGN-cms-ghost.md` — expansion phase 10
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 2 + Layer 3 — the structural-specs layer and the Content Design JSON layer that every CMS choice must accommodate.
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` § Translation workflow + Pattern A/B — the i18n strategy locked at this phase.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § Migration recipes — the stack-CMS pairing recipes for Astro+Decap, Next.js+Payload, WordPress+native, Framer+Framer-CMS.
+- `DESIGN-content-layers.md` § Layer 2 + Layer 3 — the structural-specs layer and the Content Design JSON layer that every CMS choice must accommodate.
+- `DESIGN-i18n.md` § Translation workflow + Pattern A/B — the i18n strategy locked at this phase.
+- `DESIGN-project-scaffold.md` § Migration recipes — the stack-CMS pairing recipes for Astro+Decap, Next.js+Payload, WordPress+native, Framer+Framer-CMS.
 
 Context7 lookups (mandatory when the relevant CMS is on the table):
 

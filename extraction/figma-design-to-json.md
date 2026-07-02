@@ -2,7 +2,7 @@
 
 > Figma plugin that exports a Figma file as structured JSON. **Expansion path beyond MVP** (per locked decision 55). Used in entry mode `has-figma-file` — the common scenario where a designer or freelancer hands the muggle a Figma file and the muggle wants a site that matches.
 >
-> Anchor: `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"Figma design-to-json plugin" (lines 174-182).
+> Anchor: `DESIGN-ingestion-and-extraction.md` §"Figma design-to-json plugin" (lines 174-182).
 > External: https://www.figma.com/community/plugin/1514601930647701205/design-to-json
 
 ## What it does
@@ -136,7 +136,7 @@ extraction:
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"Figma design-to-json plugin" — design-doc anchor
+- `DESIGN-ingestion-and-extraction.md` §"Figma design-to-json plugin" — design-doc anchor
 - `phase-contracts/06.5-artifact-ingestion.md` — invocation contract
 - `extraction/stitch.md` — peer for non-Figma extraction (URLs, screenshots)
 - `extraction/ai-output.md` — peer for code-based artifacts

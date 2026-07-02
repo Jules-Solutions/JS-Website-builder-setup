@@ -3,7 +3,7 @@
 scripts/wb_claudemd.py — the project-root CLAUDE.md orientation surface.
 
 Gap #2 of the orchestration-spine remediation program
-(`Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md` §7 row #2
+(`DESIGN-orchestration-spine.md` §7 row #2
 + §9 — Commander CONFIRMED). The plugin writes a STANDING project-root `CLAUDE.md`:
 durable, always-loaded orientation that survives even when the plugin isn't loaded
 (the user opens the project in plain Claude Code, or on a machine without the
@@ -46,7 +46,7 @@ Interface rules (mirror the locked wb_keys.py / wb_markdown.py module contract,
     identity produces identical bytes (no git churn).
 
 See also:
-  - Workstreams/website-builder/foundation/DESIGN-orchestration-spine.md §7 #2 + §9
+  - DESIGN-orchestration-spine.md §7 #2 + §9
   - scripts/wb-bootstrap.py (the .gitignore managed-block pattern this mirrors; the
     bootstrap caller that CREATES the file)
   - scripts/wb_orchestrate.py (the spine caller that REFRESHES the phase line)

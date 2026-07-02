@@ -9,9 +9,9 @@ next_phase: 32
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-post-launch-template.md
 ---
 
 # Phase 31 — Launch announcement
@@ -96,13 +96,13 @@ The `ASSETS.md` (or, if skipped, the logged skip decision with surfaced cost) is
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 31 (seed — `Gating: none`; common failure = muggles forget to tell anyone, agent makes "tell people" a step)
-- **Design doc — post-launch maintainer template (the once-at-launch vs ongoing split, decision 37/49):** `Workstreams/website-builder/cross-cutting/DESIGN-post-launch-template.md` § Phase 31-34 vs maintainer template (decision 37) — phase 31 maps to the maintainer's eventual launch-announcement capability; **referenced, not authored here**
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 31 (seed — `Gating: none`; common failure = muggles forget to tell anyone, agent makes "tell people" a step)
+- **Design doc — post-launch maintainer template (the once-at-launch vs ongoing split, decision 37/49):** `DESIGN-post-launch-template.md` § Phase 31-34 vs maintainer template (decision 37) — phase 31 maps to the maintainer's eventual launch-announcement capability; **referenced, not authored here**
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
 - **Phase 5 (the voice the announcement is written in):** `brand.yaml.voice`
 - **Phase 16 (the substance-is-yours / shaping-is-mine discipline applied to announcement copy):** `phase-contracts/16-copywriting.md` § Common failure modes
 - **Phase 3 (the audience + channels the announcement targets):** `phase-contracts/03-requirements.md` § What Claude must establish — primary audience + likely-arrival-channel
 - **Phase 30 (the analytics that will show whether the announcement worked):** `phase-contracts/30-analytics-search-submission.md`
-- **Locked decisions 37 + 49** (phases 31-34 run once at launch; post-launch 8-skill maintainer split owns ongoing) — STATE doc: `Workstreams/website-builder/website-builder.md`
+- **Locked decisions 37 + 49** (phases 31-34 run once at launch; post-launch 8-skill maintainer split owns ongoing) — STATE doc: `website-builder.md`
 
 No mandatory external research for this phase (per the INST — phases 31/32/33 are first-principles authoring from the seed; the gating concern is voice + audience-fit consistency across the batch, not fetched docs). Freshness date for this contract: **2026-05-18**.

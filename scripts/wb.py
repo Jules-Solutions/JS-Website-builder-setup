@@ -10,7 +10,8 @@ routes each verb-family to its implementation:
     wb keys <verb> ...      → Captain Q's module (scripts/wb_keys.py)
     wb fanout <verb> ...    → the fan-out helper (scripts/wb_fanout.py)
     wb skills <verb> ...    → scripts/install-skills.sh (subprocess)
-    wb maintain <verb> ...  → scripts/wb-bootstrap.{sh,py} / install-skills.sh
+    wb maintain <verb> ...  → scripts/wb-bootstrap.{sh,py} / install-skills.sh /
+                               scripts/wb_postlaunch.py (subprocess)
 
 Module boundary (locked per Decision 78 — see scripts/README.md § Module boundary):
   - `library` + `keys` + `fanout` are IMPORTABLE Python modules under scripts/ that
@@ -30,7 +31,7 @@ scripts/wb-bootstrap.sh). The launcher resolves a Python interpreter +
 CLAUDE_PLUGIN_ROOT and execs this runner. This file is pure-stdlib (argparse)
 so it runs under any resolved interpreter without third-party deps.
 
-Per locked decisions in `Workstreams/website-builder/website-builder.md`:
+Per locked decisions in `website-builder.md`:
   42 — library runtime owned by Captain P
   29 — keys/secrets runtime owned by Captain Q
   48 — the `wb {library|keys|skills|maintain} <verb>` surface
@@ -78,7 +79,7 @@ LIBRARY_VERBS = ("list", "add", "remove", "refresh", "refresh-all", "prune", "in
 KEYS_VERBS = ("migrate-to-1password", "migrate-to-env")
 FANOUT_VERBS = ("decompose", "aggregate", "status")
 SKILLS_VERBS = ("update", "sync")
-MAINTAIN_VERBS = ("reconfig", "install-skills")
+MAINTAIN_VERBS = ("reconfig", "install-skills", "postlaunch")
 
 
 # ---------- Logging helpers ----------
@@ -354,7 +355,7 @@ def route_skills(args: argparse.Namespace, *, project_root: Path) -> int:
 
 def route_maintain(args: argparse.Namespace, *, project_root: Path) -> int:
     """
-    Route `maintain reconfig|install-skills` to the existing Phase-1 runners.
+    Route `maintain reconfig|install-skills|postlaunch` to the existing runners.
 
     - `maintain reconfig` — re-invoke wb-bootstrap to re-confirm entry-mode /
       secrets-backend / flavor choices without destroying content. Delegates to
@@ -364,6 +365,13 @@ def route_maintain(args: argparse.Namespace, *, project_root: Path) -> int:
       the .py runner over the .sh launcher).
     - `maintain install-skills` — re-run install-skills.sh directly (decision 48
       lists `maintain {reconfig|install-skills}`).
+    - `maintain postlaunch` — re-invoke scripts/wb_postlaunch.py to (re)materialize
+      the post-launch maintainer template into `.website-builder/post-launch/`.
+      wb_postlaunch.py ships as a standalone runner (invoked directly by the
+      wb-deploy skill's phase-29 wizard — see that script's module docstring);
+      this verb is the CLI-discoverability follow-up named in the F7 audit
+      finding, wiring the SAME runner into `wb maintain` the same way `reconfig`
+      wires wb-bootstrap.py. It does not reimplement the materializer.
     """
     if args.verb == "reconfig":
         runner = SCRIPTS_DIR / "wb-bootstrap.py"
@@ -380,6 +388,24 @@ def route_maintain(args: argparse.Namespace, *, project_root: Path) -> int:
             cmd.append("--force")
         log_info("maintain reconfig - re-invoking wb-bootstrap.py to re-confirm "
                  "entry-mode / secrets-backend / flavor (content preserved).")
+        return _run_subprocess(cmd, project_root=project_root)
+
+    if args.verb == "postlaunch":
+        runner = SCRIPTS_DIR / "wb_postlaunch.py"
+        if not runner.is_file():
+            log_err(f"wb_postlaunch.py not found at {runner}.")
+            log_err("  Check plugin install integrity (it's Phase-6 substrate).")
+            return 4
+        python_bin = _resolve_python()
+        # wb_postlaunch.py reads Path.cwd() for the project dir by default; cwd
+        # is set to project_root by _run_subprocess, so no --project-dir needed.
+        cmd = [python_bin, str(runner)]
+        if getattr(args, "answers", None):
+            cmd += ["--answers", str(args.answers)]
+        if getattr(args, "force", False):
+            cmd.append("--force")
+        log_info("maintain postlaunch - materializing the post-launch maintainer "
+                 "template into .website-builder/post-launch/ (phase 29).")
         return _run_subprocess(cmd, project_root=project_root)
 
     # install-skills
@@ -543,6 +569,23 @@ def build_parser() -> argparse.ArgumentParser:
         "--primary",
         default=None,
         help="Primary design-skill flavor (default: ui-ux-pro-max).",
+    )
+    maintain_postlaunch = maintain_sub.add_parser(
+        "postlaunch",
+        help="Materialize the post-launch maintainer template "
+             "(.website-builder/post-launch/).",
+    )
+    maintain_postlaunch.add_argument(
+        "--answers",
+        type=Path,
+        default=None,
+        help="JSON file of phase-29 wizard answers; merged over safe defaults "
+             "(see scripts/wb_postlaunch.py default_answers()).",
+    )
+    maintain_postlaunch.add_argument(
+        "--force",
+        action="store_true",
+        help="Suppress the existing-config notice on re-materialize.",
     )
 
     return p

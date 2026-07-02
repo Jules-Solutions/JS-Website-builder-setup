@@ -1,6 +1,6 @@
 # Phase 15 — Content/Component Separation
 
-Detailed patterns for the phase-15 content-per-section workflow. The single load-bearing discipline of phase 15. Source of truth: `Projects/Jules.Solutions/Subprojects/website-builder/phase-contracts/15-content-per-section.md` + `Workstreams/website-builder/foundation/DESIGN-content-layers.md` (the canonical separation reference).
+Detailed patterns for the phase-15 content-per-section workflow. The single load-bearing discipline of phase 15. Source of truth: `Projects/Jules.Solutions/Subprojects/website-builder/phase-contracts/15-content-per-section.md` + `DESIGN-content-layers.md` (the canonical separation reference).
 
 ## The separation, stated
 
@@ -67,7 +67,7 @@ Reconcile reuse: a section type used on multiple pages is specced once; each pag
 
 Surface only when the user asks how a component becomes a CMS primitive — the answer is always "at phase 18; the phase-15 spec is the contract that primitive implements":
 
-- **Payload** (`Workstreams/website-builder/cms/DESIGN-cms-payload.md` § Pages collection with Blocks field): each `components.yaml` entry → one Payload `Block`; props → Payload `fields`; `variants` → a `select` field.
+- **Payload** (`DESIGN-cms-payload.md` § Pages collection with Blocks field): each `components.yaml` entry → one Payload `Block`; props → Payload `fields`; `variants` → a `select` field.
 - **Decap** (`cms/DESIGN-cms-decap.md` § list + types widget): `components.yaml` entries → Decap's typed-union `types` list.
 - **none** (`cms/DESIGN-cms-none.md` § frontmatter section array): file-based markdown's `sections[]` discriminated-union schema (Zod-validated for Astro/static stacks).
 

@@ -243,9 +243,9 @@ These are the **anti-vision** locks. Refuse without apology; explain once, then 
 When the user wants to dig deeper, point them at:
 
 - **Plugin home:** `${CLAUDE_PLUGIN_ROOT}/README.md` (or this plugin's GitHub repo)
-- **Vision + positioning:** `Workstreams/website-builder/VISION-website-builder.md` (in the Jules.Life vault, when present)
-- **STATE doc + decisions ledger:** `Workstreams/website-builder/website-builder.md`
-- **Architecture:** `Workstreams/website-builder/foundation/DESIGN-architecture.md`
+- **Vision + positioning:** `VISION-website-builder.md` (in the Jules.Life vault, when present)
+- **STATE doc + decisions ledger:** `website-builder.md`
+- **Architecture:** `DESIGN-architecture.md`
 - **Phase contracts (full):** `${CLAUDE_PLUGIN_ROOT}/phase-contracts/NN-name.md` (loaded by phase-group skills)
 - **Per-stack adapters:** `${CLAUDE_PLUGIN_ROOT}/adapters/stack-{name}.md`
 - **Per-CMS adapters:** `${CLAUDE_PLUGIN_ROOT}/cms-adapters/{name}.md`

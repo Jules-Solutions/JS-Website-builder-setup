@@ -9,10 +9,10 @@ next_phase: 16
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/foundation/DESIGN-content-layers.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-content-layers.md
 library_clones_at_entry:
   - resource: component-patterns
     as: component-patterns
@@ -193,8 +193,8 @@ sections:
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the canonical source for the content/component separation this phase enforces. Layer 2 (structural specs → `components.yaml`, `sections.yaml`), Layer 3 (Content Design JSON → string-key declarations), Layer 4 (page-level prose → content placeholders, valued at phase 16). The `## What layer is what concern` diagnostic table is the agent's reference when correcting separation failures.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `components.yaml` + `content/sections.yaml` + `content/pages/{slug}.md` — the exact schemas this phase writes.
+- `DESIGN-content-layers.md` — the canonical source for the content/component separation this phase enforces. Layer 2 (structural specs → `components.yaml`, `sections.yaml`), Layer 3 (Content Design JSON → string-key declarations), Layer 4 (page-level prose → content placeholders, valued at phase 16). The `## What layer is what concern` diagnostic table is the agent's reference when correcting separation failures.
+- `DESIGN-project-scaffold.md` § `components.yaml` + `content/sections.yaml` + `content/pages/{slug}.md` — the exact schemas this phase writes.
 
 Content Design JSON methodology (string-key declaration):
 
@@ -207,9 +207,9 @@ Component-pattern corpus:
 
 Per-CMS structural mappings (relevant because `components.yaml` from this phase consumes CMS shape at phase 18):
 
-- `Workstreams/website-builder/cms/DESIGN-cms-payload.md` § Pages collection with Blocks field — each `components.yaml` entry maps to one Payload `Block`; props map to Payload `fields`; `variants` map to a `select` field.
-- `Workstreams/website-builder/cms/DESIGN-cms-decap.md` § list + types widget — `components.yaml` entries map to Decap's typed-union `types` list.
-- `Workstreams/website-builder/cms/DESIGN-cms-none.md` § frontmatter section array — file-based markdown's `sections[]` discriminated-union schema (Zod-validated for Astro/static stacks).
+- `DESIGN-cms-payload.md` § Pages collection with Blocks field — each `components.yaml` entry maps to one Payload `Block`; props map to Payload `fields`; `variants` map to a `select` field.
+- `DESIGN-cms-decap.md` § list + types widget — `components.yaml` entries map to Decap's typed-union `types` list.
+- `DESIGN-cms-none.md` § frontmatter section array — file-based markdown's `sections[]` discriminated-union schema (Zod-validated for Astro/static stacks).
 
 WebSearch (recommended for novel section types):
 

@@ -1,6 +1,6 @@
 # Phase 9 — Sitemap + conversion-test reference
 
-> Loaded when running phase 9. The conversion-test challenge patterns, page-count-rationale construction, legal-page reservation rules, page-vs-section disambiguation, non-greenfield extracted-sitemap handling. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/09-sitemap.md` + `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § sitemap.yaml + `DESIGN-content-layers.md` § Layer 2.
+> Loaded when running phase 9. The conversion-test challenge patterns, page-count-rationale construction, legal-page reservation rules, page-vs-section disambiguation, non-greenfield extracted-sitemap handling. Source of truth: `${CLAUDE_PLUGIN_ROOT}/phase-contracts/09-sitemap.md` + `DESIGN-project-scaffold.md` § sitemap.yaml + `DESIGN-content-layers.md` § Layer 2.
 
 ## What phase 9 produces
 

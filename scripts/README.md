@@ -6,7 +6,7 @@
 >
 > **Placement note (General Option-B decision, 2026-06-12):** this contract lives at `scripts/README.md` — NOT `commands/README.md` — because the CC plugin spec auto-registers **every** `commands/*.md` as a slash command (a `commands/README.md` would ship a junk `/README` command). The repo's genre rule holds: *the contract doc is the README of the directory where the contracted code lands* — and the contracted code (O's dispatcher + P's library module + Q's keys module) lands in `scripts/`. **`commands/` is CC-reserved: NO `.md` may be placed there except real slash-command wrappers** (Captain O's `commands/wb.md` is the only Phase 5 entry).
 >
-> **Anchors:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` (CLI exposure + plugin layout), `Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md` (library verbs), `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` (keys verbs), `Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md` (skills verbs + install-skills.sh), `Workstreams/website-builder/BUILD-strategy.md` Phase 5 (lines 209-230), STATE doc decisions 29 / 32 / 42 / 48 / 55 / 59 / 65 / 75 / 77 / 78.
+> **Anchors:** `DESIGN-architecture.md` (CLI exposure + plugin layout), `DESIGN-resource-curation.md` (library verbs), `DESIGN-secrets-and-keys.md` (keys verbs), `DESIGN-skill-distribution.md` (skills verbs + install-skills.sh), `BUILD-strategy.md` Phase 5 (lines 209-230), STATE doc decisions 29 / 32 / 42 / 48 / 55 / 59 / 65 / 75 / 77 / 78.
 
 ---
 
@@ -276,18 +276,18 @@ Per decisions 65 (worktree isolation) + 77 (validated multi-Captain wave pattern
 
 ## See also
 
-- `Workstreams/website-builder/BUILD-strategy.md` Phase 5 (lines 209-230) — wave DoD + dispatch model
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` — plugin layout (`commands/` per line 58-ish; CLI exposure)
-- `Workstreams/website-builder/cross-cutting/DESIGN-resource-curation.md` — `wb library` CLI sketch + auto-clone triggers (Captain P)
-- `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` — keys.yaml/.env/.env.op + migrate flows (Captain Q)
-- `Workstreams/website-builder/cross-cutting/DESIGN-skill-distribution.md` — install-skills.sh + `wb skills update/sync` (Captain O)
-- `Workstreams/website-builder/extraction/DESIGN-extraction-stitch.md` — Stitch recipe (Captain N)
-- `Workstreams/website-builder/skills/DESIGN-skill-uiuxpromax.md` — UI/UX Pro Max manifest source (Captain M)
+- `BUILD-strategy.md` Phase 5 (lines 209-230) — wave DoD + dispatch model
+- `DESIGN-architecture.md` — plugin layout (`commands/` per line 58-ish; CLI exposure)
+- `DESIGN-resource-curation.md` — `wb library` CLI sketch + auto-clone triggers (Captain P)
+- `DESIGN-secrets-and-keys.md` — keys.yaml/.env/.env.op + migrate flows (Captain Q)
+- `DESIGN-skill-distribution.md` — install-skills.sh + `wb skills update/sync` (Captain O)
+- `DESIGN-extraction-stitch.md` — Stitch recipe (Captain N)
+- `DESIGN-skill-uiuxpromax.md` — UI/UX Pro Max manifest source (Captain M)
 - `skills-bundle/README.md` — sibling Captain-0 contract (manifest schema)
 - `tests/README.md` § Phase 5 — where CLI / library / keys / skill-bundle / extraction tests land
 - `scripts/wb-bootstrap.sh` + `scripts/install-skills.sh` — the cross-OS launcher + Python-resolution precedent the `wb` CLI follows
 - `.claude/rules/modular-build-convention.md` — the atomic-unit discipline behind the O/P/Q module split
-- STATE doc decisions 29 / 32 / 42 / 48 / 55 / 59 / 65 / 75 / 77 / 78 — `Workstreams/website-builder/website-builder.md`
+- STATE doc decisions 29 / 32 / 42 / 48 / 55 / 59 / 65 / 75 / 77 / 78 — `website-builder.md`
 
 ## Provenance
 

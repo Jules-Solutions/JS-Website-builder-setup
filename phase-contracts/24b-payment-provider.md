@@ -9,12 +9,12 @@ next_phase: "24c"
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/commerce/DESIGN-payment-providers.md
-  - Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md
-  - Workstreams/website-builder/commerce/DESIGN-booking-calcom.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-payment-providers.md
+  - DESIGN-commerce-stripe-checkout.md
+  - DESIGN-booking-calcom.md
+  - DESIGN-secrets-and-keys.md
 ---
 
 # Phase 24b — Payment provider wiring *(only if transactional)*
@@ -81,7 +81,7 @@ How the agent handles it: **Stripe Checkout handles SCA automatically** — the 
 
 ## Expansion payment providers (post-MVP — brief mention block)
 
-Fully designed in `Workstreams/website-builder/commerce/DESIGN-payment-providers.md`, real, but expansion options for the MVP. The agent names these only on explicit user request or clear audience need, and logs a decision before adding one alongside Stripe:
+Fully designed in `DESIGN-payment-providers.md`, real, but expansion options for the MVP. The agent names these only on explicit user request or clear audience need, and logs a decision before adding one alongside Stripe:
 
 - **Mollie** — EU-focused; cheaper iDeal (0.29% + €0.25) / Bancontact / SEPA than Stripe. The pick when NL/BE/Nordic audience >40%. No TWINT.
 - **PayPal** — brand-trust legacy; high in Germany (~70% e-commerce share) and older/consumer audiences. Higher fees (3.49% + $0.49 US; severe cross-border ~4.4%). Rarely sole provider — offered *alongside* Stripe. No TWINT.
@@ -147,17 +147,17 @@ The `payment-config.yaml` with embedded SCA + per-method test evidence is the re
 
 ## Reference materials
 
-- **Design doc — payment-provider matrix (read in full):** `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` — the per-audience decision tree, the comparison matrix, the TWINT-CRITICAL section, the commerce-platform-TWINT-support table, the Swiss pause-and-report rule, the multi-provider patterns, `payment-config.yaml` schema, cross-provider failure modes
-- **Design doc — Stripe Checkout (TWINT + phase-24b sub-section):** `Workstreams/website-builder/commerce/DESIGN-commerce-stripe-checkout.md` § TWINT for Switzerland + § Phase 24b — payment provider wiring
-- **Design doc — Cal.com (paid-booking payment bridge):** `Workstreams/website-builder/commerce/DESIGN-booking-calcom.md` § Phase 24b — payment provider wiring (for paid bookings) + the TWINT-via-Stripe-only caveat
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 24b (seed)
-- **Design doc — key handling:** `Workstreams/website-builder/cross-cutting/DESIGN-secrets-and-keys.md` § Phase contracts (24b listed) + § Anti-patterns
+- **Design doc — payment-provider matrix (read in full):** `DESIGN-payment-providers.md` — the per-audience decision tree, the comparison matrix, the TWINT-CRITICAL section, the commerce-platform-TWINT-support table, the Swiss pause-and-report rule, the multi-provider patterns, `payment-config.yaml` schema, cross-provider failure modes
+- **Design doc — Stripe Checkout (TWINT + phase-24b sub-section):** `DESIGN-commerce-stripe-checkout.md` § TWINT for Switzerland + § Phase 24b — payment provider wiring
+- **Design doc — Cal.com (paid-booking payment bridge):** `DESIGN-booking-calcom.md` § Phase 24b — payment provider wiring (for paid bookings) + the TWINT-via-Stripe-only caveat
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 24b (seed)
+- **Design doc — key handling:** `DESIGN-secrets-and-keys.md` § Phase contracts (24b listed) + § Anti-patterns
 - **Phase 24a (the platform 24b wires under):** `phase-contracts/24a-commerce-platform.md` § What Claude must establish
 - **Phase 11 transactional decision (decision 26 Swiss-audience source):** `phase-contracts/11-stack-decision.md` § Transactional decision
 - **External research (loaded fresh 2026-05-18 for this contract):**
   - context7 `/stripe/stripe-node` v19.1.0 — webhook verification (`stripe.webhooks.constructEvent(rawBody, sig, whsec)` against `express.raw`), Checkout Session `payment_method_types` including `twint`, off-session/SCA flags (`setup_future_usage: 'off_session'`, `off_session: true`); cached `.website-builder/library/docs/stripe.md`
   - Stripe TWINT — https://docs.stripe.com/payments/twint — CHF-only, 5,000.00 CHF max, merchant-onboarding prerequisites (operational public site, legal name/address/contact, CH shipping for physical goods, CHF pricing), refunds to 180 days, disputes 25-50/1M, payment_method_type `twint`, supported in Checkout/Payment Links/Elements/Subscriptions/Invoicing (NOT Express Checkout Element). Confirmed 2026-05-18.
   - Stripe SCA — https://docs.stripe.com/strong-customer-authentication — EEA mandatory since 2019-09-14, UK since 2021-09-14, Checkout handles SCA automatically, off-session/Setup-Intent flags, grandfathered cards (EU pre-2020-12-31, UK pre-2021-09-14), liability shift to issuer, legacy Charges API unsupported. Confirmed 2026-05-18.
-- **Locked decisions 54 + 26** (MVP = Stripe; Swiss audience → TWINT-via-Stripe default) — STATE doc: `Workstreams/website-builder/website-builder.md`
+- **Locked decisions 54 + 26** (MVP = Stripe; Swiss audience → TWINT-via-Stripe default) — STATE doc: `website-builder.md`
 
 Freshness date for this contract: **2026-05-18**. The agent re-validates the Stripe TWINT + SCA surface via WebFetch/context7 at session start when phase 24b is active.

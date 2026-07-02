@@ -37,4 +37,4 @@ Every brand's color/type/spacing/motion block mirrors the plugin's `brand.yaml.t
 ## See also
 
 - `../design-systems/` — foundational *design* systems (Material/Apple/Carbon/Tailwind/Radix) vs. these complete *brand* systems.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` §328 — the spec this dir satisfies.
+- `DESIGN-architecture.md` §328 — the spec this dir satisfies.

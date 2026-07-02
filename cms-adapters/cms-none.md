@@ -2,7 +2,7 @@
 
 > **Identity.** "No CMS." Content is markdown files committed to git. The static-site framework (Astro Content Collections / Hugo `content/` / Eleventy data cascade) reads files at build time and produces the deployed site. **CMS name + version baseline:** there is no CMS — the relevant version is whichever static-site framework reads the files. Canonical context7 IDs for the read-path frameworks: `/withastro/docs` (default pairing), `/gohugoio/hugo`, `/11ty/eleventy`. **Freshness-check requirement:** the agent invokes context7 against the chosen framework at phases 12 / 17 / 18 / 22 to confirm current Content Collections / data-cascade / archetype surfaces. Framework APIs evolve; training data is stale.
 >
-> **Source design doc:** `Workstreams/website-builder/cms/DESIGN-cms-none.md`. Captain I authored against the 12-section schema in `cms-adapters/README.md`.
+> **Source design doc:** `DESIGN-cms-none.md`. Captain I authored against the 12-section schema in `cms-adapters/README.md`.
 
 ## Mental model
 
@@ -724,13 +724,13 @@ Negative findings (11ty MCP, Pagefind MCP, image-optimization MCP) are documente
 
 Foundation design-doc paths (vault-root-relative per `vault-workstreams.md` link standard):
 
-- `Workstreams/website-builder/cms/DESIGN-cms-none.md` — source design doc (this adapter's primary source)
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` — `cms-adapters/` directory placement
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5-layer content stack `## Content layer mapping` maps
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — i18n model + Decision 38/39/40/41 defaults
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` — phase 12 (CMS decision) + phase 22 (forms/i18n/transactional) + phase 24a/b/c (commerce branching) + phase 6.5 (ingestion)
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` — `.website-builder/` layout the migration recipe mirrors
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
+- `DESIGN-cms-none.md` — source design doc (this adapter's primary source)
+- `DESIGN-architecture.md` — `cms-adapters/` directory placement
+- `DESIGN-content-layers.md` — the 5-layer content stack `## Content layer mapping` maps
+- `DESIGN-i18n.md` — i18n model + Decision 38/39/40/41 defaults
+- `DESIGN-phase-contracts.md` — phase 12 (CMS decision) + phase 22 (forms/i18n/transactional) + phase 24a/b/c (commerce branching) + phase 6.5 (ingestion)
+- `DESIGN-project-scaffold.md` — `.website-builder/` layout the migration recipe mirrors
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
 
 Cross-adapter references (Phase 3 + Phase 4 substrate):
 

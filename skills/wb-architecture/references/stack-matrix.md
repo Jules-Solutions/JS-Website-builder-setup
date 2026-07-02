@@ -1,6 +1,6 @@
 # Reference — Stack matrix (phase 11)
 
-> Per-stack prose for the three MVP stacks, the expansion-stack substitution table, the 5-question decision logic, and the complete transactional sibling rulings. Authoritative source of truth is `Workstreams/website-builder/stacks/DESIGN-stack-{framer,nextjs,wordpress}.md` + `phase-contracts/11-stack-decision.md` — read those fully for any stack the user seriously considers. This file is the fast-load summary.
+> Per-stack prose for the three MVP stacks, the expansion-stack substitution table, the 5-question decision logic, and the complete transactional sibling rulings. Authoritative source of truth is `adapters/stack-{framer,nextjs,wordpress}.md` + `phase-contracts/11-stack-decision.md` — read those fully for any stack the user seriously considers. This file is the fast-load summary.
 
 ## MVP stacks (decision 52 — build-now for v1)
 
@@ -45,7 +45,7 @@ Surface trade-offs in concrete language ("pick Framer, you can't migrate hosts w
 
 ## Expansion stacks (post-MVP — expansion phase 10)
 
-Fully designed in `Workstreams/website-builder/stacks/`, accessible to users who already know them, **not first-class in MVP**. Mention only when the user names one or an MVP stack is clearly wrong. Steer toward an MVP stack for v1.
+Fully designed in the website-builder workstream (vault-side), accessible to users who already know them, **not first-class in MVP**. Mention only when the user names one or an MVP stack is clearly wrong. Steer toward an MVP stack for v1.
 
 | Expansion stack | What it is | Closest MVP substitute |
 |---|---|---|

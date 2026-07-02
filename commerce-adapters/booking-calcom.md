@@ -1,6 +1,6 @@
 # Booking adapter — Cal.com
 
-> The canonical booking adapter for service / consulting / coaching / appointment businesses. Open-source, self-hostable Calendly alternative — same scheduling primitives (event types, availability, time-zone handling, integrations with Google/Microsoft calendars), but AGPLv3 licensed, fully API-driven, and self-hostable. The MVP default per `Workstreams/website-builder/website-builder.md` decision 54.
+> The canonical booking adapter for service / consulting / coaching / appointment businesses. Open-source, self-hostable Calendly alternative — same scheduling primitives (event types, availability, time-zone handling, integrations with Google/Microsoft calendars), but AGPLv3 licensed, fully API-driven, and self-hostable. The MVP default per `website-builder.md` decision 54.
 >
 > Cal.com sells **time** (1-many event types: 30-min consult, 1-hour coaching, 2-hour workshop). For sites that sell **things** (products / digital downloads / subscriptions), pair Cal.com with a commerce adapter (Stripe Checkout per [commerce-adapters/commerce-stripe.md](commerce-stripe.md) is the most common pairing).
 
@@ -182,7 +182,7 @@ Two distinct cost surfaces — SaaS pricing tiers AND self-hosted option. Cloud 
 Cal.com itself charges $0 for bookings (free or paid). For paid bookings, Cal.com bridges to Stripe / PayPal — the bridged processor charges their standard rates:
 
 - **Cal.com → Stripe:** Stripe charges 2.9% + 30¢ (or regional equivalent — see [commerce-stripe.md § Costs](commerce-stripe.md#costs)). For CHF event types paid via TWINT, the rate is Stripe's standard CHF rate.
-- **Cal.com → PayPal:** PayPal charges 3.49% + $0.49 US / 1.99-2.49% + €0.35 EU intra-EU / 4.4% + fixed for cross-border (per [DESIGN-payment-providers.md lines 186-192](../Workstreams/website-builder/commerce/DESIGN-payment-providers.md)). Higher cost — appropriate when legacy-trust audiences matter or for international customers paying via PayPal.
+- **Cal.com → PayPal:** PayPal charges 3.49% + $0.49 US / 1.99-2.49% + €0.35 EU intra-EU / 4.4% + fixed for cross-border (per [DESIGN-payment-providers.md lines 186-192](../DESIGN-payment-providers.md)). Higher cost — appropriate when legacy-trust audiences matter or for international customers paying via PayPal.
 
 ### Critical disclosures
 
@@ -240,7 +240,7 @@ For the website-builder's i18n integration:
 
 ## TWINT-for-Switzerland callout
 
-**TWINT is the non-negotiable Swiss-market payment method.** Per `commerce-adapters/README.md` § "TWINT-for-Switzerland — non-negotiable rule" + `Workstreams/website-builder/website-builder.md` decision 26 (Switzerland home market) + decision 47 (TWINT priority) + `DESIGN-booking-calcom.md` lines 150-156 + 196-200.
+**TWINT is the non-negotiable Swiss-market payment method.** Per `commerce-adapters/README.md` § "TWINT-for-Switzerland — non-negotiable rule" + `website-builder.md` decision 26 (Switzerland home market) + decision 47 (TWINT priority) + `DESIGN-booking-calcom.md` lines 150-156 + 196-200.
 
 This adapter's TWINT support classification: **Via Stripe bridge from another platform** (NOT direct). Cal.com itself does NOT process payments; for TWINT-on-paid-bookings, Cal.com bridges to Stripe (which provides native TWINT support per [commerce-stripe.md § TWINT-for-Switzerland callout](commerce-stripe.md#twint-for-switzerland-callout)). **PayPal-bridge does NOT support TWINT** — agent enforces Stripe selection for Swiss-audience paid bookings.
 
@@ -297,7 +297,7 @@ For Phase 4: the adapter file documents the chain; the fixture demonstrates the 
 
 - TWINT contract (5-condition rule): [commerce-adapters/payment-config-schema.md § TWINT contract](payment-config-schema.md#twint-contract--non-negotiable-for-ch-audience-projects)
 - Sibling Stripe adapter (where TWINT lives natively): [commerce-adapters/commerce-stripe.md § TWINT-for-Switzerland callout](commerce-stripe.md#twint-for-switzerland-callout)
-- Phase 4 DoD anchor: `Workstreams/website-builder/BUILD-strategy.md` line 202 — *"TWINT path validates on Stripe Checkout (CH-region simulation)"* — booking-adapter side bridges to Stripe for the same contract
+- Phase 4 DoD anchor: `BUILD-strategy.md` line 202 — *"TWINT path validates on Stripe Checkout (CH-region simulation)"* — booking-adapter side bridges to Stripe for the same contract
 
 ### Pause-and-report rule
 
@@ -421,17 +421,17 @@ When `entry_mode = has-existing-site` AND the existing user already has Cal.com:
 
 ### Foundation cross-references
 
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` — plugin directory layout (`commerce-adapters/` per line 100)
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` — phase 22 (forms / transactional) + phase 24a (booking platform setup, booking branch) + 24b (payment provider, paid bookings only) + 24c (booking legal)
-- `Workstreams/website-builder/foundation/DESIGN-content-layers.md` — the 5 content layers the § "Content layer mapping" table maps
-- `Workstreams/website-builder/foundation/DESIGN-i18n.md` — i18n model + timezone + currency
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` — `.website-builder/` directory layout
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
+- `DESIGN-architecture.md` — plugin directory layout (`commerce-adapters/` per line 100)
+- `DESIGN-phase-contracts.md` — phase 22 (forms / transactional) + phase 24a (booking platform setup, booking branch) + 24b (payment provider, paid bookings only) + 24c (booking legal)
+- `DESIGN-content-layers.md` — the 5 content layers the § "Content layer mapping" table maps
+- `DESIGN-i18n.md` — i18n model + timezone + currency
+- `DESIGN-project-scaffold.md` — `.website-builder/` directory layout
+- `DESIGN-ingestion-and-extraction.md` — phase 6.5 mechanism
 
 ### Source design docs
 
-- `Workstreams/website-builder/commerce/DESIGN-booking-calcom.md` — Cal.com source design doc (lines 17-267)
-- `Workstreams/website-builder/commerce/DESIGN-payment-providers.md` — payment-provider matrix + TWINT-critical section (lines 222-274 for the TWINT-via-Stripe-bridge specifics)
+- `DESIGN-booking-calcom.md` — Cal.com source design doc (lines 17-267)
+- `DESIGN-payment-providers.md` — payment-provider matrix + TWINT-critical section (lines 222-274 for the TWINT-via-Stripe-bridge specifics)
 
 ### Captain 0 prep packet (sibling Phase 4 files)
 
@@ -474,5 +474,5 @@ When `entry_mode = has-existing-site` AND the existing user already has Cal.com:
 
 ### Decision anchors
 
-- `Workstreams/website-builder/website-builder.md` decision 18 (full stack coverage), decision 26 (Switzerland home market), decision 34 (transactional flag mid-flip), decision 47 (TWINT priority), decision 54 (Cal.com booking default — THIS adapter), decision 58 (parallel-to-platform subproject location), decision 65 (per-callsign worktree)
-- `Workstreams/website-builder/BUILD-strategy.md` Phase 4 DoD lines 187-209 (booking adapter scope; line 202 TWINT contract bridged via Stripe for Cal.com paid bookings)
+- `website-builder.md` decision 18 (full stack coverage), decision 26 (Switzerland home market), decision 34 (transactional flag mid-flip), decision 47 (TWINT priority), decision 54 (Cal.com booking default — THIS adapter), decision 58 (parallel-to-platform subproject location), decision 65 (per-callsign worktree)
+- `BUILD-strategy.md` Phase 4 DoD lines 187-209 (booking adapter scope; line 202 TWINT contract bridged via Stripe for Cal.com paid bookings)

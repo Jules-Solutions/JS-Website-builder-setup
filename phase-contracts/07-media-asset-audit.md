@@ -9,9 +9,9 @@ next_phase: 8
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
 ---
 
 # Phase 7 — Media refinement / asset audit
@@ -161,9 +161,9 @@ The agent updates `.website-builder/project.yaml.current_phase` to `8` upon user
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 7 (seed for this contract)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — media/ layout + AUDIT.md location:** `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `media/` (the structured media tree assets move into post-audit) + § `decisions/`
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 7 (seed for this contract)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — media/ layout + AUDIT.md location:** `DESIGN-project-scaffold.md` § `media/` (the structured media tree assets move into post-audit) + § `decisions/`
 - **Design doc — downstream consumers of the audit:** phase 8 (image strategy — sources around `needs-replacement`/`unusable`), phase 18 (component imagery), phase 20 (responsive variants need ≥1920px sources), phase 22 (perf image budget), phase 26 (SEO alt text) — all in `DESIGN-phase-contracts.md`
 - **External — reverse-image-search tooling (loaded fresh 2026-05-18 for this contract):**
   - Tool comparison (Google Lens vs TinEye vs Yandex) — https://toolspivot.com/blog/google-lens-vs-tineye-vs-yandex/ (Google = visual similarity + product/landmark ID; TinEye = exact-match digital fingerprint + first-publication date; Yandex = aggressive facial recognition + Eastern-Europe/Asia coverage)

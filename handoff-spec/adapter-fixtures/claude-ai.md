@@ -1,6 +1,6 @@
 # Adapter Fixture — Claude.ai
 
-> Per-tool handoff fixture for **Claude.ai** (claude.ai web app). Better long-context handling than ChatGPT and honors structured input well — the full brief, including `iteration_history`, fits without trimming. Canonical design anchor: `Workstreams/website-builder/cross-cutting/DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
+> Per-tool handoff fixture for **Claude.ai** (claude.ai web app). Better long-context handling than ChatGPT and honors structured input well — the full brief, including `iteration_history`, fits without trimming. Canonical design anchor: `DESIGN-handoff-protocol.md` § "Adapter fixtures". Brief contract: `handoff-spec/component-request-v1.md`. Output contract: `handoff-spec/component-output-v1.md`.
 >
 > Tool behaviour verified 2026-06-14 (see "Sources"). Re-verify on a cadence.
 

@@ -1,6 +1,6 @@
 # Reference — SEO + structured data + metadata (phase 26)
 
-> Loaded for phase 26. The contract is `phase-contracts/26-seo-structured-data.md`; the corpus reference is `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources. schema.org types + Google's rich-result eligibility evolve — the agent re-fetches `https://schema.org/` and `https://developers.google.com/search/docs/appearance/structured-data` at session start when phase 26 is active and validates every page's JSON-LD against the current tools rather than trusting training-data schema knowledge. Freshness baseline: **2026-05-18**.
+> Loaded for phase 26. The contract is `phase-contracts/26-seo-structured-data.md`; the corpus reference is `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources. schema.org types + Google's rich-result eligibility evolve — the agent re-fetches `https://schema.org/` and `https://developers.google.com/search/docs/appearance/structured-data` at session start when phase 26 is active and validates every page's JSON-LD against the current tools rather than trusting training-data schema knowledge. Freshness baseline: **2026-05-18**.
 
 ## The two disciplines (the gates this phase exists to enforce)
 

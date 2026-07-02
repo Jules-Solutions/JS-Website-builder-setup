@@ -9,10 +9,10 @@ next_phase: 23
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-project-scaffold.md
-  - Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - DESIGN-project-scaffold.md
+  - DESIGN-context7-integration.md
 library_clones_at_entry:
   - resource: seo-checklists
     as: seo-checklists
@@ -115,10 +115,10 @@ The `wb-build-integration` phase-group skill remains loaded (single skill for ph
 
 Foundation docs:
 
-- `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 22 — the seed for this contract.
-- `Workstreams/website-builder/foundation/DESIGN-architecture.md` § consumers (image-gen pipeline for responsive variants) / § Integration with Claude Code primitives / § context7 integration.
-- `Workstreams/website-builder/foundation/DESIGN-project-scaffold.md` § `audit/` conventions; `media/IMAGE-PLAN.md` (the LCP-candidate inventory).
-- `Workstreams/website-builder/cross-cutting/DESIGN-context7-integration.md` — phase 22 invokes context7 for stack perf primitives + Lighthouse scoring; `/GoogleChrome/lighthouse` cross-stack ID.
+- `DESIGN-phase-contracts.md` § 22 — the seed for this contract.
+- `DESIGN-architecture.md` § consumers (image-gen pipeline for responsive variants) / § Integration with Claude Code primitives / § context7 integration.
+- `DESIGN-project-scaffold.md` § `audit/` conventions; `media/IMAGE-PLAN.md` (the LCP-candidate inventory).
+- `DESIGN-context7-integration.md` — phase 22 invokes context7 for stack perf primitives + Lighthouse scoring; `/GoogleChrome/lighthouse` cross-stack ID.
 - `.website-builder/library/seo-checklists/` — Lighthouse-mapped performance + SEO checklists (the baseline phase 22 audits against; SEO overlaps at phase 26).
 
 Core Web Vitals + Lighthouse (mandatory at this phase — current as of the freshness date):

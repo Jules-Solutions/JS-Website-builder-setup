@@ -9,9 +9,9 @@ next_phase: 3
 re_runnable: false
 type: PHASE-CONTRACT
 relates_to:
-  - Workstreams/website-builder/foundation/DESIGN-phase-contracts.md
-  - Workstreams/website-builder/foundation/DESIGN-architecture.md
-  - Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md
+  - DESIGN-phase-contracts.md
+  - DESIGN-architecture.md
+  - ${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md
 library_clones_at_entry:
   - resource: brand-examples-corpus
     as: brand-examples
@@ -128,10 +128,10 @@ The agent updates `.website-builder/project.yaml.current_phase` to `3` upon user
 
 ## Reference materials
 
-- **Design doc — phase pipeline source:** `Workstreams/website-builder/foundation/DESIGN-phase-contracts.md` § 2 (seed for this contract)
-- **Design doc — pipeline integration:** `Workstreams/website-builder/foundation/DESIGN-architecture.md` § Phase contracts
-- **Design doc — reference catalogue:** `Workstreams/website-builder/foundation/DESIGN-ecosystem-catalog.md` § Reference resources (the external inspiration sources the agent surfaces when the user has no references: Awwwards, Dribbble, Behance, Land-book, One Page Love, Mobbin, SaaS Pages)
-- **Design doc — adjective output target:** `Workstreams/website-builder/foundation/DESIGN-content-layers.md` § Layer 1 — Design tokens (the adjective set seeds phase-17 token generation)
+- **Design doc — phase pipeline source:** `DESIGN-phase-contracts.md` § 2 (seed for this contract)
+- **Design doc — pipeline integration:** `DESIGN-architecture.md` § Phase contracts
+- **Design doc — reference catalogue:** `${CLAUDE_PLUGIN_ROOT}/reference-corpus/ECOSYSTEM-CATALOG.md` § Reference resources (the external inspiration sources the agent surfaces when the user has no references: Awwwards, Dribbble, Behance, Land-book, One Page Love, Mobbin, SaaS Pages)
+- **Design doc — adjective output target:** `DESIGN-content-layers.md` § Layer 1 — Design tokens (the adjective set seeds phase-17 token generation)
 - **Plugin corpus — design exemplars:** `.website-builder/library/awesome-design-md/` — cloned from VoltAgent/awesome-design-md; 60+ DESIGN.md exemplars from Claude / Shopify / Stripe / Figma / Notion / IBM etc.; agent greps for patterns when surfacing candidate adjective sets
 - **Plugin corpus — brand examples:** `.website-builder/library/brand-examples/` — 5-8 complete brand systems showing voice + tokens + component patterns; useful when the user wants to see "what a complete vision looks like" before committing
 - **External libraries** (fetch-on-demand per catalog):

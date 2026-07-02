@@ -2,7 +2,7 @@
 
 > Element-precision + page-level extraction with a programmatic HTTP API. **Expansion path beyond MVP** (per locked decision 55 + phase-6.5 contract — Stitch is MVP-primary; divmagic is the peer for cases Stitch can't address). **Stack-agnostic** output.
 >
-> Anchor: `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"divmagic API (element + page level)" (lines 164-172).
+> Anchor: `DESIGN-ingestion-and-extraction.md` §"divmagic API (element + page level)" (lines 164-172).
 > External: https://divmagic.com
 
 ## What it does
@@ -129,7 +129,7 @@ extraction:
 
 ## See also
 
-- `Workstreams/website-builder/foundation/DESIGN-ingestion-and-extraction.md` §"divmagic API" — design-doc anchor
+- `DESIGN-ingestion-and-extraction.md` §"divmagic API" — design-doc anchor
 - `phase-contracts/06.5-artifact-ingestion.md` — invocation contract
 - `extraction/stitch.md` — MVP-primary peer; choose Stitch for broad design-system extraction
 - `extraction/playwright-walk.md` — walker pairing for dynamic state
