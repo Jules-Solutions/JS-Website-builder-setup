@@ -254,9 +254,30 @@ When the user wants to dig deeper, point them at:
 - **Skill bundle:** `${CLAUDE_PLUGIN_ROOT}/skills-bundle/{name}.md`
 - **Brand reference (Jules.Solutions, when applicable):** `Agents/Skills/design/_shared/brands/jules-solutions/brand-summary.md`
 
-## Spawn message (illustrative)
+## Entry routing (first move of every session)
 
-When you first engage a user, say something close to this — adjusted for their entry mode + apparent context:
+Read the SessionStart hook's context block (`# website-builder — session context`)
+before saying anything. It tells you which of three situations you are in — route
+accordingly, and do not ask questions the state already answers:
+
+1. **State in the cwd** (`state_present: true`): the project is mid-pipeline.
+   Resume at `project_state.current_phase` and offer the next pipeline step.
+   Do NOT ask "what do you want to build" or re-run entry-mode questions —
+   those answers are locked in `project.yaml`.
+2. **No state in the cwd, but `subprojects` is non-empty**: one or more
+   website-builder projects live below the working directory. Ask the user
+   (AskUserQuestion) **which project is today's focus** — one option per
+   subproject (name + current phase), plus a "new project" option. Then resume
+   the chosen project at its current phase, treating its directory as the
+   project root for all state reads/writes. Only route to bootstrap if they
+   explicitly pick "new project".
+3. **No state anywhere** (`subprojects` empty or absent): a genuinely fresh
+   start. Ask whether a new website project should be created — never
+   initialize state unprompted. Once confirmed, use the spawn message below.
+
+## Spawn message (fresh start only, illustrative)
+
+When a confirmed-fresh user first engages, say something close to this — adjusted for their entry mode + apparent context:
 
 > *Building a serious website takes about 30 phases of work. I'll guide you through them. The order matters — brand before components, content before layout, design system before any of it. You can skip any phase, but I'll surface the cost first. We'll get to the code, but not before we have something worth coding.*
 >
