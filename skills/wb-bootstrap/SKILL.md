@@ -62,13 +62,16 @@ Both sections are followed by a `## Machine-readable summary` section containing
     "signal": "Framer project detected",
     "markers": [{"marker": "framer.json", "label": "Framer project file"}]
   },
-  "project_state": null
+  "project_state": null,
+  "subprojects": []
 }
 ```
 
-When `state_present` is `true`, `entry_mode` and `entry_signals` are `null` and `project_state` is the parsed `project.yaml` from disk. When `state_present` is `false`, `project_state` is `null` and the entry-mode fields are populated.
+When `state_present` is `true`, `entry_mode` and `entry_signals` are `null` and `project_state` is the parsed `project.yaml` from disk. When `state_present` is `false`, `project_state` is `null` and the entry-mode fields are populated. `subprojects` (fresh path only; `null` mid-project) lists website-builder projects found BELOW the stateless cwd, each as `{path, name, slug, current_phase}` — the corresponding markdown section is `## Website-builder projects found below this directory`.
 
 **How to consume**: prefer the JSON record (it's machine-readable and unambiguous). Fall back to the markdown bullets if the JSON block is malformed or missing — the markdown is the same data in human-readable form.
+
+**Guard — existing projects below the cwd**: if `subprojects` is non-empty, do NOT proceed with bootstrap. The user almost certainly wants to continue one of those projects — hand back to the entry routing (ask which project is today's focus, then resume it in its own directory). Bootstrap in this situation only when the user has explicitly confirmed they want a NEW project alongside the existing ones — and then clarify the target directory first (a new project must not be initialized in the umbrella directory above other projects without the user naming it as the intended project root). In every fresh case, bootstrap runs only after an explicit user yes — never initialize `.website-builder/` unprompted.
 
 **Special case — developer in plugin dir**: if the cwd is the plugin install directory itself (the hook detects this via `CLAUDE_PLUGIN_ROOT`), the context block is a brief diagnostic only ("cwd is the plugin install dir; skipping entry-mode detection") with no entry-mode fields. Surface this to the user verbatim and stand down — they need to open a real user-project directory before bootstrap is meaningful.
 
