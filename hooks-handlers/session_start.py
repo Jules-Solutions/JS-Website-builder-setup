@@ -270,7 +270,9 @@ def read_state_yaml(state_path: Path) -> dict | None:
         return None
     try:
         text = state_path.read_text(encoding="utf-8")
-    except OSError:
+    except (OSError, UnicodeDecodeError):
+        # UnicodeDecodeError: a corrupt / non-UTF-8 project.yaml must degrade to
+        # "unreadable" (None), never crash the SessionStart hook.
         return None
 
     parsed: dict = {}
@@ -305,6 +307,83 @@ def read_project_state(root: Path) -> dict | None:
         return None
     project_yaml = sd / "project.yaml"
     return read_state_yaml(project_yaml)
+
+
+# Directories never descended into by the subproject scan. Superset of
+# list_top_level's skip set plus common build-output dirs. Dot-dirs are skipped
+# wholesale in find_subprojects (the `.website-builder` marker itself is probed
+# explicitly per candidate dir, so this loses nothing).
+SUBPROJECT_SCAN_SKIP: set[str] = {
+    ".git",
+    "node_modules",
+    ".venv",
+    "venv",
+    "__pycache__",
+    ".pytest_cache",
+    "dist",
+    "build",
+    "out",
+    ".next",
+    ".astro",
+    ".svelte-kit",
+    "vendor",
+}
+
+SUBPROJECT_SCAN_MAX_DEPTH = 4
+SUBPROJECT_SCAN_MAX_RESULTS = 20
+
+
+def find_subprojects(root: Path, max_depth: int = SUBPROJECT_SCAN_MAX_DEPTH) -> list[dict]:
+    """Bounded scan BELOW root for website-builder projects.
+
+    Only runs on the fresh path (root itself has no `.website-builder/`). Users
+    who keep several website-builder projects under one umbrella directory (a
+    vault, a `clients/` dir, a monorepo) start CC at the umbrella root — this
+    scan lets the agent route them to the right project instead of proposing a
+    fresh bootstrap next to existing ones.
+
+    Depth- and count-bounded (SessionStart has a 30s budget; this must stay
+    fast on wide trees). A directory that IS a project is not descended into —
+    nested projects inside a project are out of scope. Returns a list of
+    {path, name, slug, current_phase} dicts, sorted by path; empty on none.
+    """
+    found: list[dict] = []
+
+    def walk(d: Path, depth: int) -> None:
+        if depth > max_depth or len(found) >= SUBPROJECT_SCAN_MAX_RESULTS:
+            return
+        try:
+            children = sorted(
+                (p for p in d.iterdir() if p.is_dir()),
+                key=lambda p: p.name.lower(),
+            )
+        except (OSError, PermissionError):
+            return
+        for child in children:
+            if len(found) >= SUBPROJECT_SCAN_MAX_RESULTS:
+                return
+            if child.name in SUBPROJECT_SCAN_SKIP or child.name.startswith("."):
+                continue
+            project_yaml = child / ".website-builder" / "project.yaml"
+            try:
+                is_project = project_yaml.is_file()
+            except OSError:
+                is_project = False
+            if is_project:
+                state = read_state_yaml(project_yaml) or {}
+                found.append(
+                    {
+                        "path": str(child.relative_to(root)),
+                        "name": state.get("name") or child.name,
+                        "slug": state.get("slug"),
+                        "current_phase": state.get("current_phase", "?"),
+                    }
+                )
+                continue  # do not descend into a project
+            walk(child, depth + 1)
+
+    walk(root, 1)
+    return found
 
 
 # ---------------------------------------------------------------------------
@@ -532,6 +611,7 @@ def render_context(
     keys: dict | None = None,
     media: dict | None = None,
     validation: dict | None = None,
+    subprojects: list[dict] | None = None,
 ) -> str:
     """Render the context block injected into the session.
 
@@ -544,6 +624,8 @@ def render_context(
     run_resolve_media() / run_validate_layers() (image+video/audio gen path +
     content-layer validation). All are already secret-safe (the media resolvers +
     resolve_keys never return a resolved value; validation findings are value-free).
+    `subprojects` is the fresh-path find_subprojects() result (website-builder
+    projects found BELOW a stateless cwd) — None on the mid-project path.
     """
     lines: list[str] = []
     lines.append("# website-builder — session context")
@@ -601,13 +683,44 @@ def render_context(
         if "top_level" in entry:
             lines.append(f"- Top-level entries: {', '.join(entry['top_level'][:20])}")
         lines.append("")
-        lines.append(
-            "The user has not yet run the bootstrap skill. When they ask for "
-            "help building or improving a website, invoke the `wb-bootstrap` "
-            "skill — it confirms the entry mode, initializes `.website-builder/`, "
-            "fetches upstream skills, and routes into phase 1 (greenfield) or "
-            "phase 6.5 (any other entry mode)."
-        )
+        if subprojects:
+            lines.append("## Website-builder projects found below this directory")
+            lines.append("")
+            for sp in subprojects:
+                phase = sp.get("current_phase", "?")
+                lines.append(
+                    f"- **{sp.get('name', '?')}** — `{sp.get('path', '?')}` "
+                    f"(current phase: {phase})"
+                )
+            lines.append("")
+            if len(subprojects) == 1:
+                lines.append(
+                    "The working directory itself has no website-builder state, but "
+                    "one project exists below it. Confirm with the user that this "
+                    "project is today's focus, then resume it at its current phase — "
+                    "treat the project's own directory as the project root for all "
+                    "state reads and writes. Do NOT bootstrap a new project here "
+                    "unless the user explicitly asks for one."
+                )
+            else:
+                lines.append(
+                    "The working directory itself has no website-builder state, but "
+                    "multiple projects exist below it. Ask the user (AskUserQuestion) "
+                    "which project is today's focus, then resume THAT project at its "
+                    "current phase — treat the chosen project's directory as the "
+                    "project root for all state reads and writes. Do NOT bootstrap a "
+                    "new project here unless the user explicitly asks for one."
+                )
+        else:
+            lines.append(
+                "The user has not yet run the bootstrap skill. When they ask for "
+                "help building or improving a website, ASK whether a new project "
+                "should be created — never initialize `.website-builder/` "
+                "unprompted. Once they confirm, invoke the `wb-bootstrap` "
+                "skill — it confirms the entry mode, initializes `.website-builder/`, "
+                "fetches upstream skills, and routes into phase 1 (greenfield) or "
+                "phase 6.5 (any other entry mode)."
+            )
         if entry["mode"] in ("has-existing-site", "has-Framer-attempt", "has-AI-output", "has-Figma-file"):
             lines.append("")
             lines.append(
@@ -628,6 +741,10 @@ def render_context(
         "entry_mode": entry["mode"] if not state_present else None,
         "entry_signals": {k: v for k, v in entry.items() if k != "mode"} if not state_present else None,
         "project_state": project,
+        # Fresh-path only: website-builder projects found BELOW a stateless cwd
+        # (find_subprojects). None on the mid-project path; [] when the scan ran
+        # and found nothing.
+        "subprojects": subprojects,
         # Phase-5 runtime interlocks (mid-project path only; None on fresh
         # projects). `keys` is secret-safe — it carries env-var NAMES + counts +
         # value-free fix messages, never resolved secret values.
@@ -881,9 +998,17 @@ def main() -> int:
             orchestrate_block = run_orchestrate_session_start(root)
         except Exception:  # noqa: BLE001 — last-resort guard: session-start must never crash
             orchestrate_block = None
-    else:
+    subprojects: list[dict] | None = None
+    if not state_present:
         entry = detect_entry_mode(root)
         project = None
+        # Fresh path: look for website-builder projects BELOW the cwd so the
+        # agent can route to an existing project instead of proposing a fresh
+        # bootstrap next to it. Bounded + defensive (must never crash the hook).
+        try:
+            subprojects = find_subprojects(root)
+        except Exception:  # noqa: BLE001 — last-resort guard: session-start must never crash
+            subprojects = []
 
     context = render_context(
         root=root,
@@ -894,6 +1019,7 @@ def main() -> int:
         keys=keys,
         media=media,
         validation=validation,
+        subprojects=subprojects,
     )
     # The orchestration block is appended to the existing render (plain stdout enters
     # context for SessionStart — § 2; PostToolUse needs JSON, SessionStart does not).
