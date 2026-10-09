@@ -49,24 +49,32 @@ specified; not re-derived:
    - Override: if `.website-builder/decisions/skip-phase-NN.md` exists for the
      phase being skipped → ALLOW with a logged advisory notice.
    - Phase 6.5 current OR a 6.5-authorized tool → never blocks (side-channel).
-5. CC contract: emits the modern JSON `hookSpecificOutput.permissionDecision`
-   form on stdout with exit 0 (the current canonical contract per context7
-   `/anthropics/claude-code` 2026-05-19 fetch), AND for a BLOCK additionally
-   exits 2 with the reason on stderr (the documented exit-code fallback so the
-   refusal lands regardless of which contract the running CC honors). The
+5. CC contract: a BLOCK emits the documented JSON deny on stdout
+   (`hookSpecificOutput` with `hookEventName`, `permissionDecision` and
+   `permissionDecisionReason`) AND exits 2 with the reason on stderr, so the
+   refusal lands whichever of the two Claude Code acts on. Measured on Claude
+   Code 2.1.295: the same deny JSON WITHOUT `hookEventName` /
+   `permissionDecisionReason` was ignored (the tool ran). An ALLOW never
+   carries a `permissionDecision`: `"allow"` is an auto-approval that skips the
+   user's permission prompt, which an advisory notice must not do. The
    catch-all `try/except` in `__main__` ALLOWs + emits a diagnostic on any
    internal error — this hook must NEVER brick a session by throwing.
+   The hook must be launched through `hooks-handlers/run.sh` (see
+   `hooks/hooks.json`): a `python3 || python || py` command re-runs the handler
+   on the exit 2 with an already-consumed stdin, and that run exits 0.
 
-CC PreToolUse output contract (context7 /anthropics/claude-code, fetched
-2026-05-19 — see `.claude/temp/ctx7-docs/claude-code-pretooluse.md` +
-`claude-code-hook-exitcodes.md`):
+CC PreToolUse output contract (https://code.claude.com/docs/en/hooks and
+.../agent-sdk/hooks, via ctx7 `/websites/code_claude`, 2026-10-09):
 
-    stdout JSON (current/primary):
-      {"hookSpecificOutput": {"permissionDecision": "allow|deny|ask"},
-       "systemMessage": "..."}
-    exit 0  — success; stdout shown in transcript (ALLOW path)
-    exit 2  — blocking error; stderr fed back to Claude (BLOCK fallback)
-    other   — non-blocking error
+    stdout JSON (processed on exit 0):
+      {"hookSpecificOutput": {"hookEventName": "PreToolUse",
+                              "permissionDecision": "deny",
+                              "permissionDecisionReason": "..."}}
+      "Include `hookEventName` in `hookSpecificOutput` to identify which hook
+       type the output is for"; top-level `systemMessage` is a user-facing note
+    exit 0  — success; ALLOW path
+    exit 2  — blocking error; stderr fed back to Claude
+    other   — non-blocking error (the tool still runs)
 
 Reusable helpers carried over verbatim-in-spirit from the v0.1 stub per the
 INST: `read_scalar_yaml`, `read_payload`, `extract_tool_name`,
@@ -858,33 +866,37 @@ def has_skip_decision(root: Path, phase: str) -> Path | None:
 
 
 def emit_allow(notice: str = "") -> int:
-    """ALLOW: JSON permissionDecision=allow on stdout, exit 0.
+    """ALLOW: exit 0, no decision.
 
     An empty `notice` emits nothing (silent allow — the common path; the
     matcher only fires on Edit/Write/MultiEdit/Bash so a silent allow keeps
     the in-phase happy path noise-free). A non-empty `notice` is surfaced as
     an advisory `systemMessage` while still allowing the call.
+
+    No `permissionDecision` is emitted: with a `hookEventName` present Claude
+    Code treats `"allow"` as an auto-approval that skips the user's permission
+    prompt. An advisory must leave the normal permission flow untouched.
     """
     if notice:
-        out = {
-            "hookSpecificOutput": {"permissionDecision": "allow"},
-            "systemMessage": notice,
-        }
-        print(json.dumps(out), flush=True)
+        print(json.dumps({"systemMessage": notice}), flush=True)
     return 0
 
 
 def emit_block(reason: str) -> int:
-    """BLOCK: dual-emit for maximum compatibility with the CC contract.
+    """BLOCK: dual-emit so the refusal lands whichever channel Claude Code acts on.
 
-    Per context7 /anthropics/claude-code (2026-05-19): the modern contract is
-    a stdout JSON `hookSpecificOutput.permissionDecision: "deny"` with exit 0;
-    the documented fallback is exit 2 with the reason on stderr. We emit BOTH
-    so the refusal lands regardless of which contract the running CC honors:
-    JSON deny on stdout, the same reason on stderr, exit 2.
+    stdout carries the documented JSON deny (honored on exit 0); stderr carries
+    the same reason and the process exits 2 (the exit-code contract, which
+    Claude Code acts on directly). `hookEventName` and `permissionDecisionReason`
+    are what make the stdout form count: without them Claude Code 2.1.295
+    ignored it and ran the tool.
     """
     out = {
-        "hookSpecificOutput": {"permissionDecision": "deny"},
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": reason,
+        },
         "systemMessage": reason,
     }
     print(json.dumps(out), flush=True)
@@ -1054,7 +1066,6 @@ if __name__ == "__main__":
     except Exception as exc:  # noqa: BLE001 — intentional catch-all in a hook
         print(
             json.dumps({
-                "hookSpecificOutput": {"permissionDecision": "allow"},
                 "systemMessage": (
                     "[website-builder] PreToolUse handler error (allowing "
                     f"call so the session is not bricked): {exc!r}"

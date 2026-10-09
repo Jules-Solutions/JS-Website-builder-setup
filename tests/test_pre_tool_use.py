@@ -683,3 +683,198 @@ class TestGitShipsCommsMessage:
             "git commit -m \"a; b && c | d\"",
             "ls",
         ]
+
+
+# --------------------------------------------------------------------------- #
+# Enforcement: what Claude Code actually receives
+#
+# The hook's verdict only counts if it reaches Claude Code. Two things used to
+# stop that, and the pytest suite above could not see either (it calls the hook
+# directly): (1) the deny JSON lacked `hookEventName` / `permissionDecisionReason`
+# and Claude Code 2.1.295 ignored it; (2) hooks.json ran `python3 X || python X
+# || py X`, so the exit 2 of a block started the next interpreter on an already
+# consumed stdin, which allowed the call and exited 0. These tests run the
+# command string from hooks/hooks.json itself, through sh, the way Claude Code
+# does (Git Bash on Windows, with ${CLAUDE_PLUGIN_ROOT} in forward-slash form).
+# --------------------------------------------------------------------------- #
+
+HOOKS_JSON = PLUGIN_ROOT / "hooks" / "hooks.json"
+SH = shutil.which("sh")
+needs_sh = pytest.mark.skipif(SH is None, reason="no POSIX sh on PATH")
+
+
+def _hook_command(event: str) -> str:
+    cfg = json.loads(HOOKS_JSON.read_text(encoding="utf-8"))
+    return cfg["hooks"][event][0]["hooks"][0]["command"]
+
+
+def _run_configured(
+    event: str,
+    cwd: Path,
+    stdin: str,
+    *,
+    path: str | None = None,
+    extra_env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess:
+    """Run hooks/hooks.json's command for `event` as Claude Code does.
+
+    With `path` the child runs on that PATH only; the command's leading `sh` is
+    then spelled as its absolute path so the private PATH needs no `sh` in it."""
+    assert SH is not None
+    command = _hook_command(event)
+    env = {**os.environ, "CLAUDE_PLUGIN_ROOT": PLUGIN_ROOT.as_posix()}
+    if path is not None:
+        assert command.startswith("sh ")
+        command = f'"{Path(SH).as_posix()}" ' + command[len("sh "):]
+        env["PATH"] = path
+    env.update(extra_env or {})
+    return subprocess.run(
+        [SH, "-c", command],
+        input=stdin,
+        capture_output=True,
+        text=True,
+        env=env,
+        cwd=str(cwd),
+        timeout=60,
+    )
+
+
+class TestBlockEmission:
+    """The deny output follows the documented Claude Code contract."""
+
+    def test_deny_json_carries_event_name_decision_and_reason(self):
+        proj = _make_project(current_phase="1")
+        try:
+            proc = _run(proj, _write("src/app/page.tsx"))
+            _assert_block(proc)
+            out = json.loads(proc.stdout.strip())
+            hso = out["hookSpecificOutput"]
+            assert hso["hookEventName"] == "PreToolUse"
+            assert hso["permissionDecision"] == "deny"
+            assert hso["permissionDecisionReason"].startswith(
+                "⛔ website-builder anti-skip: BLOCKED"
+            )
+            assert "src/app/page.tsx" in hso["permissionDecisionReason"]
+        finally:
+            shutil.rmtree(proj, ignore_errors=True)
+
+    def test_advisory_allow_never_carries_a_permission_decision(self):
+        """`allow` with a hookEventName auto-approves the call and skips the
+        user's permission prompt; an advisory must not do that."""
+        proj = _make_project(current_phase=None)  # degraded state -> advisory
+        try:
+            proc = _run(proj, _edit("src/components/Hero.tsx"))
+            _assert_allow(proc)
+            out = json.loads(proc.stdout.strip())
+            assert "current_phase" in out["systemMessage"]
+            assert "hookSpecificOutput" not in out
+        finally:
+            shutil.rmtree(proj, ignore_errors=True)
+
+
+@needs_sh
+class TestConfiguredHookLauncher:
+    """The command strings in hooks/hooks.json, run through sh."""
+
+    @pytest.mark.parametrize("event", ["SessionStart", "PreToolUse", "PostToolUse"])
+    def test_every_hook_goes_through_the_launcher_and_has_no_fallback_chain(self, event):
+        command = _hook_command(event)
+        assert "hooks-handlers/run.sh" in command
+        assert "||" not in command, (
+            "a `||` interpreter chain re-runs the handler on a non-zero exit "
+            "with stdin already consumed"
+        )
+
+    def test_block_keeps_exit_2_and_the_payload_reaches_the_handler(self):
+        proj = _make_project(current_phase="1")
+        try:
+            proc = _run_configured(
+                "PreToolUse", proj, json.dumps(_write("src/app/page.tsx"))
+            )
+            assert proc.returncode == 2, (proc.returncode, proc.stdout, proc.stderr)
+            out = json.loads(proc.stdout.strip().splitlines()[0])
+            # the verdict names the target: the handler really read the payload
+            assert "src/app/page.tsx" in out["hookSpecificOutput"]["permissionDecisionReason"]
+            assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
+            assert "BLOCKED" in proc.stderr
+        finally:
+            shutil.rmtree(proj, ignore_errors=True)
+
+    def test_permit_keeps_exit_0_and_is_silent(self):
+        proj = _make_project(current_phase="1")
+        try:
+            proc = _run_configured("PreToolUse", proj, json.dumps(_write(COMMS_MESSAGE)))
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            assert proc.stdout.strip() == ""
+        finally:
+            shutil.rmtree(proj, ignore_errors=True)
+
+    def test_session_start_and_post_tool_use_run_clean(self):
+        proj = _make_project(current_phase="1")
+        try:
+            start = _run_configured("SessionStart", proj, "")
+            assert start.returncode == 0, (start.returncode, start.stderr)
+            assert "website-builder" in start.stdout
+            post = _run_configured("PostToolUse", proj, json.dumps(_write(COMMS_MESSAGE)))
+            assert post.returncode == 0, (post.returncode, post.stderr)
+        finally:
+            shutil.rmtree(proj, ignore_errors=True)
+
+    # ---- interpreter selection, with stand-in interpreters on a private PATH -- #
+
+    @staticmethod
+    def _fake(bin_dir: Path, name: str, *, version_line: str, version_exit: int = 0,
+              run_exit: int = 0, log: Path | None = None, tag: str = "") -> None:
+        """A stand-in `python3`/`python`: `-V` prints `version_line`; anything
+        else logs `tag` plus the first stdin line to `log` and exits `run_exit`."""
+        script = (
+            "#!/bin/sh\n"
+            'if [ "$1" = "-V" ] || [ "$2" = "-V" ]; then\n'   # `python -V` / `py -3 -V`
+            f"  echo '{version_line}'\n"
+            f"  exit {version_exit}\n"
+            "fi\n"
+            "IFS= read -r line\n"
+            f"echo '{tag}' >> '{log.as_posix() if log else '/dev/null'}'\n"
+            f"echo \"$line\" >> '{log.as_posix() if log else '/dev/null'}'\n"
+            f"exit {run_exit}\n"
+        )
+        path = bin_dir / name
+        path.write_text(script, encoding="utf-8", newline="\n")
+        path.chmod(0o755)
+
+    def test_handler_runs_once_and_its_exit_code_survives(self, tmp_path):
+        """The first working interpreter runs the handler; its exit 2 is the
+        launcher's; no later candidate is started."""
+        bin_dir, log = tmp_path / "bin", tmp_path / "calls.log"
+        bin_dir.mkdir()
+        self._fake(bin_dir, "python3", version_line="Python 3.99.0", run_exit=2,
+                   log=log, tag="python3-ran")
+        self._fake(bin_dir, "python", version_line="Python 3.99.0", run_exit=0,
+                   log=log, tag="WRONG-second-interpreter-ran")
+        payload = '{"tool_name":"Write","tool_input":{"file_path":"x"}}'
+        proc = _run_configured("PreToolUse", tmp_path, payload + "\n", path=str(bin_dir))
+        assert proc.returncode == 2, (proc.returncode, proc.stdout, proc.stderr)
+        assert log.read_text(encoding="utf-8").splitlines() == ["python3-ran", payload]
+
+    def test_store_stub_and_python2_are_skipped(self, tmp_path):
+        """A python3 that only opens the Store (non-zero `-V`) and a Python 2
+        `python` are passed over."""
+        bin_dir, log = tmp_path / "bin", tmp_path / "calls.log"
+        bin_dir.mkdir()
+        self._fake(bin_dir, "python3", version_line="Python was not found; run without "
+                   "arguments to install from the Microsoft Store", version_exit=49,
+                   log=log, tag="WRONG-stub-ran")
+        self._fake(bin_dir, "python", version_line="Python 2.7.18", log=log,
+                   tag="WRONG-python2-ran")
+        self._fake(bin_dir, "py", version_line="Python 3.99.0", log=log, tag="py-ran")
+        proc = _run_configured("PreToolUse", tmp_path, "payload\n", path=str(bin_dir))
+        assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+        assert log.read_text(encoding="utf-8").splitlines() == ["py-ran", "payload"]
+
+    def test_no_usable_interpreter_is_a_non_blocking_error_not_a_block(self, tmp_path):
+        bin_dir = tmp_path / "bin"
+        bin_dir.mkdir()
+        self._fake(bin_dir, "python", version_line="Python 2.7.18")
+        proc = _run_configured("PreToolUse", tmp_path, "{}", path=str(bin_dir))
+        assert proc.returncode == 1, (proc.returncode, proc.stdout, proc.stderr)
+        assert "no Python 3 interpreter" in proc.stderr

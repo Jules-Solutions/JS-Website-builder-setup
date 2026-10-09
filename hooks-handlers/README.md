@@ -29,13 +29,40 @@ and agents use to collaborate and to keep the project's records:
 
 ## Invocation
 
-The handlers are invoked by Claude Code at the registered hook events. The
-`hooks/hooks.json` file uses `python3` as the interpreter and resolves the
-script via `${CLAUDE_PLUGIN_ROOT}/hooks-handlers/<name>.py`.
+The handlers are invoked by Claude Code at the registered hook events, through
+the launcher `run.sh`. Each command in `hooks/hooks.json` is
 
-`${CLAUDE_PLUGIN_ROOT}` resolves to the plugin's installed directory at runtime.
-`python3` must be available on the user's PATH. The handlers are pure-stdlib
-Python — no third-party dependencies.
+```
+sh "${CLAUDE_PLUGIN_ROOT}/hooks-handlers/run.sh" "${CLAUDE_PLUGIN_ROOT}/hooks-handlers/<name>.py"
+```
+
+`${CLAUDE_PLUGIN_ROOT}` resolves to the plugin's installed directory at runtime
+(forward-slash form on Windows, where Claude Code runs shell-form hooks through
+Git Bash). The handlers are pure-stdlib Python — no third-party dependencies.
+
+### Why a launcher (and not `python3 X || python X || py X`)
+
+A hook reads its payload from stdin exactly once, and a non-zero exit is how a
+PreToolUse handler says BLOCK (exit 2). With an `||` chain, that exit 2 made the
+shell start the next interpreter on the already-consumed stdin; it read an empty
+payload, allowed the call and exited 0, so the block never reached Claude Code.
+`run.sh` instead chooses ONE interpreter first (the first of `python3`, `python`,
+`py -3` whose `-V` prints `Python 3.x`, which also skips a Windows Store alias stub
+and a Python 2 `python`), then `exec`s it. The handler runs exactly once; its
+stdin, stdout, stderr and exit code are the hook's. With no usable interpreter
+it exits 1 (a non-blocking hook error: the tool still runs), never 2.
+
+Do not put a `||` fallback back into `hooks.json`; `tests/test_pre_tool_use.py`
+(`TestConfiguredHookLauncher`) fails if you do.
+
+### What the PreToolUse handler returns
+
+BLOCK: stdout JSON `{"hookSpecificOutput": {"hookEventName": "PreToolUse",
+"permissionDecision": "deny", "permissionDecisionReason": "..."}, "systemMessage":
+"..."}`, the same reason on stderr, exit 2. Claude Code 2.1.295 ignored the deny
+JSON when `hookEventName` and `permissionDecisionReason` were missing. ALLOW:
+silent, or `{"systemMessage": "<advisory>"}`; never a `permissionDecision`,
+because `allow` auto-approves the call past the user's permission prompt.
 
 ## Hook contract
 
