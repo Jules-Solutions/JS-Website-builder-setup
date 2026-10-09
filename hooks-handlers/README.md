@@ -11,6 +11,22 @@
 | `session_start.py` | `SessionStart` | (none — fires every session) | Detects entry mode (5 modes per locked decision 15) on a fresh project, or surfaces current phase + project state on a mid-flight project. Output is injected into the agent's session context. |
 | `pre_tool_use.py` | `PreToolUse` | `Edit\|Write\|MultiEdit\|Bash` | Anti-skip gating against the current phase's exit criteria. v0.1 minimal — permissive when phase contracts (Phase 2 deliverable) are absent. |
 
+## What the PreToolUse gate does and does not gate
+
+The gate refuses a forward-skip into building or deploying the SITE. It does not touch the files people
+and agents use to collaborate and to keep the project's records:
+
+- **Writes** (Write / Edit / MultiEdit) to `comms/`, `docs/`, `CLAUDE.md`, `README.md` and `.claude/`, plus
+  any entry in `project.yaml.gate_exempt_paths`, are class `meta-write`: allowed at every phase, silently.
+  `gate_exempt_defaults: false` drops the built-in entries. Schema: `state/README.md` § `project.yaml`.
+  Paths are resolved (absolute or relative, either slash, `..` collapsed) before they are matched, so
+  `comms/../src/app/page.tsx` is a code write.
+- **`git`** commands (`git add`, `git commit`, `git push`, ...) are never build-deploy, whatever their
+  arguments say (a commit message may mention "vercel"). A deploy chained after git still is one:
+  `git commit -m x && vercel --prod` is blocked. The gate that keeps site code out of a push is code-write
+  (the editor tools cannot create site files before phase 18); the hook is a discipline aid, not a sandbox,
+  and does not inspect what a `git push` carries.
+
 ## Invocation
 
 The handlers are invoked by Claude Code at the registered hook events. The

@@ -79,10 +79,23 @@ component_library: shadcn      # shadcn | radix | headless-ui | custom | none
 # Localisation (written at phase 4 exit if multilingual)
 default_language: en
 languages: [en, de]
+
+# Gate exemptions (optional; read by the PreToolUse anti-skip hook)
+gate_exempt_paths: [notes, assets/drafts]
+gate_exempt_defaults: true
 ```
 
 **Required at bootstrap:** `name`, `slug`, `started_at`, `entry_mode`, `current_phase: 1`.
 All other fields are added progressively by their authoring phase.
+
+**Gate exemptions.** The PreToolUse hook gates writes to *site* files (code) until phase 18. Writes to
+collaboration and project-meta files are never gated, at any phase: by default `comms/`, `docs/`,
+`CLAUDE.md`, `README.md` and `.claude/` (see `DEFAULT_GATE_EXEMPT_PATHS` in `hooks-handlers/pre_tool_use.py`).
+`gate_exempt_paths` adds project-specific entries; `gate_exempt_defaults: false` drops the built-in ones
+(for a site that is published from `docs/`, say). Entries are project-root-relative, forward-slash, no
+wildcards; an entry matches that path and everything under it (`notes` matches `notes/idea.md`; `CLAUDE.md`
+matches only the root file). Accepted spellings: an inline list (`[a, b]`) or a block list (indented or not).
+An entry that would cover the whole project (`.`, `/`, `..`) is ignored.
 
 ---
 

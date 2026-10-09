@@ -33,6 +33,12 @@ specified; not re-derived:
 4. Decision logic:
    - No `.website-builder/project.yaml` → silent ALLOW (pre-bootstrap; the
      bootstrap skill itself needs Write/Bash to scaffold).
+   - Write/Edit/MultiEdit to a gate-exempt path (collaboration and project-meta
+     files: `comms/`, `docs/`, `CLAUDE.md`, `README.md`, `.claude/`, plus the
+     project's own `gate_exempt_paths`) → class `meta-write`, silent ALLOW at
+     EVERY phase. The gate exists to stop a forward-skip into building the
+     SITE; the files two collaborators use to talk to each other and to record
+     the project are not the site. See `DEFAULT_GATE_EXEMPT_PATHS`.
    - `project.yaml` present but `current_phase` missing/unreadable →
      soft-ALLOW + advisory notice.
    - Tool-class in PHASE_TOOL_POLICY[current_phase] → ALLOW.
@@ -75,6 +81,7 @@ from __future__ import annotations
 
 import json
 import os
+import posixpath
 import re
 import sys
 from pathlib import Path
@@ -131,6 +138,68 @@ def read_scalar_yaml(path: Path) -> dict:
             raw_value = raw_value[1:-1]
         parsed[key] = raw_value
     return parsed
+
+
+def _strip_yaml_comment(raw: str) -> str:
+    """Drop a trailing ` # comment` that is not inside a quoted value."""
+    if not raw.startswith(("'", '"')) and " #" in raw:
+        return raw.split(" #", 1)[0].strip()
+    return raw
+
+
+def _unquote(raw: str) -> str:
+    raw = raw.strip()
+    if len(raw) >= 2 and raw[0] in ("'", '"') and raw[-1] == raw[0]:
+        return raw[1:-1]
+    return raw
+
+
+def read_yaml_list(path: Path, key: str) -> list[str]:
+    """Read one top-level list-valued key of a YAML file as a list of strings.
+
+    `read_scalar_yaml` skips list entries on purpose (nothing else here needs
+    them), so a list-valued key needs this companion. It reads exactly one key
+    and accepts the shapes a `project.yaml` carries a list in:
+
+        key: [a, b, "c d"]       inline flow list (wb-bootstrap's hand emitter)
+        key:                     indented block list
+          - a
+        key:                     unindented block list (PyYAML `safe_dump`,
+        - a                      which wb-bootstrap uses when PyYAML is present)
+
+    A bare scalar (`key: a`) reads as a one-item list. Missing file, missing
+    key, or an unreadable file → []. Items that contain a comma are not
+    supported in the inline form (use the block form).
+    """
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return []
+    for idx, line in enumerate(lines):
+        if not line or line.startswith((" ", "\t", "#", "-")) or ":" not in line:
+            continue
+        name, _, raw = line.partition(":")
+        if name.strip() != key:
+            continue
+        raw = _strip_yaml_comment(raw.strip())
+        if raw:
+            if raw.startswith("[") and raw.endswith("]"):
+                parts = raw[1:-1].split(",")
+            else:
+                parts = [raw]
+            return [p for p in (_unquote(x) for x in parts) if p]
+        items: list[str] = []
+        for nxt in lines[idx + 1:]:
+            stripped = nxt.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            if stripped != "-" and not stripped.startswith("- "):
+                break
+            item = _unquote(_strip_yaml_comment(stripped[1:].strip()))
+            if item:
+                items.append(item)
+        return items
+    return []
 
 
 def read_project_state(root: Path) -> dict:
@@ -253,7 +322,34 @@ CODE_EXTENSIONS: frozenset[str] = frozenset({
     ".md", ".mdx",
 })
 
+# Collaboration and project-meta paths the gate never touches: a write to one
+# of these is class `meta-write` and is allowed at every phase. They are the
+# files people and agents use to talk to each other and to keep the project's
+# records (a message file per exchange under comms/, STATE/BACKLOG/log under
+# docs/, agent instructions in CLAUDE.md and .claude/); none of them is the
+# SITE, so writing them is never a forward-skip into building it.
+#
+# Entries are project-root-relative, forward-slash. An entry matches the path
+# itself and everything under it (`docs` matches `docs/STATE.md`;
+# `CLAUDE.md` matches only the root CLAUDE.md). A project adds its own entries
+# with `gate_exempt_paths` in `.website-builder/project.yaml`, and drops these
+# defaults with `gate_exempt_defaults: false` (a site published from `docs/`,
+# say, must keep that folder gated).
+DEFAULT_GATE_EXEMPT_PATHS: tuple[str, ...] = (
+    "comms",
+    "docs",
+    "CLAUDE.md",
+    "README.md",
+    ".claude",
+)
+GATE_EXEMPT_PATHS_KEY = "gate_exempt_paths"
+GATE_EXEMPT_DEFAULTS_KEY = "gate_exempt_defaults"
+
 # Bash command verbs that mean build / package / deploy (build-deploy class).
+# `git` is deliberately NOT here: version control carries project records and
+# collaboration messages (`git add`, `git commit`, `git push` of a comms
+# message must work at phase 1), and the SITE-side gate is code-write, which
+# stops the agent producing site code to push in the first place.
 BUILD_DEPLOY_RE = re.compile(
     r"(?:^|[\s;&|])(?:"
     r"(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?build"
@@ -261,11 +357,13 @@ BUILD_DEPLOY_RE = re.compile(
     r"|(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?(?:deploy|preview|start)"
     r"|vercel\b|wrangler\b|netlify\b"
     r"|gh\s+[\w-]*\s*deploy|docker\b"
-    r"|git\s+push"
     r"|payload\s+migrate"
     r")",
     re.IGNORECASE,
 )
+
+# A shell segment that is a git invocation (optional leading VAR=value words).
+_GIT_SEGMENT_RE = re.compile(r"^(?:\w+=\S*\s+)*git(?:\.exe)?(?:\s|$)", re.IGNORECASE)
 
 # Bash command verbs that are benign inventory/inspection (always-broad class):
 # ls, file, du, mkdir, cp, mv, cat, dig, whois, curl-read, identify, exiftool,
@@ -276,7 +374,10 @@ BUILD_DEPLOY_RE = re.compile(
 
 # Tool classes (the vocabulary PHASE_TOOL_POLICY is keyed on):
 #   "state-write"   — Write/Edit/MultiEdit targeting a path under .website-builder/
-#   "code-write"    — Write/Edit/MultiEdit targeting a code/source path outside
+#   "meta-write"    — Write/Edit/MultiEdit targeting a gate-exempt collaboration
+#                      or project-meta path (DEFAULT_GATE_EXEMPT_PATHS + the
+#                      project's gate_exempt_paths); allowed at every phase
+#   "code-write"    — Write/Edit/MultiEdit targeting any other path outside
 #                      .website-builder/ (the phase-18-gated class)
 #   "build-deploy"  — Bash whose command matches build/deploy/package verbs
 #   "benign-bash"   — any other Bash (inventory/inspection/audit shell)
@@ -320,8 +421,154 @@ def _bash_command(tool_input: dict) -> str:
     return ""
 
 
-def classify_tool(tool_name: str, tool_input: dict) -> tuple[str, str]:
+def _split_shell_segments(cmd: str) -> list[str]:
+    """Split a shell command line into its simple commands.
+
+    Splits on `;`, `&`, `|` and newlines that are outside quotes, so a quoted
+    argument (a commit message, a heredoc inside `$(...)`) stays inside the
+    segment it belongs to. Heuristic, not a shell parser: it is enough to tell
+    `git commit -m "…"` apart from `git commit -m "…" && vercel --prod`.
+    """
+    segments: list[str] = []
+    buf: list[str] = []
+    quote = ""
+    i = 0
+    while i < len(cmd):
+        ch = cmd[i]
+        if ch == "\\" and quote != "'" and i + 1 < len(cmd):
+            buf.append(cmd[i:i + 2])
+            i += 2
+            continue
+        if quote:
+            if ch == quote:
+                quote = ""
+            buf.append(ch)
+        elif ch in ("'", '"'):
+            quote = ch
+            buf.append(ch)
+        elif ch in ";&|\n":
+            segments.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+        i += 1
+    segments.append("".join(buf))
+    return [s.strip() for s in segments if s.strip()]
+
+
+def is_build_deploy(cmd: str) -> bool:
+    """True if the Bash command runs a build / package / deploy verb.
+
+    A segment whose command is `git` is never build-deploy, whatever its
+    arguments say: a commit message that mentions "vercel" or "docker" is a
+    message. Every other segment is matched against BUILD_DEPLOY_RE, so a
+    deploy chained after git (`git commit … && vercel --prod`) still counts.
+    """
+    for segment in _split_shell_segments(cmd):
+        if _GIT_SEGMENT_RE.match(segment):
+            continue
+        if BUILD_DEPLOY_RE.search(segment):
+            return True
+    return False
+
+
+def _clean_exempt_entry(entry: str) -> str | None:
+    """Normalize one gate-exempt entry to a root-relative forward-slash path.
+
+    Returns None for an entry that must not be honored: empty, absolute, or
+    one that resolves to the project root or outside it (`.`, `./`, `..`,
+    `/`) — such an entry would exempt the whole project and switch the gate
+    off.
+    """
+    e = entry.strip().replace("\\", "/")
+    if not e or e.startswith("/") or re.match(r"^[A-Za-z]:", e):
+        return None
+    e = posixpath.normpath(e)
+    if e == "." or e == ".." or e.startswith("../"):
+        return None
+    return e
+
+
+def effective_exempt_paths(project: dict, root: Path) -> tuple[str, ...]:
+    """The gate-exempt entries in force for this project.
+
+    `project` is the scalar dict from `read_project_state`; the list-valued
+    `gate_exempt_paths` is read from the same file with `read_yaml_list`.
+    """
+    entries: list[str] = []
+    defaults_off = str(project.get(GATE_EXEMPT_DEFAULTS_KEY, "")).strip().lower() in (
+        "false", "no", "off", "0",
+    )
+    if not defaults_off:
+        entries.extend(DEFAULT_GATE_EXEMPT_PATHS)
+    entries.extend(
+        read_yaml_list(state_dir(root) / "project.yaml", GATE_EXEMPT_PATHS_KEY)
+    )
+    cleaned = (_clean_exempt_entry(e) for e in entries)
+    return tuple(dict.fromkeys(e for e in cleaned if e))
+
+
+def _real_posix(path: str) -> str:
+    """`os.path.realpath` as a forward-slash string (falls back to a lexical
+    normalize if the OS refuses the path). realpath resolves `..`, symlinks and
+    junctions, Windows 8.3 short names and on-disk case, none of which a prefix
+    test on the raw strings would see; it works for a path that does not exist
+    yet, which a Write target usually is."""
+    try:
+        return os.path.realpath(path).replace("\\", "/")
+    except (OSError, ValueError):
+        return posixpath.normpath(path.replace("\\", "/"))
+
+
+def project_relative(target: str, root: Path) -> str | None:
+    """Project-root-relative, forward-slash form of a write target, or None.
+
+    CC hands Write/Edit an ABSOLUTE `file_path` (`C:\\proj\\comms\\x.md`); a
+    relative one (`comms/x.md`, `.\\comms\\x.md`) is read against `root`. Both
+    are resolved before any prefix test, so `comms/../src/app/page.tsx` is the
+    `src/` file it names, not a comms file. None when the target is not under
+    `root`.
+    """
+    t = target.strip().replace("\\", "/")
+    if not t:
+        return None
+    base = root.as_posix()
+    absolute = t.startswith("/") or re.match(r"^[A-Za-z]:/", t)
+    real_t = _real_posix(t if absolute else f"{base}/{t}")
+    real_base = _real_posix(base)
+    # Windows paths are case-insensitive; POSIX ones are not.
+    fold = str.lower if os.name == "nt" else (lambda s: s)
+    prefix = real_base.rstrip("/") + "/"
+    if not fold(real_t).startswith(fold(prefix)):
+        return None
+    return real_t[len(prefix):] or None
+
+
+def is_gate_exempt(target: str, root: Path | None, exempt: tuple[str, ...]) -> bool:
+    """True if the write target is under one of the gate-exempt entries.
+
+    Without a `root` nothing can be anchored, so nothing is exempt.
+    """
+    if root is None:
+        return False
+    rel = project_relative(target, root)
+    if rel is None:
+        return False
+    return any(rel == e or rel.startswith(e + "/") for e in exempt)
+
+
+def classify_tool(
+    tool_name: str,
+    tool_input: dict,
+    *,
+    root: Path | None = None,
+    exempt: tuple[str, ...] = DEFAULT_GATE_EXEMPT_PATHS,
+) -> tuple[str, str]:
     """Map a PreToolUse payload to (tool_class, target_kind).
+
+    `root` is the project root (needed to recognize an absolute write target as
+    inside the project) and `exempt` the gate-exempt entries in force; both
+    only matter for write-family tools.
 
     Total + defensive: an unknown tool returns ("unknown", "") which the policy
     authorizes broadly (never crash, never spuriously block an unrecognized
@@ -343,6 +590,10 @@ def classify_tool(tool_name: str, tool_input: dict) -> tuple[str, str]:
         # write or an ambiguous case we should not punish with a block).
         if not target:
             return ("state-write", "")
+        # Collaboration / project-meta files (comms/, docs/, CLAUDE.md, …) are
+        # not the site: never gated.
+        if is_gate_exempt(target, root, exempt):
+            return ("meta-write", target)
         ext = ""
         m = re.search(r"(\.[A-Za-z0-9]+)$", target.replace("\\", "/"))
         if m:
@@ -358,7 +609,7 @@ def classify_tool(tool_name: str, tool_input: dict) -> tuple[str, str]:
     # --- bash-family ------------------------------------------------------- #
     if name == "Bash" or lname in ("bash", "shell", "sh"):
         cmd = _bash_command(tool_input)
-        if cmd and BUILD_DEPLOY_RE.search(cmd):
+        if cmd and is_build_deploy(cmd):
             return ("build-deploy", cmd)
         return ("benign-bash", cmd)
 
@@ -416,7 +667,7 @@ def classify_tool(tool_name: str, tool_input: dict) -> tuple[str, str]:
 # unioned in. Each phase notes the contract filename it was curated from.
 
 _ALWAYS = frozenset({
-    "state-write", "ask", "read", "web", "context7",
+    "state-write", "meta-write", "ask", "read", "web", "context7",
     "benign-bash", "mcp-other", "unknown",
 })
 
@@ -488,7 +739,7 @@ PHASE_TOOL_POLICY: dict[str, frozenset[str]] = {
 # agent from silently mutating state, not from advancing — and has NO
 # `## Skip authorization` section because it is re-runnable, not skippable).
 SIDE_CHANNEL_CLASSES: frozenset[str] = frozenset({
-    "state-write", "ask", "read", "web", "context7",
+    "state-write", "meta-write", "ask", "read", "web", "context7",
     "benign-bash", "playwright", "mcp-other", "unknown",
 })
 
@@ -664,7 +915,19 @@ def decide(
     raw_phase = project.get("current_phase")
     phase = normalize_phase(raw_phase)
 
-    tool_class, target = classify_tool(tool_name, tool_input)
+    tool_class, target = classify_tool(
+        tool_name,
+        tool_input,
+        root=root,
+        exempt=effective_exempt_paths(project, root),
+    )
+
+    # (g) Collaboration / project-meta write (comms/, docs/, CLAUDE.md, …):
+    #     never gated, at any phase, and never worth an advisory — not even the
+    #     "current_phase unreadable" one below (a fresh bootstrap leaves
+    #     current_phase: 0, which does not normalize to a pipeline phase).
+    if tool_class == "meta-write":
+        return (True, "")
 
     # (b) State dir exists but current_phase missing/unreadable → soft-ALLOW
     #     with an advisory notice (the bootstrap skill can reconcile later).
